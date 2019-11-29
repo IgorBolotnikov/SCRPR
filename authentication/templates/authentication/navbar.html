@@ -1,0 +1,27 @@
+{% load i18n %}
+{% load static %}
+
+<label id="burger_click" class="burger_button" for="toggle">
+  <div id="burger_touch" class="burger_container">
+    <div class="line1"></div>
+    <div class="line2"></div>
+    <div class="line3"></div>
+  </div>
+</label>
+<input id="toggle" type="checkbox" name="">
+<div class="navbar">
+  <div class="navbar_container">
+    <a class="navbutton logo" href="{% url 'scrpr:index' %}">SCRPR</a>
+    <ul class="navbar_list">
+      <li><a class="navbutton" href="{% url 'scrpr:news' %}">{% trans 'News' %}</a></li
+      ><li><a class="navbutton first_item" href="{% url 'scrpr:games' %}">{% trans 'Games' %}</a></li
+      ><li><a class="navbutton second_item" href="{% url 'scrpr:jobs' %}">{% trans 'Jobs' %}</a></li
+      ><li><a class="navbutton third_item" href="{% url 'scrpr:freelance' %}">{% trans 'Freelance' %}</a></li
+      >{% if user.is_authenticated %}<li><a class="navbutton" href="{% url 'scrpr:favorites_list' %}">{% trans 'My Account' %}</a></li
+        ><li><a class="navbutton" href="{% url 'scrpr:logout' %}?next={% url 'scrpr:index' %}">{% trans 'Log Out' %}</a></li
+      >{% else %}<li><a class="navbutton" href="{% url 'authentication:login' %}?next={% url 'scrpr:index' %}">{% trans 'Log In' %}</a></li
+      ><li><a class="navbutton" href="{% url 'authentication:register' %}?next={% url 'scrpr:index' %}">{% trans 'Register' %}</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,532 @@
+/* Notes:
+    1. Alternative layout
+    activates in to instances:
+    if the screen width is <= 500px and
+    if the screen height is <= 500px.
+    They are independent from each other.*/
+
+
+/* ======================
+===== GENERAL STYLE =====
+====================== */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: #333;
+  line-height: 1.6em;
+  margin: auto;
+}
+
+button {
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.alert {
+  display: block;
+  font-size: 18px;
+  border: 1px solid grey;
+  padding: .5em;
+  border-radius: .5em;
+  width: 520px;
+  margin: 20px auto;
+}
+
+.success {
+  color: rgb(1, 150, 1);
+  background-color: rgba(1, 150, 1, 0.1);
+  border-color: rgb(1, 150, 1);
+}
+
+.error {
+  color: rgb(150, 1, 1);
+  background-color: rgba(150, 1, 1, 0.1);
+  border-color: rgb(150, 1, 1);
+}
+
+.warning {
+  color: rgb(150, 150, 1);
+  background-color: rgba(150, 150, 1, 0.1);
+  border-color: rgb(150, 150, 1);
+}
+
+.info {
+  color: rgb(1, 1, 150);
+  background-color: rgba(1, 1, 1, 0.150);
+  border-color: rgb(1, 1, 150);
+}
+
+.error_message_container {
+  margin: 0 30px;
+}
+
+.error_message {
+  font-size: 10px;
+  color: rgb(200, 1, 1);
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ======================
+===== STICKY NAVBAR =====
+====================== */
+
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.navbar {
+  z-index: 1;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  background: #333333;
+  display: block;
+  overflow-y: visible;
+}
+
+.navbar ul {
+  visibility: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  width: 100%;
+  height: 60px;
+}
+
+.navbar li {
+  display: inline-block;
+  margin: 0px 3%;
+}
+
+.navbar a {
+  font-size: 18px;
+  padding: 0.5em;
+  text-decoration: none;
+  border-radius: 0.5em;
+  color: rgba(255, 255, 255);
+  transition: background-color 0.2s;
+}
+
+.navbar a:hover {
+  background-color: grey;
+}
+
+#toggle {
+  display: none;
+}
+
+.burger-button {
+  color: white;
+  display: block;
+  display: none;
+}
+
+/* ======================
+===== EVERY SECTION =====
+====================== */
+
+section {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  width: 100%;
+  height: auto;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+section h1 {
+  font-size: 3.0em;
+  vertical-align: top;
+  padding: 1em 0px 1em 0px;
+}
+
+.lists {
+  width: 60%;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  list-style: none;
+  justify-content: center;
+}
+
+.lists li {
+  display: inline-block;
+  margin: 1.0em;
+}
+
+/* ==================
+===== HOME PAGE =====
+================== */
+
+#home {
+  height: calc(100vh - 60px);
+  min-height: 500px;
+}
+
+.home-info {
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.name {
+  line-height: 1.2;
+  font-weight: bold;
+  font-size: 2.5em;
+  padding-top: 1.0em;
+}
+
+.rank {
+  line-height: 1.2;
+  font-size: 2.0em;
+  padding-top: 0.5em;
+  padding-bottom: 1.0em;
+}
+
+.icon {
+  display: block;
+  filter: invert(1);
+  height: 30px;
+  width: 30px;
+}
+
+.icon-bg {
+  padding: 12px;
+  border: 0px solid #333333;
+  background-color: #333333;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.icon-bg:hover {
+  background-color: grey;
+}
+
+.resume_container {
+  background-color: #333333;
+  display: flex;
+  border-radius: 10px;
+  margin: 10px auto 40px auto;
+}
+
+.resume_link {
+  padding: .5em;
+  width: 2em;
+  height: 1.5em;
+  color: white;
+  margin: auto;
+  transition: background-color 0.2s;
+}
+
+.first_link {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.second_link {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.resume_link:hover {
+  background-color: grey;
+}
+
+.separator {
+  width: 1px;
+  background-color: grey;
+}
+
+/* ===================
+===== ABOUT PAGE =====
+=================== */
+
+#about {
+  padding-bottom: 100px;
+}
+
+.about-info {
+  padding-bottom: .5em;
+}
+
+.technologies li {
+  border: 1px solid #333333;
+  border-radius: 0.5em;
+  padding: 0.1em 0.5em;
+}
+
+/* ======================
+===== PROJECTS PAGE =====
+====================== */
+
+.projects-container {
+  padding-bottom: 100px;
+}
+
+.projects-item {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  border-bottom: 1px solid #333333;
+  padding: 20px 0px 20px 0px;
+}
+
+.projects-item:last-child {
+  border-bottom: None;
+}
+
+.projects-graphic-part {
+  padding-right: 20px;
+}
+
+.projects-image {
+  border: 3px solid #333333;
+  border-radius: 11%;
+  transition: border-color 0.2s;
+  transition: transform 0.2s;
+}
+
+.projects-image:hover {
+  border-color: grey;
+  transform: scale(1.03);
+}
+
+.projects-button {
+  width: 150px;
+  text-align: center;
+  margin-bottom: 5px;
+  color: rgb(255, 255, 255);
+  background-color: #333333;
+  border: 0px solid #333333;
+  border-radius: 0.5em;
+  padding: .5em;
+  line-height: 1.0;
+  transition: background-color 0.2s;
+}
+
+.projects-header {
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: left;
+  padding-bottom: 0.5em;
+}
+
+.projects-header a {
+  text-decoration: none;
+  color: #333333;
+  transition: color 0.2s;
+}
+
+.projects-header a:hover {
+  color: grey;
+}
+
+.projects-description {
+  text-align: left;
+}
+
+.projects-button:hover {
+  background-color: grey;
+}
+
+/* =====================
+===== CONTACT PAGE =====
+===================== */
+
+.contact-text {
+  margin-top: .15em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+}
+
+.message-form .contact-text {
+  color: white;
+}
+
+.message-form {
+  background-color: #333;
+  border: 1px solid #333;
+  border-radius: .5em;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+  max-width: 500px;
+}
+
+.field {
+  margin: .15em .3em;
+  width: calc(100%-1.0em);
+  font-size: 16px;
+  border: 1pt solid #333;
+  border-radius: .5em;
+  padding: .5em;
+}
+
+.field:first-child {
+  margin: 0px 0px 0px 0px;
+  display: inline-block;
+  clear: right;
+  width: calc(100% - 60px - 1.4em);
+}
+
+.field:last-child {
+  height: 9em;
+  margin-bottom: 0.3em;
+}
+
+.first-field {
+  margin: .3em .3em .15em .3em;
+  text-align: left;
+  display: block;
+}
+
+.submit {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: block;
+  float: right;
+  height: auto;
+  font-size: 16px;
+  width: 60px;
+  border: 1pt solid #ccc;
+  border-radius: .5em;
+  padding: .5em 0em;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #333333;
+  transition: background-color 0.2s;
+}
+
+.submit:hover {
+  cursor: pointer;
+  background-color: grey;
+  border-color: grey;
+}
+
+
+/* ======================
+===== MEDIA QUERIES =====
+====================== */
+
+
+@media (max-width: 500px) {
+
+/* ===== ALT ALL LISTS ===== */
+
+  .lists {
+    width: 90%;
+  }
+
+/* ===== ALT NAVBAR ===== */
+
+  .burger-button {
+    cursor: pointer;
+    vertical-align: middle;
+    display: block;
+    text-align: center;
+    width: 60px;
+    line-height: 60px;
+    font-size: 2.2em;
+    float: left;
+  }
+
+  .navbar ul {
+    overflow: hidden;
+    clear: left;
+    background-color: #333333;
+    margin-top: 60px;
+    display: block;
+    height: 0px;
+    transition: height 0.2s;
+  }
+
+  .navbar ul li {
+    height: 60px;
+    border-top: 1px solid #ccc;
+    padding: 0;
+    margin: 0;
+    display: flex;
+  }
+
+  .navbar a {
+    display: block;
+    padding: 0;
+    padding-top: 17px;
+    text-align: center;
+    height: 43px;
+    width: 100%;
+    border-radius: 0;
+    color: white;
+    font-size: 26px;
+  }
+
+  #toggle:checked + ul {
+    height: 244px;
+  }
+
+  .navbar ul li a:hover{
+    background-color: inherit;
+  }
+
+/* ===== ALT "HOME" PART ===== */
+
+
+
+/* ===== ALT "ABOUT" BAR ===== */
+
+  .projects-button {
+    margin-bottom: 10px;
+
+  }
+
+  .projects-header {
+    /* margin-top: 10px; */
+    text-align: center;
+  }
+
+/* ===== ALT "PROJECTS" PART ===== */
+
+  .projects-item {
+    display: block;
+  }
+
+  .projects-graphic-part {
+    padding-right: 0;
+  }
+
+/* ===== ALT "CONTACT" PART ===== */
+
+  .message-form {
+    width: 80%;
+  }
+}

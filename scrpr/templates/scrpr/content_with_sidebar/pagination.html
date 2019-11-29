@@ -1,0 +1,15 @@
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a class="pagination_button" href="?{% if params %}{{ params }}&{% endif %}page=1">&lang;&lang;</a>
+            <a class="pagination_button" href="?{% if params %}{{ params }}&{% endif %}page={{ page_obj.previous_page_number }}">&lang;</a>
+        {% endif %}
+        <span class="pagination_current_page">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+            <a class="pagination_button" href="?{% if params %}{{ params }}&{% endif %}page={{ page_obj.next_page_number }}">&rang;</a>
+            <a class="pagination_button" href="?{% if params %}{{ params }}&{% endif %}page={{ page_obj.paginator.num_pages }}">&rang;&rang;</a>
+        {% endif %}
+    </span>
+</div>

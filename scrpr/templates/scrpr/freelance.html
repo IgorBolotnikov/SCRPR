@@ -1,0 +1,41 @@
+{% extends 'scrpr/base.html' %}
+
+{% block content %}
+<form class="input_bar" method="POST">
+  {{ form.hidden_tag() }}
+  {{ form.scrape(class="scrape-bar scrape_bar--faded field", placeholder="Enter keywords here...") }}
+</form>
+<div class="search_results_header">
+  <span class="keywords_list">Results for keywords:</span>
+  <span class="keywords keywords_list">
+  {% if keywords %}
+    {% for keyword in keywords_list %}
+      "{{ keyword }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  {% else %}...{% endif %}
+  </span>
+</div>
+<div class="results_list">
+  <ul>
+    {% for result in results %}
+      <li class="list_item">
+        <div>
+          <a class="list_link" href="{{ result['source'] }}" target="_blank">From {{ result['source'] }}</a>
+        </div>
+        <div class="list_item_header">
+          <div class="header_container">
+            <a  class="list_link list_header" href="{{ result['link'] }}" target="_blank">{{ result['title'] }}</a>
+          </div>
+          <span class="list_salary">{% if result['salary_max'] %}{{ result['salary_max'] }} UAH{% endif %}</span>
+        </div>
+        <div class="list_location_employer">
+          <span class="list_location">{{ result['location'] }}</span>{% if result['employer'] %} | <span class='list_employer'>{{ result['employer'] }}</span>{% endif %}
+        </div>
+        <div class="list_body">
+          <p>{{ result['body'] }}</p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

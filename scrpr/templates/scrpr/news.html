@@ -1,0 +1,17 @@
+{% extends 'scrpr/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  <ul class="news_list">
+    {% for post in object_list %}
+      <li class="window">
+        <p class="posted_datetime">{% trans 'Posted on ' %}{{ post.datetime_posted }}</p>
+        <p class="post_title">{{ post.title }}</p>
+        <div class="post_body">
+          {{ post.body|safe }}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

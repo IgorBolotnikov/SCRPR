@@ -1,0 +1,19 @@
+{% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
+{% load i18n %}
+
+{% block sidebar %}
+  {% include 'scrpr/content_with_sidebar/account_sidebar.html' %}
+{% endblock %}
+{% block main_content %}
+  <div class="favorites_container window">
+    <form method="post">
+      {% csrf_token %}
+      <h2 class="favorites_header">{% trans 'Please confirm deletion.' %}</h2>
+      <br>
+      <div class="favorites_buttons">
+        <input type="submit" name="save" value="{% trans 'DELETE' %}" class="favorites_button big_button">
+        <a href="{% url 'scrpr:favorites_game' pk=object.id %}" class="favorites_button_redirect big_button">{% trans 'BACK' %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

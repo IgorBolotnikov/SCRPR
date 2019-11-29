@@ -1,0 +1,64 @@
+{% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block sidebar %}
+  <form method="POST" action="">
+    {% csrf_token %}
+    <div class="search_tab">
+      {{ form.title }}<input type="submit" class="search_button" value="">
+    </div>
+    <div class="filters_tab">
+      <button id="filters_button" type="button" name="button" class="big_button" onclick="openFilters()">{% trans 'Filters' %}</button>
+      {{ form.city }}
+      <div id="filters_list" class="filters_list window">
+        <h2 class="filter_header">{% trans 'Salary' %}</h2>
+        <div class="filter_field">
+          <label class="numeric_filter_label" for="id_salary_min">{{ form.salary_min.label }}</label>
+          {{ form.salary_min }}
+        </div>
+        <div class="filter_field">
+          <label class="numeric_filter_label"  for="id_salary_max">{{ form.salary_max.label }}</label>
+          {{ form.salary_max }}
+        </div>
+        <div class="filter_field">
+          {{ form.with_salary }}<label class="checkbox_label" for="id_with_salary">{{ form.with_salary.label }}</label>
+        </div>
+      </div>
+    </div>
+    {% if user.id %}
+      <div class="add_to_favorites_container">
+        <input type="submit" class="big_button save_to_favorites_button" name="save_to_favorites" value="{% trans 'Save to Favorites' %}">
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}
+{% block main_content %}
+  {% if not object_list %}
+    <h1 class="no_results">{% trans 'No results :(' %}</h1>
+  {% else %}
+    <ul class="window results_list_jobs">
+      {% for result in object_list %}
+        <li class="list_item">
+          <div>
+            <a class="list_link" href="{{ result.source }}" target="_blank">From {{ result.source }}</a>
+          </div>
+          <div class="list_item_header">
+            <div class="header_container">
+              <a  class="list_link list_header" href="{{ result.link }}" target="_blank">{{ result.title }}</a>
+            </div>
+            <span class="list_salary">{% if result.salary_min %}{{ result.salary_min|floatformat }} - {% endif %}{% if result.salary_max %}{{ result.salary_max|floatformat }} {{ result.currency }}{% endif %}</span>
+          </div>
+          <div class="list_location_employer">
+            <span class="list_location">{{ result.location }}</span>{% if result.employer %} | <span class='list_employer'>{{ result.employer }}</span>{% endif %}
+          </div>
+          <div class="list_body">
+            <p>{{ result.body|linebreaks }}</p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% include 'scrpr/content_with_sidebar/pagination.html' %}
+  {% endif %}
+<script src="{% static 'scrpr/jobs.js' %}"></script>
+{% endblock %}

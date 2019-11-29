@@ -1,0 +1,1553 @@
+/* ======================
+===== GENERAL STYLE =====
+====================== */
+
+/* Thank you Google for an amazing font for the logo! */
+@import url('https://fonts.googleapis.com/css?family=Livvic&display=swap');
+
+* {
+  font-family: Helvetica, Arial, sans-serif;
+  color: #444444;
+  text-decoration: none;
+  padding: 0px;
+  margin: 0px;
+  font-weight: 300;
+}
+
+body {
+  background-color: rgb(245, 245, 245);
+}
+
+input, textarea, select, option {
+  -webkit-border-radius: 0px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+::selection {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.field {
+  outline: none;
+  font-size: 20px;
+  border: 1px solid #cccccc;
+  padding: 0.5em;
+  transition: border-color 0.2s;
+  margin: 0px;
+}
+
+.field:focus {
+  border-color: grey;
+}
+
+/* ===============
+===== NAVBAR =====
+================== */
+
+#toggle {
+  display: none;
+}
+
+.burger_button {
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  display: block;
+  width: 60px;
+  height: 60px;
+}
+
+.burger_container {
+  width: 100%;
+  height: 100%;
+}
+
+.line1, .line2, .line3 {
+  width: 30px;
+  height: 4px;
+  background-color: white;
+  margin: 6px 18px 6px auto;
+  transition: 0.2s;
+}
+
+.line1 {
+  margin-top: 18px;
+}
+
+.change .line1 {
+  -webkit-transform: translate(0px, 10px) rotate(45deg) ;
+  transform: translate(0px, 10px) rotate(45deg) ;
+}
+
+.change .line2 {
+  opacity: 0;
+}
+
+.change .line3 {
+  -webkit-transform: translate(0px, -10px) rotate(-45deg) ;
+  transform: translate(0px, -10px) rotate(-45deg);
+}
+
+.navbar {
+  background-color: #ff4d4d;
+  box-shadow: #cccccc 0px 5px 5px;
+  overflow: hidden;
+  height: 60px;
+  transition: height 0.2s;
+}
+
+.friends {
+  display: none;
+  width: 0px;
+}
+
+.navbar_container {
+  display: block;
+  height: 60px;
+}
+
+.navbar_list {
+  padding: 0;
+  display: block;
+  height: auto;
+}
+
+.navbar_list li {
+  height: 60px;
+}
+
+.navbar_list li a {
+  display: block;
+  line-height: 1.0;
+}
+
+.navbar_container li {
+  display: block;
+}
+
+#toggle:checked + .navbar {
+  height: 420px;
+}
+
+.navbutton {
+  color: white;
+  font-size: 20px;
+  padding: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.navbutton:hover {
+  background-color: white;
+  color: #ff4d4d;
+}
+
+.logo {
+  display: inline-block;
+  left: 0;
+  font-weight: normal;
+  line-height: 1.0;
+  padding: 15px;
+  padding-right: 0;
+  font-size: 30px;
+  background-color: inherit;
+  font-family: 'Livvic', sans-serif;
+  color: white;
+  width: auto;
+}
+
+.logo:hover {
+  background-color: inherit;
+  color: white;
+}
+
+.source_code {
+  font-family: monospace;
+  font-weight: normal;
+}
+
+/* ===============
+===== FOOTER =====
+=============== */
+
+.footer_container {
+  display: block;
+  background-color: #bbbbbb;
+  margin-top: 50px;
+}
+
+.footer_list {
+  width: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+  list-style: none;
+  padding: 10px 0;
+  margin: none;
+}
+
+.footer_list li {
+  display: inline-block;
+  margin: auto;
+  width: 100%;
+  text-align: center;
+}
+
+.footer_list_item {
+  width: 100%;
+  line-height: 2.0;
+  color: #ffffff;
+  transition: color 0.1s;
+}
+
+.footer_list_item:hover {
+  color: #ff4d4d;
+}
+
+.footer_lower {
+  background-color: #666666;
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  flex-direction: column;
+}
+
+.footer_lower p {
+  font-size: 12px;
+  color: #cccccc;
+  line-height: 1.5;
+}
+
+/* ========================
+===== CONTENT SECTION =====
+======================== */
+
+.pagination {
+  margin-top: 15px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination_current_page {
+  display: inline-block;
+  padding: .5em;
+  line-height: 1;
+  border: 1px solid #cccccc;
+  background-color: white;
+}
+
+.pagination_button {
+  display: inline-block;
+  border: 1px solid #ff4d4d;
+  padding: .5em;
+  width: 1.5em;
+  line-height: 1;
+  color: #ff4d4d;
+  background-color: white;
+  transition-property: background-color, color;
+  transition-duration: 0.2s, 0.2s;
+  text-align: center;
+}
+
+.pagination_button:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.filter_item {
+  padding: 10px 0px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.filter_item:first-of-type {
+  margin-top: 10px;
+}
+
+.filter_item:last-of-type {
+  border-bottom: none;
+}
+
+.checkbox {
+  height: 20px;
+  width: 20px;
+  border: 1px solid #cccccc;
+  border-radius: 50%;
+  transition-property: border-width, border-color;
+  transition-duration: 0.2s, 0.2s;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.checkbox_label {
+  padding-left: .5em;
+  font-size: 15px;
+  line-height: 1.0;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.checkbox:checked {
+  border-width: 6px;
+  border-color: #ff4d4d;
+}
+
+.cb_jobs:checked {
+  border-color: rgba(77, 210, 255, 0.7);
+}
+
+.cb_games:checked {
+  border-color: rgba(255, 77, 255, 0.7);
+}
+
+.cd_freelance:checked {
+  border-color: rgba(255, 210, 77, 0.7);
+}
+
+.window {
+  background-color: white;
+  box-shadow: #cccccc 0px 0px 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.big_button {
+  width: auto;
+  font-size: 20px;
+  padding: .5em;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  background-color: white;
+  transition: background-color, color;
+  transition: 0.2s, 0.2s;
+}
+
+.small_button {
+  width: auto;
+  font-size: 15px;
+  padding: .3em;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  background-color: white;
+  transition-property: background-color, color;
+  transition-duration: 0.2s, 0.2s;
+}
+
+.big_button:hover, .small_button:hover {
+  cursor: pointer;
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.no_results {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+/* ===== HOME PAGE ===== */
+
+.content_container {
+  margin: auto;
+  max-width: 1024px;
+  min-height: calc(100vh - 276px);
+}
+
+.main_page_first_section {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #ff4d4d;
+}
+
+.greeting_first {
+  color: white;
+  display: block;
+  font-size: 50px;
+  width: 100%;
+  padding-top: 120px;
+  padding-bottom: 30px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.greeting_second {
+  color: #ff4d4d;
+  display: block;
+  font-size: 50px;
+  width: 100%;
+  padding-top: 30px;
+  padding-bottom: 120px;
+  text-align: center;
+  font-weight: 600;
+  background-color: #222222;
+}
+
+.main_page_second_section {
+  background-color: white;
+  padding: 100px 0;
+  box-shadow: #cccccc 0px 0px 20px;
+}
+
+.features_container {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.features_header {
+  display: block;
+  text-align: center;
+  font-size: 30px;
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+  line-height: 2.0;
+  color: #222222;
+  font-weight: 400;
+}
+
+.features_list {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  list-style: none;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: #222222 0px 0px 10px;
+  width: 90%;
+  max-width: 300px;
+}
+
+.features_item {
+  margin: auto;
+  padding-top: 15px;
+  background-color: white;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.features_item:last-of-type {
+  margin-bottom: 0px;
+  border-bottom: none;
+}
+
+.features_item figcaption {
+  margin-top: 10px;
+  line-height: 1.0;
+  padding-bottom: .5em;
+  font-weight: bolder;
+  font-size: 20px;
+}
+
+.first_item {
+  color: rgb(77, 210, 77);
+}
+
+.first_item:hover {
+  color: rgb(77, 210, 77);
+}
+
+.second_item {
+  color: rgb(77, 210, 255);
+}
+
+.second_item:hover {
+  color: rgb(77, 210, 255);
+}
+
+.third_item {
+  color: rgb(255, 210, 77);
+}
+
+.third_item:hover {
+  color: rgb(255, 210, 77);
+}
+
+.websites_list {
+  margin: 10px;
+  list-style: none;
+  display: block;
+}
+
+.websites_list_item {
+  display: block;
+  margin: 10px;
+  font-size: 18px;
+}
+
+.main_page_third_section {
+  background-color: #222222;
+  display: block;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.paragraph {
+  text-align: center;
+  color: #ff4d4d;
+  font-size: 26px;
+  font-weight: bolder;
+  margin: 30px;
+}
+
+.paragraph:first-of-type {
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ff4d4d;
+}
+
+.to_do_list {
+  margin: 60px;
+}
+
+.to_do_list_item {
+  font-size: 20px;
+  color: white;
+  margin: 20px 0px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid white;
+}
+
+.to_do_list_item:last-of-type {
+  border-bottom: none;
+}
+
+.main_page_forth_section {
+  background-image: url('gears.svg');
+  background-color: rgba(255, 255, 255, 0.95);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-blend-mode: lighten;
+  display: block;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  margin-bottom: -50px;
+}
+
+.big_text {
+  font-weight: 600;
+  text-align: center;
+  margin: 50px 20px;
+}
+
+.emphasized {
+  font-weight: 600;
+  font-style: normal;
+  color: #ff4d4d;
+}
+
+/* ===== NEWS PAGE ===== */
+
+.news_list {
+  display: block;
+  padding: 15px;
+  list-style: none;
+  width: calc(100% - 30px);
+  max-width: 500px;
+  margin: auto;
+}
+
+.posted_datetime {
+  font-size: 13px;
+  color: #bbbbbb;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 5px;
+}
+
+.post_title {
+  color: #ff4d4d;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.post_body {
+  padding-top: 5px;
+}
+
+.post_body p {
+  margin: 10px 0px;
+}
+
+.post_body ul {
+  margin: 0px 30px;
+}
+
+.post_body li {
+  margin: 10px 0px;
+}
+
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+  max-width: 752px;
+  display: block;
+  margin: 0px auto 20px auto;
+  padding-top: 15px;
+}
+
+/* ===== JOBS PAGE ===== */
+
+.search_field_jobs {
+  box-sizing: border-box;
+  height: 45px;
+  width: calc(100% - 45px - 30px);
+}
+
+.city_filter {
+  border-radius: 0px;
+  background-color: white;
+  display: block;
+  margin: 0;
+}
+
+.city_filter:focus {
+  border-color: #cccccc;
+}
+
+.city_inline {
+  border-left-width: 0px;
+  border-right-width: 0px;
+}
+
+.city_separate {
+  display: inline-flex;
+  margin-left: 15px;
+}
+
+.filter_field {
+  display: block;
+  margin: 10px;
+  width: calc(100% - 20px);
+  height: auto;
+}
+
+.filter_field:last-of-type {
+  margin-bottom: 20px;
+}
+
+.numeric_filter_label {
+  padding-left: 10px;
+  display: block;
+  min-width: 40px;
+  max-width: 184px;
+}
+
+.numeric_filter {
+  display: inline-block;
+  width: 184px;
+}
+
+.salary_filter {
+  display: inline-block;
+  width: 184px;
+}
+
+.search_button {
+  box-sizing: border-box;
+  display: inline-block;
+  height: 45px;
+  width: 45px;
+  background-color: white;
+  background-image: url("Img/Icons/search.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  border: 1px solid #cccccc;
+  transition-property: background-color, border-color;
+  transition: 0.2s, 0.2s;
+}
+
+.search_button:hover {
+  background-color: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
+.search_results_header {
+  line-height: 1.0;
+  margin: 20px auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  width: auto;
+}
+
+.keywords_list {
+  font-size: 20px;
+  width: calc(100% - 40px);
+}
+
+.keywords {
+  font-weight: 500;
+}
+
+.results_container {
+  display: block;
+  margin: 0px 15px;
+}
+
+.results_list_jobs {
+  margin: 0px;
+}
+
+.list_item {
+  display: block;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  height: auto;
+}
+
+.list_item:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.list_link {
+  color: grey;
+  font-size: 15px;
+  line-height: 1.0;
+  transition: color 0.2s;
+}
+
+.list_link:hover {
+  color: black;
+}
+
+.header_container {
+  font-size: 20px;
+  margin: .5em 0;
+}
+
+.list_header {
+  display: inline-block;
+  color: #8080ff;
+  font-size: 20px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.list_header:hover {
+  color: #1a1aff;
+}
+
+.list_salary {
+  display: block;
+  font-size: 20px;
+  color: #ff4d4d;
+}
+
+.list_location_employer {
+  display: block;
+  margin: .5em 0 .5em 0;
+  color: grey;
+}
+
+.list_location {
+  color: grey;
+}
+
+.list_employer {
+  font-weight: 500;
+}
+
+.list_body {
+  display: block;
+  line-height: 1.3;
+  font-weight: 100;
+  color: #404040;
+  word-wrap: break-word;
+}
+
+/* ===== GAMES PAGE ===== */
+
+.search_tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: auto;
+}
+
+.filters_tab {
+  display: block;
+  width: calc(100% - 30px);
+  margin: 15px auto;
+}
+
+.filters_list {
+  padding: 0 15px;
+  margin: 0px;
+  height: auto;
+  max-height: 0px;
+  overflow: hidden;
+  transition-property: margin, max-height;
+  transition-duration: 0.2s, 0.2s;
+}
+
+.filters_list.filters_open {
+  visibility: visible;
+  height: auto;
+  max-height: 800px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.filter_header {
+  line-height: 1.0;
+  color: #ff4d4d;
+  margin: 15px 0;
+  border-bottom: 1px solid #ff4d4d;
+}
+
+.search_field_games {
+  box-sizing: border-box;
+  height: 45px;
+  width: calc(100% - 45px - 30px);
+}
+
+.results_list_games {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: auto;
+  padding: 0;
+  margin: -5px;
+}
+
+.list_item_games {
+  display: block;
+  background-color: white;
+  margin: 5px;
+  height: 124px;
+  max-width: 356px;
+  width: calc(100% - 10px);
+  box-shadow: #cccccc 0px 0px 5px;
+}
+
+.list_link_gamebox {
+  height: 124px;
+  max-width: 356px;
+  width: calc(100%);
+  overflow: hidden;
+  display: flex;
+  transition: box-shadow 0.2s;
+}
+
+.list_link_gamebox:hover {
+  box-shadow: #ff4d4d 0px 0px 10px;
+}
+
+.game_image {
+  display: inline-block;
+  margin: 0px;
+  padding: 0px;
+  height: 124px;
+}
+
+.description_container_games {
+  margin: 0px;
+  display: inline-block;
+  max-width: 232px;
+  width: calc(100% - 15px);
+}
+
+.list_header_games {
+  display: block;
+  font-size: 15px;
+  color: black;
+  font-weight: 400;
+  line-height: 1.0;
+  max-width: 232px;
+  width: calc(100% - 20px);
+  height: auto;
+  margin: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.list_price {
+  max-width: 232px;
+  width: calc(100% - 20px);
+  height: auto;
+  font-size: 15px;
+  color: #ff4d4d;
+  margin: 0 10px;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.psplus_price {
+  color: #daa520;
+}
+
+.save_to_favorites_button {
+  display: block;
+  width: calc(100% - 30px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== REGISTER AND LOGIN PAGES ===== */
+
+.alert {
+  display: block;
+  font-size: 18px;
+  border: 1px solid grey;
+  padding: .5em;
+  border-radius: .5em;
+  width: 520px;
+  margin: 20px auto;
+}
+
+.success {
+  color: rgb(1, 150, 1);
+  background-color: rgba(1, 150, 1, 0.1);
+  border-color: rgb(1, 150, 1);
+}
+
+.error {
+  color: rgb(150, 1, 1);
+  background-color: rgba(150, 1, 1, 0.1);
+  border-color: rgb(150, 1, 1);
+}
+
+.warning {
+  color: rgb(150, 150, 1);
+  background-color: rgba(150, 150, 1, 0.1);
+  border-color: rgb(150, 150, 1);
+}
+
+.info {
+  color: rgb(1, 1, 150);
+  background-color: rgba(1, 1, 1, 0.150);
+  border-color: rgb(1, 1, 150);
+}
+
+.error_message_container {
+  margin: 0 30px;
+}
+
+.error_message {
+  font-size: 10px;
+  color: rgb(200, 1, 1);
+}
+
+.auth_container {
+  width: calc(100% - 60px);
+  max-width: 400px;
+  margin: 15px auto;
+}
+
+.auth_header {
+  text-align: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.auth_note {
+  font-size: 15px;
+  color: grey;
+  text-align: center;
+}
+
+.auth_label {
+  display: block;
+  font-size: 20px;
+  margin: 15px 0 0 30px;
+}
+
+.auth_field {
+  width: calc(100% - 22px);
+  margin: 15px 0 0 0;
+  display: block;
+}
+
+.input_error input, textarea {
+  border-color: rgb(200, 1, 1);
+}
+
+.auth_button {
+  margin-top: 15px;
+  display: inline-block;
+}
+
+.auth_redirect {
+  padding-left: 1em;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  color: grey;
+}
+
+.login_redirect {
+  width: calc(100% - 114px);
+  height: auto;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.auth_link {
+  color: black;
+  transition: color .2s;
+}
+
+.auth_link:hover {
+  color: #ff4d4d;
+}
+
+/* ===== FAVORITES PAGE ===== */
+
+.error_message_container {
+  margin: 0 10px;
+}
+
+.account_spacing {
+  height: 15px;
+}
+
+.account_container {
+  width: calc(100% - 60px);
+  max-width: 600px;
+  margin: auto;
+}
+
+.account_header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  margin: 0px 15px;
+}
+
+.account_header_upper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.user_image {
+  display: block;
+  border: 1px solid #cccccc;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+}
+
+.user_info {
+  display: inline-flex;
+  flex-direction: column;
+  width: calc(100% - 70px);
+  margin-left: 10px;
+}
+
+.account_name {
+  word-wrap: break-word;
+}
+
+.account_email {
+  color: grey;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+}
+
+.account_button {
+  display: block;
+  margin-top: 15px;
+  width: calc(100% + 8px - 30px);
+  text-align: center;
+}
+
+.account_form {
+  display: inline-block;
+  margin: auto;
+  height: 55px;
+  transition: height 0.2s;
+  overflow: hidden;
+  width: 100%;
+}
+
+.update_form {
+  width: 100%;
+  display: inline-block;
+}
+
+.open {
+  height: 415px;
+}
+
+.account_label {
+  margin-top: 10px;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.account_field {
+  width: calc(100% - 30px);
+}
+
+.account_image_label {
+  height: 17px;
+  display: inline-block;
+  margin: 15px auto 0 auto;
+  width: calc(100% - 20px);
+  line-height: 1.0;
+}
+
+.account_image_field {
+  height: 18px;
+  display: inline-block;
+  margin: 10px auto 5px auto;
+  width: auto;
+}
+
+.favorites_container {
+  box-sizing: border-box;
+  margin: auto;
+  max-width: 722px;
+  min-height: 200px;
+}
+
+.favorites_container>form {
+  margin: auto;
+}
+
+.favorites_header {
+  color: #ff4d4d;
+  text-align: center;
+  padding-bottom: 5px;
+}
+
+.favorites_list {
+  list-style: none;
+}
+
+.favorites_list_item {
+  padding: 10px;
+  border-top: 1px solid #cccccc;
+  transition: background-color 0.2s;
+}
+
+.favorites_list_item:hover {
+  background-color: #eeeeee;
+}
+
+.favorites_list_item_title {
+  margin-bottom: 5px;
+}
+
+.favorites_list_item_additional {
+  display: none;
+}
+
+.favorites_list_item_notifications {
+  color: #aaaaaa;
+}
+
+.favorites_field {
+  margin: 15px 0px;
+}
+
+.favorites_field_city_filter {
+  margin-left: -10px;
+}
+
+.favorites_field input {
+  width: calc(100% - 22px);
+}
+
+.favorites_buttons {
+}
+
+.favorites_button {
+  display: block;
+  width: calc(100%);
+  text-align: center;
+}
+
+.favorites_button_redirect {
+  margin-top: 15px;
+  display: block;
+  width: calc(100% - 22px);
+  text-align: center;
+}
+
+.no_favorites_header {
+  text-align: center;
+  border-top: 1px solid #cccccc;
+  padding: 10px;
+  color: #bbbbbb;
+}
+
+/* ===== ABOUT PAGE ===== */
+
+.about_container {
+  width: calc(100% - 60px);
+  max-width: 800px;
+  margin: 15px auto;
+}
+
+.about_header {
+  line-height: 1.0;
+  text-align: center;
+  font-size: 40px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.about_body p {
+  color: grey;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.text_header {
+  color: #ff4d4d;
+  font-size: 20px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+/* ===== RATE PAGE ===== */
+
+.rate_header {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  text-align: center;
+  font-size: 40px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.rate_container {
+  width: calc(100% - 60px);
+  max-width: 450px;
+  margin: 15px auto;
+}
+
+.rate_description {
+  margin: 15px auto;
+  text-align: center;
+  max-width: 400px;
+}
+
+.review {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+
+.rate_field {
+  display: block;
+  margin-top: 15px;
+  width: calc(100% - 22px);
+}
+
+.comment_field {
+  height: 9em;
+}
+
+.rate_button {
+  margin-top: 15px;
+  display: block;
+}
+
+/* ========================= */
+/* ===== MEDIA QUERIES ===== */
+/* ========================= */
+
+@media (min-width: 640px) {
+
+  #filters_button {
+    display: inline-block;
+  }
+
+  .search_field_jobs {
+    width: calc(100% - 45px - 149px);
+  }
+
+  .favorites_list_item_additional {
+    display: contents;
+  }
+
+  .big_text {
+    margin: 50px 15%;
+  }
+
+}
+
+@media (min-width: 760px) {
+
+  #filters_button {
+    display: inline-block;
+  }
+
+  .features_list {
+    width: auto;
+    max-width: 732px;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-direction: row;
+  }
+
+  .features_item {
+    border-bottom: none;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    width: 230px;
+    border-right: 1px solid #cccccc;
+  }
+
+  .features_item:last-of-type {
+    border-right: none;
+  }
+
+}
+
+@media (min-width: 800px) {
+
+  #filters_button {
+    display: inline-block;
+  }
+
+  .navbar {
+    display: flex;
+    width: 100%;
+    height: 60px;
+  }
+
+  .navbar_container {
+    position: relative;
+    display: flex;
+    margin: auto;
+    height: 100%;
+    width: inherit;
+  }
+
+  .navbar_list {
+    height: inherit;
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    list-style: none;
+    position: absolute;
+    right: 0;
+  }
+
+  .navbar_list li {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .burger_button {
+    display: none;
+  }
+
+  .favorites_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .favorites_container>form {
+    margin: auto;
+    width: 80%;
+  }
+
+  .favorites_list {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 49%;
+  }
+
+  .to_do_list {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .to_do_list_item {
+    width: 45%;
+    border: none;
+  }
+
+}
+
+@media (min-width: 1024px) {
+
+  .wide_section {
+    width: 100vw;
+    margin-left: calc(512px - 50vw);
+  }
+
+  .save_to_favorites_button {
+    width: 100%;
+  }
+
+  .sidebar {
+    width: 257px;
+    margin: 0px 10px 15px 15px;
+    float: left;
+    position: sticky;
+    left: 0px;
+    top: 15px;
+  }
+
+  .paragraph {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-right: 10%;
+    padding-left: 10%;
+  }
+
+  /* ===== GAMES PAGE ===== */
+
+  .search_field_games {
+    width: calc(100% - 45px);
+  }
+
+  .filters_tab {
+    margin: 15px 0px;
+    width: 100%;
+  }
+
+  .keywords, .keywords_list {
+    word-wrap: break-word;
+  }
+
+  .search_results_header {
+    display: inline-block;
+    margin: 0 0 0 5px;
+    padding: 15px 0 0 0;
+    width: calc(100% - 257px - 30px);
+  }
+
+  .filters_list {
+    max-height: 900px;
+    height: auto;
+  }
+
+  #filters_button {
+    display: none;
+  }
+
+  .city_separate {
+    margin-bottom: 15px;
+    margin-left: 0px;
+  }
+
+  .results_container {
+    overflow: hidden;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .results_list_games {
+    margin: 10px 10px 10px 0px;
+    justify-content: flex-start;
+  }
+
+  .pagination {
+    margin-top: 0px;
+  }
+
+  .no_results {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 100px;
+  }
+
+  /* ===== JOBS PAGE ===== */
+
+  .search_field_jobs {
+    width: calc(100% - 45px);
+  }
+
+  .results_list_jobs {
+    display: inline-block;
+    width: auto;
+    margin: 15px 15px 15px 5px;
+  }
+
+  /* ===== FAVORITES PAGE ===== */
+
+  .account_header {
+    margin: 0px;
+    width: 227px;
+  }
+
+  .favorites_container {
+    margin: 15px 15px 10px 5px;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .favorites_field_city_filter {
+    margin-left: 0px;
+    margin-bottom: -15px;
+  }
+
+  .favorites_list {
+    max-width: 400px;
+  }
+
+}
+
+@media (max-width: 400px) {
+
+  #filters_button {
+    display: inline-block;
+  }
+
+  .auth_redirect {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+}
+
+@media (min-width: 1318px) {
+
+  .features_header {
+    margin: auto 0px;
+    margin-right: 30px;
+    width: 50%;
+  }
+
+  .main_page_second_section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+}

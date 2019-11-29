@@ -1,0 +1,58 @@
+{% extends 'scrpr/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<div class="main_page_first_section wide_section">
+  <h1 class="greeting_first">{% trans 'Search in one place' %}</h1>
+  <h1 class="greeting_second red">{% trans 'Get results from many' %}</h1>
+</div>
+<div class="main_page_second_section wide_section">
+  <h1 class="features_header">{% trans 'Automatic web scraping from different websites' %}</h1>
+  <div class="features_container">
+    <ul class="features_list">
+      <li class="features_item"><figure class="figure_one">
+        <img src="{% static 'scrpr/Img/Icons/games.png' %}" height="100px" width="100px" alt="Games">
+        <figcaption class="first_item">{% trans 'PS4 game prices' %}</figcaption></figure>
+        <ul class="websites_list">
+          <li class="websites_list_item">store.playstation.com</li>
+        </ul>
+      </li>
+        <li class="features_item"><figure class="figure_two">
+        <img src="{% static 'scrpr/Img/Icons/jobs.png' %}" height="100px" width="100px" alt="Jobs">
+        <figcaption class="second_item">{% trans 'Job offers' %}</figcaption></figure>
+        <ul class="websites_list">
+          <li class="websites_list_item">www.work.ua</li>
+          <li class="websites_list_item">www.rabota.ua</li>
+          <li class="websites_list_item">www.jobs.ua</li>
+          <li class="websites_list_item">ua.jooble.org</li>
+          <li class="websites_list_item">www.trud.ua</li>
+          <li class="websites_list_item">www.jobis.com.ua</li>
+          <li class="websites_list_item">www.novarobota.ua</li>
+          <li class="websites_list_item">www.hotwork.com.ua</li>
+        </ul>
+      </li>
+      <li class="features_item"><figure class="figure_three">
+        <img src="{% static 'scrpr/Img/Icons/freelance.png' %}" height="100px" width="100px" alt="Freelance">
+        <figcaption class="third_item">{% trans 'Freelance job offers' %}</figcaption></figure>
+        <ul class="websites_list">
+          <li class="websites_list_item">- IN PROGRESS -</li>
+        </ul>
+    </li>
+    </ul>
+  </div>
+</div>
+<div class="main_page_third_section wide_section">
+  <p class="paragraph">{% trans 'Whenever you search something, you can save your search parameters.' %}</p>
+  <p class="paragraph">{% trans 'Whatever you save, you can set automatic notifications.' %}</p>
+  <ol class="to_do_list">
+    <li class="to_do_list_item">{% trans 'Go to the search page and start searching :)' %}</li>
+    <li class="to_do_list_item">{% trans 'Save search parameters to Favorites' %}</li>
+    <li class="to_do_list_item">{% trans 'Manage your Favorites form My Account page' %}</li>
+    <li class="to_do_list_item">{% trans 'Setup notifications for each query' %}</li>
+  </ol>
+</div>
+<div class="main_page_forth_section wide_section">
+  <h1 class="big_text">{% trans "You don't need to search for the same stuff every time" %}</h1>
+  <h1 class="big_text"><em class="emphasized">{% trans "Automate it" %}</em> {% trans "and get notified whenever something new comes up" %}</h1>
+</div>
+{% endblock %}

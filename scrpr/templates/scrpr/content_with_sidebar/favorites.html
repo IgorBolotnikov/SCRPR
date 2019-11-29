@@ -1,0 +1,35 @@
+{% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
+{% load i18n %}
+
+{% block sidebar %}
+  {% include 'scrpr/content_with_sidebar/account_sidebar.html' %}
+{% endblock %}
+{% block main_content %}
+  <div class="favorites_container window">
+    <ul class="favorites_list">
+      <h2 class="favorites_header">{% trans 'Favorites in Games' %}</h2>
+      {% for object in object_list_games %}
+        <a href="{% url 'scrpr:favorites_game' pk=object.id %}"><li class="favorites_list_item"><div class="favorites_list_item_title">
+          "{{ object.title|default:"" }}"<span class="favorites_list_item_additional">{{ object.details }}</span>
+        </div><div class="favorites_list_item_notifications">
+          {% if object.notification_freq %}{{ object.notification_frequency }}{% else %}{% trans 'Notifications disabled' %}{% endif %}
+        </div></li></a>
+      {% empty %}
+        <h3 class="no_favorites_header">{% trans 'No Favorites yet' %}</h3>
+      {% endfor %}
+    </ul>
+    <br>
+    <ul class="favorites_list">
+      <h2 class="favorites_header">{% trans 'Favorites in Jobs' %}</h2>
+      {% for object in object_list_jobs %}
+        <a href="{% url 'scrpr:favorites_job' pk=object.id %}"><li class="favorites_list_item"><div class="favorites_list_item_title">
+          "{{ object.title|default:"" }}"<span class="favorites_list_item_additional">{{ object.details }}</span>
+        </div><div class="favorites_list_item_notifications">
+          {% if object.notification_freq %}{{ object.notification_frequency }}{% else %}{% trans 'Notifications disabled' %}{% endif %}
+        </div></li></a>
+      {% empty %}
+        <h3 class="no_favorites_header">{% trans 'No Favorites yet' %}</h3>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

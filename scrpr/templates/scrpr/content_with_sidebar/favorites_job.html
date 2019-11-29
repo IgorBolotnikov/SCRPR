@@ -1,0 +1,29 @@
+{% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
+{% load i18n %}
+
+{% block sidebar %}
+  {% include 'scrpr/content_with_sidebar/account_sidebar.html' %}
+{% endblock %}
+{% block main_content %}
+  <form method="post">
+    <div class="favorites_container">
+      {% csrf_token %}
+      <ul class="favorites_list window">
+        <h2 class="favorites_header">{% trans 'Manage Parameters' %}</h2>
+        <li class="favorites_field"><label class="numeric_filter_label" for="id_title">{{ form.title.label }}</label>{{ form.title }}</li>
+        <li class="favorites_field favorites_field_city_filter"><label class="numeric_filter_label" for="id_city">{{ form.city.label }}</label>{{ form.city }}</li>
+        <li class="favorites_field"><label class="numeric_filter_label" for="id_salary_min">{{ form.salary_min.label }}</label>{{ form.salary_min }}</li>
+        <li class="favorites_field"><label class="numeric_filter_label"  for="id_salary_max">{{ form.salary_max.label }}</label>{{ form.salary_max }}</li>
+        <li class="filter_field">{{ form.with_salary }}<label class="checkbox_label" for="id_with_salary">{{ form.with_salary.label }}</label></li>
+        <li class="favorites_field favorites_field_city_filter"><label class="numeric_filter_label" for="id_notification_freq">{{ form.notification_freq.label }}</label>{{ form.notification_freq }}</li>
+      </ul>
+      <ul class="favorites_list window">
+        <div class="favorites_buttons">
+          <input type="submit" name="save" value="{% trans 'SAVE' %}" class="favorites_button big_button">
+          <a href="{% url 'scrpr:favorites_job_delete' pk=object.id %}" class="favorites_button_redirect big_button">{% trans 'DELETE' %}</a>
+          <a href="{% url 'scrpr:favorites_list' %}" class="favorites_button_redirect big_button">{% trans 'BACK' %}</a>
+        </div>
+      </ul>
+    </div>
+  </form>
+{% endblock %}

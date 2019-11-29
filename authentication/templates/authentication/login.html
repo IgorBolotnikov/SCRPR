@@ -1,0 +1,38 @@
+{% extends 'authentication/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="auth_container window">
+  <h1 class="auth_header">{% trans 'Log In' %}</h1>
+  <p class="auth_note">{% trans 'This is a universal login page.' %}<br/>{% trans 'A single account for all my projects.' %}</p>
+    <form class="auth_form" method="POST" action="">
+      {% csrf_token %}
+      {% if form.username.errors %}
+      <div class="input_error">
+        {{ form.username }}
+      </div>
+        {% for error in form.username.errors %}
+        <div class="error_message_container">
+          <span class="error_message">{{ error }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        {{ form.username }}
+      {% endif %}
+      {% if form.password.errors %}
+      <div class="input_error">
+        {{ form.password }}
+      </div>
+        {% for error in form.password.errors %}
+        <div class="error_message_container">
+          <span class="error_message">{{ error }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        {{ form.password }}
+      {% endif %}
+      <input class="auth_button big_button" type="submit" value="CONFIRM"
+      ><a class="login_redirect auth_link" href="{% url 'authentication:reset_request' %}">{% trans 'Forgot your password?' %}</a>
+    </form>
+</div>
+{% endblock %}

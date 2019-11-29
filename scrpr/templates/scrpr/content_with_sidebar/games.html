@@ -1,0 +1,75 @@
+{% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
+{% load i18n %}
+
+{% block sidebar %}
+  <form method="POST" action="">
+    {% csrf_token %}
+    <div class="search_tab">
+      {{ form.title }}<input type="submit" class="search_button" value="">
+    </div>
+    <div class="filters_tab">
+      <button id="filters_button" type="button" name="button" class="big_button" onclick="openFilters()">{% trans 'Filters' %}</button>
+      <div id="filters_list" class="filters_list window">
+        <h2 class="filter_header">{% trans 'Prices' %}</h2>
+        <div class="filter_field">
+          <label class="numeric_filter_label" for="id_price_min">{{ form.price_min.label }}</label>
+          {{ form.price_min }}
+        </div>
+        <div class="filter_field">
+          <label class="numeric_filter_label"  for="id_price_max">{{ form.price_max.label }}</label>
+          {{ form.price_max }}
+        </div>
+        <div class="filter_field">
+          {{ form.psplus_price }}<label class="checkbox_label" for="id_psplus_price">{{ form.psplus_price.label }}</label>
+        </div>
+        <div class="filter_field">
+          {{ form.initial_price }}<label class="checkbox_label" for="id_initial_price">{{ form.initial_price.label }}</label>
+        </div>
+        <div class="filter_field">
+          {{ form.free }}<label class="checkbox_label" for="id_free">{{ form.free.label }}</label>
+        </div>
+      </div>
+    </div>
+    {% if user.id %}
+      <div class="add_to_favorites_container">
+        <input type="submit" class="big_button save_to_favorites_button" name="save_to_favorites" value="{% trans 'Save to Favorites' %}">
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}
+{% block main_content %}
+  {% if not object_list %}
+    <h1 class="no_results">{% trans 'No results :(' %}</h1>
+  {% else %}
+    <ul class="results_list_games">
+      {% for result in object_list %}
+        <li class="list_item_games">
+          <a class="list_link_gamebox" href="{{ result.link }}" target="_blank">
+            <div class="game_image">
+              <img src="{{ result.image }}" alt="No icon :(" width='124px' hwight='124px'>
+            </div>
+            <div class="description_container_games">
+              <div class="list_header_games">{{ result.title }}</div>
+              {% if result.initial_price is not none %}
+                <div class="list_price strikethrough">{{ result.initial_price }} UAH</div>
+              {% endif %}
+              {% if result.price == 0 %}
+                <div class="list_price">{% trans 'FREE' %}</div>
+              {% else %}
+                <div class="list_price">{{ result.price }} UAH</div>
+              {% endif %}
+              {% if result.psplus_price is not none %}
+                {% if result.psplus_price == 0 %}
+                  <div class="list_price psplus_price">{% trans 'PS Plus FREE' %}</div>
+                {% else %}
+                  <div class="list_price psplus_price">PS Plus {{ result.psplus_price }} UAH</div>
+                {% endif %}
+              {% endif %}
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    {% include 'scrpr/content_with_sidebar/pagination.html' %}
+  {% endif %}
+{% endblock %}

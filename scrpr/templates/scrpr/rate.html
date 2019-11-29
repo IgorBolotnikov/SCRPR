@@ -1,0 +1,40 @@
+{% extends 'scrpr/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="window rate_container">
+  <h1 class="rate_header">{% trans 'I appreciate that, really.' %}</h1>
+      <p class="rate_description">{% trans 'Please rate the app and feel free to leave your opinion. Any remarks and suggestions are very welcome.' %}</p>
+    {{ form.non_field_errors }}
+    <form class="review" method="POST" action="">
+      {% csrf_token %}
+      {% if form.name.errors %}
+      <div class="input_error">
+        {{ form.name }}
+      </div>
+        {% for error in form.name.errors %}
+        <div class="error_message_container">
+          <span class="error_message">{{ error }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        {{ form.name }}
+      {% endif %}
+      {% if form.comment.errors %}
+      <div class="input_error">
+        {{ form.comment }}
+      </div>
+        {% for error in form.comment.errors %}
+        <div class="error_message_container">
+          <span class="error_message">{{ error }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        {{ form.comment }}
+      {% endif %}
+      <input class="big_button rate_button" type="submit" value="SEND">
+    </form>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,13 @@
+<ul class="games_list">
+  {% for suggestion in object_list %}
+    <li class="games_list_item"><a href="{{ suggestion.link }}" class="games_list_title">{{ suggestion.title }}</a>
+      {% if suggestion.initial_price %}
+        <p class="games_list_price_initial">{{ suggestion.initial_price }} UAH</p>
+      {% endif %}
+      <p class="games_list_price">{{ suggestion.price }} UAH</p>
+      {% if suggestion.psplus_price %}
+        <p class="games_list_price_psplus">PS Plus {{ suggestion.psplus_price }} UAH</p>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

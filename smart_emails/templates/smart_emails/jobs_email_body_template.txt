@@ -1,0 +1,11 @@
+{% load i18n %}
+
+{% blocktrans %}You asked me to notify you {{ frequency }} about job offers. {% endblocktrans %}{% trans "Here's what I've found:" %}
+
+{% include 'smart_emails/jobs_list.txt' %}
+{% trans "I'm glad to be helpful!" %}
+
+{% trans "If you want to change the parameters, add something else for me to look for, or delete this suggestion, feel free to follow the link below:" %}
+{% url 'scrpr:index' %}"
+
+Bolotnikov Projects

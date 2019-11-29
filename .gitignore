@@ -1,0 +1,13 @@
+__pycache__
+venv/
+.env
+credentials.txt
+.DS_Store
+*.sqlite3
+*.json
+log.*
+*.log
+local_settings.py
+media/
+!default_image.png
+staticfiles/

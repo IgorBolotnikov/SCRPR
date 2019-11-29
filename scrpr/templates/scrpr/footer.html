@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load static %}
+
+<div class="footer_container">
+  <ul class="footer_list">
+    <li><a class="footer_list_item" href="{% url 'scrpr:about' %}">{% trans 'About' %}</a></li>
+    <li><a class="footer_list_item" href="{% url 'scrpr:rate' %}">{% trans 'Rate!' %}</a></li>
+    <li><a class="footer_list_item source_code" href="https://github.com/IgorBolotnikov" target="_blank">source_code</a></li>
+  </ul
+  ><ul class="footer_list">
+    <li><a class="footer_list_item" href="#">{% trans 'My Portfolio' %}</a></li>
+  </ul>
+  <div class="footer_lower">
+    <p>Bolotnikov Projects</p>
+    <p>{% trans 'All rights reserved (not really)' %}</p>
+  </div>
+</div>

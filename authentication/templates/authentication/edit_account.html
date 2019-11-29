@@ -1,0 +1,53 @@
+{% extends 'authentication/base.html' %}
+{% load i18n %}
+
+{% block content %}
+{% if user.username == account.username %}
+  <div class="auth_container window">
+    <h1 class="auth_header">{% trans 'Edit Account' %}</h1>
+    <form class="update_form" method="POST" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label for="id_username" class="account_label">{% trans 'Username' %}</label>
+      {% if form.username.errors %}
+        <div class="input_error">
+          {{ form.username }}
+        </div>
+        {% for error in form.username.errors %}
+          <div class="error_message_container">
+            <span class="error_message">{{ error }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        {{ form.username }}
+      {% endif %}
+      <label for="id_email" class ="account_label">{% trans 'Email' %}</label>
+      {% if form.email.errors %}
+      <div class="input_error">
+        {{ form.email }}
+      </div>
+        {% for error in form.email.errors %}
+          <div class="error_message_container">
+            <span class="error_message">{{ error }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        {{ form.email }}
+      {% endif %}
+      <label for="id_image" class="account_image_label">{% trans 'Account avatar' %}</label>
+      {{ form.image }}
+      {% if form.image.errors %}
+        {% for error in form.image.errors %}
+          <div class="error_message_container">
+            <span class="error_message">{{ error }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+      <input type="submit" value="{% trans 'SUBMIT' %}" class="account_button big_button">
+    </form>
+    <div class="additional_options">
+      <a class="account_button big_button" href="{% url 'authentication:change_password' %}">{% trans 'Change Password' %}</a>
+      <a class="account_button danger_button" href="{% url 'authentication:delete_account' slug=user.slug %}">{% trans 'Delete Account' %}</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
