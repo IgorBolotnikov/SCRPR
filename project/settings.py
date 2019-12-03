@@ -39,10 +39,10 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER')
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('MAIL_USERNAME')
-EMAIL_HOST_PASSWORD = os.environ.get('MAIL_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN')
+EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD')
 EMAIL_USE_TLS = True
 OWN_EMAIL = os.environ.get('OWN_EMAIL')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
