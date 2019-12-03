@@ -16,12 +16,11 @@ JOB_FILE_LIST = [
 GAME_FILE_LIST = [
     scrape_games.PS_STORE_FILE,
 ]
-BATCH_SIZE = 200
+BATCH_SIZE = 100
 SUCCESS_MESSAGE = 'Scraped data have been successfully loaded to db'
 
 
 class CommandBase(BaseCommand):
-    help = 'update db with scraped data (jobs and games)'
 
     @staticmethod
     def scrape_websites():
@@ -55,7 +54,7 @@ class CommandBase(BaseCommand):
         )
         # artificial limitation because of
         # limited database storage on heroku
-        for counter in range(4):
+        for counter in range(8):
             batch = list(islice(jobs, BATCH_SIZE))
             if not batch:
                 break
@@ -74,7 +73,7 @@ class CommandBase(BaseCommand):
         )
         # artificial limitation because of
         # limited database storage on heroku
-        for counter in range(5):
+        for counter in range(10):
             batch = list(islice(games, BATCH_SIZE))
             if not batch:
                 break
@@ -91,6 +90,9 @@ class CommandBase(BaseCommand):
             self._create_game_entries(self._load_json_file(filename))
 
 
+class Command(CommandBase):
+    help = 'update db with scraped data (jobs and games)'
+    
     def handle(self, *args, **options):
         self.scrape_websites()
         self.load_jobs_data()
