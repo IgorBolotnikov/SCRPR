@@ -9,9 +9,9 @@ class VirtualPaginator:
         self.number = current_page
         self.num_pages = num_pages
         self.previous_page_number = self._get_previous_page_number()
-        self.has_previous = True if self.previous_page_number > 1 else False
+        self.has_previous = True if self.number > 1 else False
         self.next_page_number = self._get_next_page_number()
-        self.has_next = True if self.next_page_number < self.num_pages else False
+        self.has_next = True if self.number < self.num_pages else False
 
     def _get_previous_page_number(self):
         if self.number > self.num_pages:

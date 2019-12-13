@@ -16,15 +16,11 @@ class PSStoreScraper(ScraperBase):
         '''
         DEFAULT_MIN_PRICE = 0
         DEFAULT_MAX_PRICE = 1000000
-
-        title = self._make_url_safe(query_params.get('title')) \
-                if query_params.get('title') else ''
+        title = query_params.get('title') if query_params.get('title') else ''
         price_min = int(query_params.get('price_min')) * 100 \
                     if query_params.get('price_min') else DEFAULT_MIN_PRICE
         price_max = int(query_params.get('price_min')) * 100 \
                     if query_params.get('price_max') else DEFAULT_MAX_PRICE
-        psplus_price = query_params.get('psplus_price') \
-                       if query_params.get('psplus_price') else False
         initial_price = query_params.get('initial_price') \
                         if query_params.get('initial_price') else False
         price_min, price_max = (0, 0) if query_params.get('free') else (price_min, price_max)
@@ -32,13 +28,14 @@ class PSStoreScraper(ScraperBase):
         page_num = query_params.get('page') if query_params.get('page') else page_num
 
         query_string = self._get_query_string({
+            'gameContentType': 'games',
             'query': title,
             'price': f'{price_min}-{price_max}',
         })
         if initial_price:
             return f'{PS_STORE_DISCOUNT_LINK}{page_num}?{query_string}'
         elif title:
-            return f'{PS_STORE_LINK}{page_mun}?{query_string}'
+            return f'{PS_STORE_LINK}{page_num}?{query_string}'
         return f'{PS_STORE_INIT_LINK}{page_num}'
 
     @staticmethod
@@ -52,7 +49,9 @@ class PSStoreScraper(ScraperBase):
 
     @staticmethod
     def _get_games_list(page):
-        games = page.find_all('div', class_='grid-cell--game')
+        # games = page.find_all('div', class_='grid-cell--game')
+        games = page.select('div.grid-cell--game, div.grid-cell--game-related')
+        print(len(games))
         return [game for game in games if game.find('h3', class_='price-display__price')]
 
     @staticmethod

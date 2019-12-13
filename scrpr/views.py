@@ -32,7 +32,6 @@ class FormListView(FormView):
         self.form = self.get_form(self.get_form_class())
         self.form.initial = self.get_form_values(request.GET.dict())
         self.current_page = self.get_current_page(request.META['QUERY_STRING'])
-        print(f'Current page is: {self.current_page}')
         self.params = self.get_query_string(self.form.initial)
         return self.render_to_response(self.get_context_data(**kwargs))
 

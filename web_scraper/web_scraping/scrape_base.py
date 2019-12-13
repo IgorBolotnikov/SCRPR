@@ -25,7 +25,7 @@ def timer(func):
         time2 = round(time(), 4)
         timespan = time2 - time1
         minutes = timespan // 60
-        seconds = round(timespan - minutes * 60)
+        seconds = round(timespan - minutes * 60, 2)
         print(f'{datetime.now()} - Scraping completed in {minutes} m, {seconds} s.')
         print('----------')
         return result
@@ -48,8 +48,7 @@ class ScraperBase:
         # self._save_results_to_json(self.filename)
 
     @timer
-    def scrape_game_website(self, page_num, query_params=None, page_limit=None):
-        print(f'Scraping with {self.__class__.__name__}')
+    def scrape_game_website(self, page_num, page_limit=1, query_params=None):
         self.output = []
         asyncio.run(self._scrape_game_pages(
             query_params=query_params,
@@ -60,8 +59,6 @@ class ScraperBase:
             'object_list': self.output,
             'last_page': self.last_page_num
         }
-        # print('Finished scraping, saving data to .json file')
-        # self._save_results_to_json(self.filename)
 
     @staticmethod
     async def _request_page(url, pagenum, session):
@@ -87,11 +84,6 @@ class ScraperBase:
                     return page
             except Exception as exeption:
                 print(exeption)
-
-
-    @staticmethod
-    def _make_url_safe(query):
-        return quote(query, safe='')
 
     @staticmethod
     def _get_query_string(params):
@@ -238,7 +230,9 @@ class ScraperBase:
                 async with session.get(url, headers=headers) as response:
                     page = await response.read()
                     page = soup(page, 'lxml')
+                    base_url = url.split(f'/{page_num}')[0] + '/'
                     games_list = self._get_games_list(page)
+                    self.last_page_num = self._get_last_page_num(page, base_url)
                     self._add_games_to_result(games_list)
                     break
             except Exception as exeption:
@@ -247,14 +241,14 @@ class ScraperBase:
     async def _scrape_game_pages(self, page_num, query_params, page_limit):
         async_tasks = []
         async with aiohttp.ClientSession() as session:
-            url = self._get_url(1, query_params)
-            base_url = url.split('/1')[0] + '/'
-            self.last_page_num = self._get_last_page_num(
-                self._request_first_page(url),
-                base_url
-            )
+            # url = self._get_url(1, query_params)
+            # base_url = url.split('/1')[0] + '/'
+            # self.last_page_num = self._get_last_page_num(
+            #     self._request_first_page(url),
+            #     base_url
+            # )
             page_num = page_num if page_num else 1
-            while not (page_num > self.last_page_num or (page_limit and page_num > page_limit)):
+            while page_num <= page_limit:
                 async_task = asyncio.create_task(self._scrape_game_page(
                     self._get_url(page_num, query_params),
                     page_num,
