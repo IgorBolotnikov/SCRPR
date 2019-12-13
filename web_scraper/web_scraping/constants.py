@@ -137,5 +137,4 @@ PS_STORE_DISCOUNT_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF7550
 PS_STORE_INIT_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-FULLGAMES/'
 PS_STORE_FILE = BASE_DIR + '/json/games_list__ps_store_ua.json'
 FREE = ['Бесплатно', 'Free']
-TITLE_QUERY = 'query='
-PRICE_QUERY = 'price='
+GAMES_PER_PAGE = 30

@@ -256,7 +256,6 @@ class GamesView(FormListView):
         query_results = PSStoreScraper().scrape_game_website(
             query_params=query_params,
             page_num=self.current_page,
-            page_limit=self.current_page
         )
         self.last_page = query_results.get('last_page')
         return query_results['object_list']
