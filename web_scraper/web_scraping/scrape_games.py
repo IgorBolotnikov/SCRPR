@@ -2,17 +2,53 @@ from .scrape_base import *
 
 
 class PSStoreScraper(ScraperBase):
+    def _get_url(self, page_num=1, query_params=None):
+        '''
+        Get url for parsing with specified query params
+        Return following url format if title is specified:
+        - https://store.playstation.com/ru-ua/grid/search-игра/{pagenum}?query={title}
 
-    def __init__(self):
-        self.filename = PS_STORE_FILE
+        Return following url for discounts:
+        - https://store.playstation.com/ru-ua/grid/STORE-MSF75508-PRICEDROPSCHI/1?price={price_min}-{pricemax}
+
+        Return following url by default:
+        - https://store.playstation.com/ru-ua/grid/STORE-MSF75508-FULLGAMES/
+        '''
+        DEFAULT_MIN_PRICE = 0
+        DEFAULT_MAX_PRICE = 1000000
+
+        title = self._make_url_safe(query_params.get('title')) \
+                if query_params.get('title') else ''
+        price_min = int(query_params.get('price_min')) * 100 \
+                    if query_params.get('price_min') else DEFAULT_MIN_PRICE
+        price_max = int(query_params.get('price_min')) * 100 \
+                    if query_params.get('price_max') else DEFAULT_MAX_PRICE
+        psplus_price = query_params.get('psplus_price') \
+                       if query_params.get('psplus_price') else False
+        initial_price = query_params.get('initial_price') \
+                        if query_params.get('initial_price') else False
+        price_min, price_max = (0, 0) if query_params.get('free') else (price_min, price_max)
+
+        page_num = query_params.get('page') if query_params.get('page') else page_num
+
+        query_string = self._get_query_string({
+            'query': title,
+            'price': f'{price_min}-{price_max}',
+        })
+        if initial_price:
+            return f'{PS_STORE_DISCOUNT_LINK}{page_num}?{query_string}'
+        elif title:
+            return f'{PS_STORE_LINK}{page_mun}?{query_string}'
+        return f'{PS_STORE_INIT_LINK}{page_num}'
 
     @staticmethod
-    def _get_url(): return PS_STORE_LINK
-
-    @staticmethod
-    def _get_last_page_num(page):
-        last = page.find_all('a', class_='paginator-control__end')[0].get('href')
-        return int(last.split('/')[-1]) if last else None
+    def _get_last_page_num(page, base_link):
+        last = page.find_all('a', class_='paginator-control__end')
+        if last:
+            last_page = int(last[0].get('href').split('/')[-1].split('?')[0])
+        else:
+            last_page = 1
+        return last_page
 
     @staticmethod
     def _get_games_list(page):

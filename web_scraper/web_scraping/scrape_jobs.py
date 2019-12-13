@@ -359,7 +359,7 @@ class WorkScraper(ScraperBase):
 
     @staticmethod
     def _get_url(city_name):
-        return f'{WORKUA_LINK}{city_name}/?ss=1&page='
+        return f'{WORKUA_LINK}{city_name}/?_pjax=%23pjax&page='
 
     @staticmethod
     def _get_last_page_num(page):

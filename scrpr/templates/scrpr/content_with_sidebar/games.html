@@ -70,6 +70,8 @@
         </li>
       {% endfor %}
     </ul>
-    {% include 'scrpr/content_with_sidebar/pagination.html' %}
+    {% if page_obj %}
+      {% include 'scrpr/content_with_sidebar/pagination.html' %}
+    {% endif %}
   {% endif %}
 {% endblock %}

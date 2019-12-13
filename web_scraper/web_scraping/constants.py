@@ -6,19 +6,19 @@ REQUEST_HEADER = 'Web-scraping project (bolotnikovprojects@gmail.com)'
 DIVIDERS = ['-', '–', '—']
 
 LINKS = (
-         'https://www.work.ua', # 0
-         'https://rabota.ua', # 1
+         'https://www.work.ua', # 0 Parsing
+         'https://rabota.ua', # 1 API
          'https://www.linkedin.com', # 2 API
          'https://hh.ua', # 3 API
-         'https://jobs.ua', # 4
-         'https://ua.jooble.org', # 5
-         'http://www.trud.ua', # 6
-         'https://jobis.com.ua', # 7
-         'http://novarobota.ua', # 8
-         'http://hotwork.com.ua' # 9
+         'https://jobs.ua', # 4 Paarsing
+         'https://ua.jooble.org', # 5 Parsing
+         'http://www.trud.ua', # 6 Parsing
+         'https://jobis.com.ua', # 7 Parsing
+         'http://novarobota.ua', # 8 Parsing
         )
 
 RABOTAUA_BASELINK = 'https://rabota.ua'
+# TODO: Use site's API
 RABOTAUA_LINK = 'https://rabota.ua/jobsearch/vacancy_list?keyWords='
 RABOTAUA_FILE = BASE_DIR + '/json/jobs_list__rabota_ua.json'
 RABOTAUA_CITIES = {
@@ -132,6 +132,10 @@ TRUDUA_CITIES = {
 }
 
 PS_STORE_BASELINK = 'https://store.playstation.com'
-PS_STORE_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-FULLGAMES/'
+PS_STORE_LINK = 'https://store.playstation.com/ru-ua/grid/search-игра/'
+PS_STORE_DISCOUNT_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-PRICEDROPSCHI/'
+PS_STORE_INIT_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-FULLGAMES/'
 PS_STORE_FILE = BASE_DIR + '/json/games_list__ps_store_ua.json'
 FREE = ['Бесплатно', 'Free']
+TITLE_QUERY = 'query='
+PRICE_QUERY = 'price='

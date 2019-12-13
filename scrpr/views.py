@@ -1,6 +1,6 @@
 # from secrets import token_hex
 # from os import path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, parse_qs
 from django.http import Http404
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -23,21 +23,29 @@ from authentication.models import User
 from .forms import *
 from .models import *
 from .constants import *
+from.paginator import VirtualPaginator
+from web_scraper.web_scraping.scrape_games import PSStoreScraper
 
 
-class FormListView(FormView, MultipleObjectMixin):
-
+class FormListView(FormView):
     def get(self, request, *args, **kwargs):
         self.form = self.get_form(self.get_form_class())
         self.form.initial = self.get_form_values(request.GET.dict())
-        self.object_list = self.get_queryset(self.form.initial)
-        self.params = self.get_query_string(request.GET.dict())
+        self.current_page = self.get_current_page(request.META['QUERY_STRING'])
+        print(f'Current page is: {self.current_page}')
+        self.params = self.get_query_string(self.form.initial)
         return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_current_page(self, query_string):
+        page_field = parse_qs(query_string).get('page')
+        page_num = page_field[0] if page_field else '1'
+        return int(page_num) if page_num.isnumeric() else 1
 
     def get_context_data(self, **kwargs):
         context = {
             'form': self.form,
             'params': self.params,
+            'object_list': self.get_queryset(self.form.initial)
         }
         context.update(kwargs)
         return super().get_context_data(**context)
@@ -241,73 +249,75 @@ class RateView(CreateView):
 
 class GamesView(FormListView):
     template_name = 'scrpr/content_with_sidebar/games.html'
-    model = Game
-    paginate_by = 30
     form_class = GamesForm
     url = 'scrpr:games'
-    ordering = 'pk'
 
-    def get_queryset(self, query_items=None):
-        if not query_items:
-            return super().get_queryset()
-        queryset = self.model.objects
-        for key, value in query_items.items():
-            if key == 'title':
-                queryset = queryset.filter(title__icontains=value)
-            elif key == 'price_min':
-                queryset = queryset.filter(
-                    Q(price__gte=value) | Q(psplus_price__gte=value))
-            elif key == 'price_max':
-                queryset = queryset.filter(
-                    Q(price__lte=value) | Q(psplus_price__lte=value))
-            elif key == 'psplus_price':
-                queryset = queryset.filter(psplus_price__isnull=False)
-            elif key == 'initial_price':
-                queryset = queryset.filter(initial_price__isnull=False)
-            elif key == 'free':
-                queryset = queryset.filter(Q(price=0.00) | Q(psplus_price=0.00))
-        return queryset
+    # TODO: Change db query to web scraping query
+    def get_queryset(self, query_params=None):
+        query_results = PSStoreScraper().scrape_game_website(
+            query_params=query_params,
+            page_num=self.current_page,
+            page_limit=self.current_page
+        )
+        self.last_page = query_results.get('last_page')
+        return query_results['object_list']
+        # if not query_items:
+        #     return super().get_queryset()
+        # queryset = self.model.objects
+        # for key, value in query_items.items():
+        #     if key == 'title':
+        #         queryset = queryset.filter(title__icontains=value)
+        #     elif key == 'price_min':
+        #         queryset = queryset.filter(
+        #             Q(price__gte=value) | Q(psplus_price__gte=value))
+        #     elif key == 'price_max':
+        #         queryset = queryset.filter(
+        #             Q(price__lte=value) | Q(psplus_price__lte=value))
+        #     elif key == 'psplus_price':
+        #         queryset = queryset.filter(psplus_price__isnull=False)
+        #     elif key == 'initial_price':
+        #         queryset = queryset.filter(initial_price__isnull=False)
+        #     elif key == 'free':
+        #         queryset = queryset.filter(Q(price=0.00) | Q(psplus_price=0.00))
+        # return queryset
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Games'),
-        }
-        context.update(kwargs)
-        return super().get_context_data(**context)
+        context = super().get_context_data(**kwargs)
+        context['title'] =  _('Games')
+        if self.last_page > 1:
+            context['page_obj'] = VirtualPaginator(self.current_page, self.last_page)
+        return context
 
 
 class JobsView(FormListView):
     template_name = 'scrpr/content_with_sidebar/jobs.html'
-    model = Job
-    paginate_by = 20
     form_class = JobsForm
     url = 'scrpr:jobs'
-    ordering = 'title'
 
+    # TODO: Change db query to web scraping query
     def get_queryset(self, query_items=None):
-        if not query_items:
-            return super().get_queryset()
-        queryset = self.model.objects
-        for key, value in query_items.items():
-            if key == 'title':
-                queryset = queryset.filter(title__icontains=value)
-            elif key == 'city':
-                queryset = queryset.filter(location=value)
-            elif key == 'salary_min':
-                queryset = queryset.filter(salary_min__gte=value)
-            elif key == 'salary_max':
-                queryset = queryset.filter(salary_max__lte=value)
-            elif key == 'with_salary':
-                queryset = queryset.filter(
-                    salary_min__isnull=False, salary_max__isnull=False)
-        return queryset
+        return
+        # if not query_items:
+        #     return super().get_queryset()
+        # queryset = self.model.objects
+        # for key, value in query_items.items():
+        #     if key == 'title':
+        #         queryset = queryset.filter(title__icontains=value)
+        #     elif key == 'city':
+        #         queryset = queryset.filter(location=value)
+        #     elif key == 'salary_min':
+        #         queryset = queryset.filter(salary_min__gte=value)
+        #     elif key == 'salary_max':
+        #         queryset = queryset.filter(salary_max__lte=value)
+        #     elif key == 'with_salary':
+        #         queryset = queryset.filter(
+        #             salary_min__isnull=False, salary_max__isnull=False)
+        # return queryset
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Jobs'),
-        }
-        context.update(kwargs)
-        return super().get_context_data(**context)
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Jobs')
+        return context
 
 
 class CustomLogoutView(LogoutView):
