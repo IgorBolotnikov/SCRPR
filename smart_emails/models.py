@@ -11,7 +11,7 @@ class SavedSuggestion(models.Model):
         (SUGGESTION_GAME, 'Game'),
     ]
 
-    saved_datetime = models.DateTimeField(auto_now_add=True),
+    saved_datetime = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=10, choices=SUCCESTION_TYPES)
     link = models.URLField(max_length=200)
     account = models.ForeignKey(
@@ -20,3 +20,6 @@ class SavedSuggestion(models.Model):
         related_query_name='suggestion',
         on_delete=models.CASCADE,
     )
+
+    def __str__(self):
+        return f'Suggestion for {self.account.username}'

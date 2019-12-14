@@ -61,6 +61,7 @@ class ScraperBase:
 
     @timer
     def scrape_game_website(self, page_num, query_params=None):
+        print(f'Scraping with {self.__class__.__name__}')
         self.output = []
         asyncio.run(self._scrape_game_pages(
             query_params=query_params,

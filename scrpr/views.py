@@ -152,7 +152,7 @@ class FavoritesGameDetailView(FavoritesMixin, UpdateView):
     model = FavoriteGameQuery
     form_class = GamesForm
     template_name_suffix = ''
-    success_url = '/scrpr/favorites/'
+    success_url = '/favorites/'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -182,7 +182,7 @@ class FavoritesJobDetailView(FavoritesMixin, UpdateView):
     model = FavoriteJobQuery
     form_class = JobsForm
     template_name_suffix = ''
-    success_url = '/scrpr/favorites/'
+    success_url = '/favorites/'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -210,7 +210,7 @@ class FavoritesJobDetailView(FavoritesMixin, UpdateView):
 class FavoritesGameDeleteView(FavoritesMixin, DeleteView):
     template_name = 'scrpr/content_with_sidebar/delete_favorites_game.html'
     model = FavoriteGameQuery
-    success_url = '/scrpr/favorites'
+    success_url = '/favorites'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -223,7 +223,7 @@ class FavoritesGameDeleteView(FavoritesMixin, DeleteView):
 class FavoritesJobDeleteView(FavoritesMixin, DeleteView):
     template_name = 'scrpr/content_with_sidebar/delete_favorites_job.html'
     model = FavoriteJobQuery
-    success_url = '/scrpr/favorites'
+    success_url = '/favorites'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -279,7 +279,7 @@ class GamesView(FormListView):
                 page_num=self.current_page,
             )
             cache.set(cache_key, query_results, 600)
-        self.last_page = query_results.get('last_page')
+        self.last_page = query_results.get('last_page', 1)
         return query_results.get('object_list')
 
     def get_context_data(self, **kwargs):
@@ -299,7 +299,6 @@ class JobsView(FormListView):
         query_params.update({'page': page_num})
         return generate_cache_key(query_params)
 
-    # TODO: Change db query to web scraping query
     def get_queryset(self, query_params=None):
         cache_key = self.get_cache_key(query_params)
         cached_query = cache.get(cache_key)

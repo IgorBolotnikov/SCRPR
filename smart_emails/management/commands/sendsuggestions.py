@@ -6,3 +6,5 @@ class Command(BaseCommand):
     '''send email suggestions to users based on favorites'''
     def handle(self, *args, **kwargs):
         Suggestion(1).send_suggestions()
+        Suggestion(7).send_suggestions()
+        Suggestion(30).send_suggestions()

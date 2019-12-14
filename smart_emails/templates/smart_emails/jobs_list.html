@@ -1,7 +1,7 @@
 <ul class="jobs_list">
   {% for suggestion in object_list %}
     <li class="jobs_list_item"><a href="{{ suggestion.link }}" class="jobs_list_title">{{ suggestion.title }}</a>
-      {% if suggestion.employer %}<p class="jobs_list_muted_text">{{ suggestion.employer }}</p>{% endif %}{% if suggestion.salary_max %}<span class=separator>|</span><p class="jobs_list_muted_text">{% if suggestion.salary_min %}{{ suggestion.salary_min }} — {% endif %}{{ suggestion.salary_max }} {{ suggestion.currency }}</p>
+      {% if suggestion.employer %}<p class="jobs_list_muted_text">{{ suggestion.employer }}</p><span class=separator>|</span>{% endif %}{% if suggestion.salary_max %}<p class="jobs_list_muted_text">{% if suggestion.salary_min %}{{ suggestion.salary_min }} — {% endif %}{{ suggestion.salary_max }} {{ suggestion.currency }}</p>
       {% endif %}
       <p class="jobs_list_body">{{ suggestion.body }}</p>
 
