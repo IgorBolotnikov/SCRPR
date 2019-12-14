@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
+from django.core.cache import cache
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
@@ -25,6 +26,10 @@ from .models import *
 from .constants import *
 from.paginator import VirtualPaginator
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
+
+
+def generate_cache_key(query):
+    return ','.join([f'{key}-{str(value).lower()}' for key, value in query.items()])
 
 
 class FormListView(FormView):
@@ -251,33 +256,26 @@ class GamesView(FormListView):
     form_class = GamesForm
     url = 'scrpr:games'
 
+    def get_cache_key(self, query_params):
+        page_num = self.current_page if self.current_page else 1
+        query_params = query_params if query_params else {'games': 'all'}
+        query_params.update({'page': page_num})
+        return generate_cache_key(query_params)
+
     # TODO: Change db query to web scraping query
     def get_queryset(self, query_params=None):
-        query_results = PSStoreScraper().scrape_game_website(
-            query_params=query_params,
-            page_num=self.current_page,
-        )
+        cache_key = self.get_cache_key(query_params)
+        cached_query = cache.get(cache_key)
+        if cached_query:
+            query_results = cached_query
+        else:
+            query_results = PSStoreScraper().scrape_game_website(
+                query_params=query_params,
+                page_num=self.current_page,
+            )
+            cache.set(cache_key, query_results, 600)
         self.last_page = query_results.get('last_page')
-        return query_results['object_list']
-        # if not query_items:
-        #     return super().get_queryset()
-        # queryset = self.model.objects
-        # for key, value in query_items.items():
-        #     if key == 'title':
-        #         queryset = queryset.filter(title__icontains=value)
-        #     elif key == 'price_min':
-        #         queryset = queryset.filter(
-        #             Q(price__gte=value) | Q(psplus_price__gte=value))
-        #     elif key == 'price_max':
-        #         queryset = queryset.filter(
-        #             Q(price__lte=value) | Q(psplus_price__lte=value))
-        #     elif key == 'psplus_price':
-        #         queryset = queryset.filter(psplus_price__isnull=False)
-        #     elif key == 'initial_price':
-        #         queryset = queryset.filter(initial_price__isnull=False)
-        #     elif key == 'free':
-        #         queryset = queryset.filter(Q(price=0.00) | Q(psplus_price=0.00))
-        # return queryset
+        return query_results.get('object_list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

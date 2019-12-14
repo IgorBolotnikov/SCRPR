@@ -135,6 +135,10 @@ PS_STORE_BASELINK = 'https://store.playstation.com'
 PS_STORE_LINK = 'https://store.playstation.com/ru-ua/grid/search-игра/'
 PS_STORE_DISCOUNT_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-PRICEDROPSCHI/'
 PS_STORE_INIT_LINK = 'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-FULLGAMES/'
+PS_STORE_PSPLUS_GAMES = [
+    'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-MEMBERSV2/',
+    'https://store.playstation.com/ru-ua/grid/STORE-MSF75508-PLUSINSTANTGAME/'
+]
 PS_STORE_FILE = BASE_DIR + '/json/games_list__ps_store_ua.json'
 FREE = ['Бесплатно', 'Free']
 GAMES_PER_PAGE = 30

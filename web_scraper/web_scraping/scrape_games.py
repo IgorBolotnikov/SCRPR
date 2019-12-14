@@ -19,14 +19,14 @@ class PSStoreScraper(ScraperBase):
         title = query_params.get('title') if query_params.get('title') else ''
         price_min = int(query_params.get('price_min')) * 100 \
                     if query_params.get('price_min') else DEFAULT_MIN_PRICE
-        price_max = int(query_params.get('price_min')) * 100 \
+        price_max = int(query_params.get('price_max')) * 100 \
                     if query_params.get('price_max') else DEFAULT_MAX_PRICE
+        psplus_price = bool(query_params.get('psplus_price'))
         initial_price = bool(query_params.get('initial_price'))
         price_min, price_max = (0, 0) if query_params.get('free') else (price_min, price_max)
-
-        page_num = query_params.get('page') if query_params.get('page') else page_num
-
+        # page_num = query_params.get('page') if query_params.get('page') else page_num
         self.params = {
+            'gameContentType': 'games,bundles',
             'query': title,
             'price': f'{price_min}-{price_max}',
         }
@@ -34,6 +34,11 @@ class PSStoreScraper(ScraperBase):
             return f'{PS_STORE_INIT_LINK}{page_num}'
         elif initial_price:
             return f'{PS_STORE_DISCOUNT_LINK}{page_num}'
+        elif psplus_price:
+            # Get page nums are simply used to iterate through each link
+            # In a list of different PS Plus offers, because these pages
+            # Never get more than 1 page each
+            return PS_STORE_PSPLUS_GAMES[page_num - 1]
         return f'{PS_STORE_INIT_LINK}{page_num}'
 
     @staticmethod
