@@ -155,7 +155,7 @@
           <p class="body_text">{% trans 'Hello, ' %}{{ username }}!<br><small class="sensei_cat">Sensei cat here.</small></p>
         </header>
         <section class=mail_body_container>
-          <p class="body_text">{% blocktrans %}You asked me to notify you {{ frequency }} about job offers. {% endblocktrans %}{% trans "Here's what I've found:" %}</p>
+          <p class="body_text">{% blocktrans %}You asked me to notify you {{ frequency|lower }} about job offers. {% endblocktrans %}{% trans "Here's what I've found:" %}</p>
           <ul>
             {% include 'smart_emails/jobs_list.html' %}
           </ul>

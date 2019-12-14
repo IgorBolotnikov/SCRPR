@@ -7,6 +7,8 @@ from django.conf import settings
 from authentication.models import User
 from .models import SavedSuggestion
 from scrpr.models import Game, Job
+from web_scraper.web_scraping.scrape_games import PSStoreScraper
+from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
 
 
 # workflow of cron job:
@@ -33,6 +35,8 @@ from scrpr.models import Game, Job
 
 
 class Suggestion:
+    MAX_SUGGESTIONS = 10
+
     def __init__(self, frequency_in_days):
         self.frequency_in_days = frequency_in_days
 
@@ -51,18 +55,26 @@ class Suggestion:
 
     @staticmethod
     def _get_saved_suggestions(user, type):
-        return SavedSuggestion.objects.filter(account=user, type=type)
+        suggestions = SavedSuggestion.objects.filter(account=user, type=type)
+        if len(suggestions) > 50:
+            for suggestion in suggestions[51:]:
+                suggestion.delete()
+        return suggestions[:50]
 
     def _get_filtered_suggestions(self, new_suggestions, user, type):
         prev_suggestions = self._get_saved_suggestions(user, type)
         return self._remove_dublicates(
-            new_suggestions, prev_suggestions.only('link'))
+            new_suggestions,
+            prev_suggestions
+        )[:self.MAX_SUGGESTIONS]
 
     @staticmethod
     def _remove_dublicates(new_list, old_list):
+        old_list = [item.link for item in old_list]
         result = []
         for entry in new_list:
-            if entry.link not in old_list:
+            if entry['link'] not in old_list:
+                print('Appending new entry')
                 result.append(entry)
         return result
 
@@ -77,7 +89,7 @@ class Suggestion:
     @staticmethod
     def save_new_suggestions(new_suggestions, type, user):
         new_entries = [
-            SavedSuggestion(type=type, link=suggestion.link, account=user) for suggestion in new_suggestions
+            SavedSuggestion(type=type, link=suggestion['link'], account=user) for suggestion in new_suggestions
         ]
         SavedSuggestion.objects.bulk_create(new_entries)
 
@@ -99,51 +111,27 @@ class Suggestion:
         message.attach_alternative(html_with_context, 'text/html')
         message.send()
 
-    def _get_game_suggestions_from_query(self, query_items):
-        if not query_items:
-            return Game.objects.all()[:10]
-        queryset = Game.objects
-        for key, value in query_items.items():
-            if key == 'title' and value:
-                queryset = queryset.filter(title__icontains=value)
-            elif key == 'price_min' and value:
-                queryset = queryset.filter(
-                    Q(price__gte=value) | Q(psplus_price__gte=value))
-            elif key == 'price_max' and value:
-                queryset = queryset.filter(
-                    Q(price__lte=value) | Q(psplus_price__lte=value))
-            elif key == 'psplus_price' and value:
-                queryset = queryset.filter(psplus_price__isnull=False)
-            elif key == 'initial_price' and value:
-                queryset = queryset.filter(initial_price__isnull=False)
-            elif key == 'free' and value:
-                queryset = queryset.filter(Q(price=0.00) | Q(psplus_price=0.00))
-        return queryset.all()[:10]
+    def _get_game_suggestions_from_query(self, query_params):
+        query_results = PSStoreScraper().scrape_game_website(
+            query_params=query_params,
+            page_num=1,
+        )
+        return query_results.get('object_list')
 
-    def _get_job_suggestions_from_query(self, query_items):
-        if not query_items:
-            return Job.objects.all()[:10]
-        queryset = Job.objects
-        for key, value in query_items.items():
-            if key == 'title' and value:
-                queryset = queryset.filter(title__icontains=value)
-            elif key == 'city' and value:
-                queryset = queryset.filter(location=value)
-            elif key == 'salary_min' and value:
-                queryset = queryset.filter(salary_min__gte=value)
-            elif key == 'salary_max' and value:
-                queryset = queryset.filter(salary_max__lte=value)
-            elif key == 'with_salary' and value:
-                queryset = queryset.filter(
-                    salary_min__isnull=False, salary_max__isnull=False)
-        return queryset.all()[:10]
+    def _get_job_suggestions_from_query(self, query_params):
+        query_results = JobsSitesScraper().scrape_websites(
+            location=query_params.get('city') if query_params else None,
+            query_params=query_params,
+            page_num=1,
+        )
+        return query_results.get('object_list')
 
     def _send_game_suggestions(self, game_favorites, user):
         for game_favorite in game_favorites.values():
             game_suggestions = self._get_game_suggestions_from_query(game_favorite)
             if game_suggestions:
                 filtered_suggestions = self._get_filtered_suggestions(
-                    game_suggestions, user, 'JOB')
+                    game_suggestions, user, 'GAME')
                 if filtered_suggestions:
                     email_context = self._get_email_context(
                         filtered_suggestions,

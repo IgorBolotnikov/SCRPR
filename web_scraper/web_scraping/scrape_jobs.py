@@ -14,8 +14,9 @@ class JobisScraper(ScraperBase):
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('div', class_='paging').find_all('a')[-1]
-        return int(last.get_text()) if last else None
+        last = page.find('div', class_='paging')
+        if last: last = last.find_all('a')[-1]
+        return int(last.get_text()) if last else 1
 
     @staticmethod
     def _get_jobs_list(page):
@@ -61,7 +62,6 @@ class JobisScraper(ScraperBase):
             url = f'{self._get_url(city_name)}{job_type}?page='
             page_num = 1
             while True:
-                print(f'Scraping page #{page_num}')
                 if page_limit and page_num > page_limit:
                     break
                 page = self._request_page(url, page_num)
@@ -197,7 +197,7 @@ class JoobleScraper(ScraperBase):
 
     @staticmethod
     def _get_job_link(offer):
-        return offer.find('div', class_='top-wr').a['href']
+        return offer.find('div', class_='top-wr').a['href'].split('ckey=')[0]
 
     @staticmethod
     def _get_job_source():
@@ -300,7 +300,9 @@ class RabotaScraper(ScraperBase):
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('dd', class_='nextbtn').previous_sibling.find('a')
+        last = page.find('dd', class_='nextbtn')
+        if last: last = last.previous_sibling
+        if last: last = last.find('a')
         return int(last.get_text()) if last else 1
 
     @staticmethod
@@ -450,10 +452,9 @@ class WorkScraper(ScraperBase):
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find(
-            'ul', class_='pagination pagination-small visible-xs-block').find(
-            'span', class_='text-default')
-        return int(last.get_text().split()[-1]) if last else None
+        last = page.find('ul', class_='pagination pagination-small visible-xs-block')
+        if last: last = last.find('span', class_='text-default')
+        return int(last.get_text().split()[-1]) if last else 1
 
     @staticmethod
     def _get_jobs_list(page):
@@ -515,7 +516,6 @@ class JobsSitesScraper:
             adjusted_num = results_num // websites_num
             object_list.extend(item['object_list'][:adjusted_num])
             last_page_list.append(item['last_page'])
-        print(f'Filtered results: {len(object_list)}')
         return {
             'object_list': object_list,
             'last_page': max(last_page_list)
@@ -523,5 +523,5 @@ class JobsSitesScraper:
 
     @timer
     def scrape_websites(self, location, page_num, query_params):
-        results = asyncio.run(self._scrape_websites(location, page_num, query_params))
+        results = asyncio.run(self._scrape_websites(location, page_num, query_params), debug=True)
         return self._adjust_results_number(results)
