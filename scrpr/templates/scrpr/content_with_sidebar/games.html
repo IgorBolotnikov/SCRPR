@@ -1,5 +1,6 @@
 {% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
 {% load i18n %}
+{% load cache %}
 
 {% block sidebar %}
   <form method="POST" action="">
@@ -70,6 +71,8 @@
         </li>
       {% endfor %}
     </ul>
-    {% include 'scrpr/content_with_sidebar/pagination.html' %}
+    {% if page_obj %}
+      {% include 'scrpr/content_with_sidebar/pagination.html' %}
+    {% endif %}
   {% endif %}
 {% endblock %}

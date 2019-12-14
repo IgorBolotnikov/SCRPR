@@ -4,6 +4,7 @@ from itertools import islice
 from web_scraper.web_scraping import scrape_jobs, scrape_games
 import json
 
+
 JOB_FILE_LIST = [
     scrape_jobs.RABOTAUA_FILE,
     scrape_jobs.WORKUA_FILE,
@@ -24,14 +25,14 @@ class CommandBase(BaseCommand):
 
     @staticmethod
     def scrape_websites():
-        scrape_jobs.JobisScraper().scrape_job_website()
-        scrape_jobs.JobsScraper().scrape_job_website()
-        scrape_jobs.JoobleScraper().scrape_job_website()
-        scrape_jobs.NovarobotaScraper().scrape_job_website()
-        scrape_jobs.RabotaScraper().scrape_job_website()
-        scrape_jobs.TrudScraper().scrape_job_website()
+        # scrape_jobs.JobisScraper().scrape_job_website()
+        # scrape_jobs.JobsScraper().scrape_job_website()
+        # scrape_jobs.JoobleScraper().scrape_job_website()
+        # scrape_jobs.NovarobotaScraper().scrape_job_website()
+        # scrape_jobs.RabotaScraper().scrape_job_website()
+        # scrape_jobs.TrudScraper().scrape_job_website()
         scrape_jobs.WorkScraper().scrape_job_website()
-        scrape_games.PSStoreScraper().scrape_game_website()
+        # scrape_games.PSStoreScraper().scrape_game_website()
 
     @staticmethod
     def _load_json_file(filename):
@@ -92,7 +93,7 @@ class CommandBase(BaseCommand):
 
 class Command(CommandBase):
     help = 'update db with scraped data (jobs and games)'
-    
+
     def handle(self, *args, **options):
         self.scrape_websites()
         self.load_jobs_data()

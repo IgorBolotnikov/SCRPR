@@ -1,61 +1,89 @@
 import os
 import json
 import lxml
+import asyncio
+import aiohttp
+import requests
+from random import random
 from urllib.request import urlopen, Request
-from time import time
+from urllib.parse import quote, urlencode
+from time import time, sleep
 from datetime import datetime
 from bs4 import BeautifulSoup as soup
 from .constants import *
 
 
-def timer(func, *args, **kwargs):
+# For gererating url-safe query strings:
+# quote('query string', safe='')
+
+
+def timer(func):
     def wrapper(*args, **kwargs):
         time1 = round(time(), 4)
         print(f'{datetime.now()} - Commencing scraping')
-        func(*args, **kwargs)
+        result = func(*args, **kwargs)
         time2 = round(time(), 4)
         timespan = time2 - time1
         minutes = timespan // 60
-        seconds = round(timespan - minutes * 60)
+        seconds = round(timespan - minutes * 60, 2)
         print(f'{datetime.now()} - Scraping completed in {minutes} m, {seconds} s.')
         print('----------')
+        return result
     return wrapper
 
 
 class ScraperBase:
-
-    @timer
-    def scrape_job_website(self, page_limit=None):
+    async def scrape_job_website(self, location, page_num, query_params=None):
         print(f'Scraping with {self.__class__.__name__}')
         self.output = []
-        for location, city_name in self.cities.items():
+        if location:
             print(f'Scraping for {location}')
-            self._scrape_job_pages(
+            await self._scrape_job_pages(
                 location=location,
-                city_name=city_name,
-                page_limit=page_limit)
-        self._save_results_to_json(self.filename)
+                city_name=self.cities[location],
+                page_num=page_num,
+                query_params=query_params
+            )
+        else:
+            for location, city_name in self.cities.items():
+                print(f'Scraping for {location}')
+                await self._scrape_job_pages(
+                    location=location,
+                    city_name=city_name,
+                    page_num=page_num,
+                    query_params=query_params
+                )
+        print(f'Scraped {len(self.output)} results')
+        return {
+            'object_list': self.output,
+            'last_page': self.last_page_num
+        }
 
     @timer
-    def scrape_game_website(self, page_limit=None):
-        print(f'Scraping with {self.__class__.__name__}')
+    def scrape_game_website(self, page_num, query_params=None):
         self.output = []
-        self._scrape_game_pages(page_limit=page_limit)
-        self._save_results_to_json(self.filename)
+        asyncio.run(self._scrape_game_pages(
+            query_params=query_params,
+            page_num=page_num,
+        ))
+        return {
+            'object_list': self.output,
+            'last_page': self.last_page_num
+        }
 
-    @staticmethod
-    def _request_page(url, pagenum=1):
-        url = url + str(pagenum)
+    def _request_first_page(self, url):
         for count in range(5):
             try:
-                request = Request(url, headers={'User-Agent': REQUEST_HEADER})
-                with urlopen(request) as response:
-                    page = response.read()
-                    page = soup(page, 'lxml')
+                headers = {'User-Agent': REQUEST_HEADER}
+                with session.get(url, headers=headers, params=self.params) as response:
+                    page = soup(response.text, 'lxml')
                     return page
-            except:
-                pass
+            except Exception as exeption:
+                print(exeption)
 
+    @staticmethod
+    def _get_query_string(params):
+        return urlencode(params)
 
     @staticmethod
     def _is_number(line):
@@ -85,11 +113,6 @@ class ScraperBase:
             if char.isnumeric() or char == '.':
                 res += char
         return float(res)
-
-    def _save_results_to_json(self, filename):
-        with open(filename, 'w+') as file:
-            json.dump(self.output, file)
-            file.close()
 
     def _parse_salary(self, salary):
         if not salary or salary.get_text() == '':
@@ -148,26 +171,164 @@ class ScraperBase:
         for game in games:
             self.output.append(self._get_game_items(game))
 
-    def _scrape_job_pages(self, location, city_name, page_limit):
-        url = self._get_url(city_name)
-        self.last_page_num = self._get_last_page_num(self._request_page(url))
-        page_num = 1
-        while True:
-            print(f'Scraping page #{page_num}')
-            if page_num > self.last_page_num or (page_limit and page_num > page_limit):
-                return
-            page = self._request_page(url, page_num)
-            self._add_jobs_to_result(self._get_jobs_list(page), location)
-            page_num += 1
 
-    def _scrape_game_pages(self, page_limit):
-        url = self._get_url()
-        self.last_page_num = self._get_last_page_num(self._request_page(url))
-        page_num = 1
-        while True:
-            print(f'Scraping page #{page_num}')
-            if page_num > self.last_page_num or (page_limit and page_num > page_limit):
-                return
-            page = self._request_page(url, page_num)
-            self._add_games_to_result(self._get_games_list(page))
-            page_num += 1
+    def _filter_free_games(game):
+        price_is_free = game.get('price') == 0
+        psplus_price = game.get('psplus_price')
+        psplus_is_free = not psplus_price or psplus_price == 0
+        return price_is_free or psplus_is_free
+
+    def _filter_games_output(self,
+                             discount_filter=False,
+                             psplus_filter=False,
+                             free=False):
+        if discount_filter:
+            self.output = filter(
+                lambda game: game.get('initial_price') is not None,
+                self.output
+            )
+        if psplus_filter:
+            self.output = filter(
+                lambda game: game.get('psplus_price') is not None,
+                self.output
+            )
+        if free:
+            self.output = filter(self._filter_free_games, self.output)
+        self.output = list(self.output)
+
+    def _set_artificial_last_page(self):
+        output_num = len(self.output)
+        pages = output_num // GAMES_PER_PAGE
+        extra_page = 1 if output_num % GAMES_PER_PAGE > 0 else 0
+        self.last_page_num = pages + extra_page
+
+    def _paginate_games_output(self, current_page_num):
+        zero_based_index = current_page_num - 1
+        start_index = zero_based_index * GAMES_PER_PAGE
+        end_index = zero_based_index + GAMES_PER_PAGE
+        self.output = self.output[start_index:end_index]
+
+    async def _scrape_job_page(self, url, page_num, location, session):
+        print(url)
+        # Max of 5 consecutive requests can be made
+        # To cover the cases of poor inirial responce, network problems
+        # or server error
+        for count in range(5):
+            try:
+                headers = {'User-Agent': REQUEST_HEADER}
+                async with session.get(url, headers=headers) as response:
+                    page = await response.text()
+                    page = soup(page, 'lxml')
+                    self.last_page_num = self._get_last_page_num(page)
+                    if self.last_page_num < page_num:
+                        jobs_list = []
+                    else:
+                        jobs_list = self._get_jobs_list(page)
+                    if response.status == 200:
+                        self._add_jobs_to_result(jobs_list, location)
+                        break
+
+            except Exception as exeption:
+                print(exeption)
+        return page
+
+    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+        last_page_num = page_num
+        async with aiohttp.ClientSession() as session:
+            while page_num <= last_page_num:
+                url = self._get_url(city_name, page_num, query_params)
+                await self._scrape_job_page(url, page_num, location, session)
+                page_num += 1
+
+    async def _scrape_game_page(self, url, page_num, session):
+        # Max of 5 consecutive requests can be made
+        # To cover the cases of poor inirial responce, network problems
+        # or server error
+        for count in range(5):
+            try:
+                headers = {'User-Agent': REQUEST_HEADER}
+                async with session.get(url,
+                                       headers=headers,
+                                       params=self.params,
+                                       allow_redirects=True) as response:
+                    page = await response.text()
+                    page = soup(page, 'lxml')
+                    base_url = url.split(f'/{page_num}')[0] + '/'
+                    games_list = self._get_games_list(page)
+                    self._add_games_to_result(games_list)
+                    # If last page was not explicitly defined
+                    # Assign the value of website's own pagination data
+                    if not hasattr(self, 'last_page_num'):
+                        self.last_page_num = self._get_last_page_num(page, base_url)
+
+                    # If nothing gives an exception,
+                    # Regard this page scraping as successfull
+                    # And don't send more requests
+                    break
+            except Exception as exeption:
+                print(exeption)
+
+    async def _scrape_game_pages(self, page_num, query_params):
+        title = query_params.get('title')
+        discount_filter = bool(query_params.get('initial_price'))
+        psplus_filter = bool(query_params.get('psplus_price'))
+        free = bool(query_params.get('free'))
+        any_filters = discount_filter or psplus_filter or free
+        async_tasks = []
+        async with aiohttp.ClientSession() as session:
+
+            # If title search is filtered, then first get the first page
+            # Syncronously and define last page
+            # It is needed for accumulating all search results asyncronously
+            # And then create artificial pagination from results quantity
+            if title and any_filters:
+                url = self._get_url(1, query_params)
+
+                # Exclude any query string from url and extract page number
+                base_url = url.split('/1')[0] + '/'
+                last_page_num = self._get_last_page_num(
+                    self._request_first_page(url),
+                    base_url
+                )
+                current_page_num = page_num
+                self.last_page_num = last_page_num
+                # Set a flag of artificial pagination to True
+                # so that output splits itself accordingly
+                self.artificial_pagination = True
+
+            # If only Ps Plus offers are selected
+            # Get all pages one by one from the list
+            elif psplus_filter:
+                page_num = 1
+                current_page_num = 1
+                self.last_page_num = last_page_num = len(PS_STORE_PSPLUS_GAMES)
+                self.artificial_pagination = True
+
+            # Else just scrape first page and make pagination
+            # In sync with website's pagination
+            # Since results ar ethe same
+            else:
+                last_page_num = page_num
+
+                # Since pagination is in sync with source website,
+                # Flag should be set to False so that output is returned as is
+                self.artificial_pagination = False
+            while page_num <= last_page_num:
+                async_task = asyncio.create_task(self._scrape_game_page(
+                    self._get_url(page_num, query_params),
+                    page_num,
+                    session
+                ))
+                async_tasks.append(async_task)
+                page_num += 1
+
+            await asyncio.gather(*async_tasks)
+            self._filter_games_output(
+                discount_filter=discount_filter,
+                psplus_filter=psplus_filter,
+                free=free
+            )
+            # Adjust output according to artificial pagination
+            if self.artificial_pagination:
+                self._set_artificial_last_page()
+                self._paginate_games_output(current_page_num)
