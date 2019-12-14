@@ -33,19 +33,31 @@ def timer(func):
 
 
 class ScraperBase:
-    @timer
-    def scrape_job_website(self, query_params=None, page_limit=None):
+    async def scrape_job_website(self, location, page_num, query_params=None):
         print(f'Scraping with {self.__class__.__name__}')
         self.output = []
-        for location, city_name in self.cities.items():
+        if location:
             print(f'Scraping for {location}')
-            asyncio.run(self._scrape_job_pages(
+            await self._scrape_job_pages(
                 location=location,
-                city_name=city_name,
-                page_limit=page_limit))
+                city_name=self.cities[location],
+                page_num=page_num,
+                query_params=query_params
+            )
+        else:
+            for location, city_name in self.cities.items():
+                print(f'Scraping for {location}')
+                await self._scrape_job_pages(
+                    location=location,
+                    city_name=city_name,
+                    page_num=page_num,
+                    query_params=query_params
+                )
         print(f'Scraped {len(self.output)} results')
-        # print('Finished scraping, saving data to .json file')
-        # self._save_results_to_json(self.filename)
+        return {
+            'object_list': self.output,
+            'last_page': self.last_page_num
+        }
 
     @timer
     def scrape_game_website(self, page_num, query_params=None):
@@ -62,7 +74,6 @@ class ScraperBase:
     def _request_first_page(self, url):
         for count in range(5):
             try:
-                session = requests.session()
                 headers = {'User-Agent': REQUEST_HEADER}
                 with session.get(url, headers=headers, params=self.params) as response:
                     page = soup(response.text, 'lxml')
@@ -102,11 +113,6 @@ class ScraperBase:
             if char.isnumeric() or char == '.':
                 res += char
         return float(res)
-
-    def _save_results_to_json(self, filename):
-        with open(filename, 'w+') as file:
-            json.dump(self.output, file)
-            file.close()
 
     def _parse_salary(self, salary):
         if not salary or salary.get_text() == '':
@@ -158,8 +164,6 @@ class ScraperBase:
         }
 
     def _add_jobs_to_result(self, jobs, location):
-        # print('Adding jobs to results list')
-        # print(f'Current results length: {len(self.output)}')
         for job in jobs:
             self.output.append(self._get_job_items(job, location))
 
@@ -205,59 +209,49 @@ class ScraperBase:
         self.output = self.output[start_index:end_index]
 
     async def _scrape_job_page(self, url, page_num, location, session):
-        # print(f'{location} Scraping page #{page_num}')
-        url = url + str(page_num)
-        for count in range(5):
-            try:
-                await asyncio.sleep(random() * 100)
-                headers = {'User-Agent': REQUEST_HEADER}
-                async with session.get(url, headers=headers) as response:
-                    await asyncio.sleep(random() * 100)
-                    print(f'--#{page_num} Parsing the page')
-                    page = await response.text()
-                    page = soup(page, 'lxml')
-                    jobs_list = self._get_jobs_list(page)
-                    if len(jobs_list) == 0:
-                        print(f'--> Page#{page_num} "{response.status}" CRASHED :D')
-                    else:
-                        print(f'-> Page#{page_num} "{response.status}" SUCCESSFULL')
-                        self._add_jobs_to_result(jobs_list, location)
-                        break
-            except Exception as exeption:
-                print(exeption)
-
-    async def _scrape_job_pages(self, location, city_name, page_limit):
-        url = self._get_url(city_name)
-        self.last_page_num = self._get_last_page_num(self._request_first_page(url))
-        page_num = 1
-        async_tasks = []
-        async with aiohttp.ClientSession() as session:
-            while not (page_num > self.last_page_num or (page_limit and page_num > page_limit)):
-                # print(f'Creating task No {page_num}')
-                async_task = asyncio.create_task(self._scrape_job_page(
-                    url,
-                    page_num,
-                    location,
-                    session))
-                async_tasks.append(async_task)
-                # print(f'Scraping page #{page_num}')
-                # page = self._request_page(url, page_num)
-                # self._add_jobs_to_result(self._get_jobs_list(page), location)
-                page_num += 1
-            # print('Gathering all created tasks')
-            await asyncio.gather(*async_tasks)
-
-    async def _scrape_game_page(self, url, page_num, session):
-
+        print(url)
         # Max of 5 consecutive requests can be made
         # To cover the cases of poor inirial responce, network problems
         # or server error
         for count in range(5):
             try:
                 headers = {'User-Agent': REQUEST_HEADER}
-                async with session.get(url, headers=headers, params=self.params) as response:
+                async with session.get(url, headers=headers) as response:
                     page = await response.text()
-                    await asyncio.sleep(2)
+                    page = soup(page, 'lxml')
+                    self.last_page_num = self._get_last_page_num(page)
+                    if self.last_page_num < page_num:
+                        jobs_list = []
+                    else:
+                        jobs_list = self._get_jobs_list(page)
+                    if response.status == 200:
+                        self._add_jobs_to_result(jobs_list, location)
+                        break
+
+            except Exception as exeption:
+                print(exeption)
+        return page
+
+    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+        last_page_num = page_num
+        async with aiohttp.ClientSession() as session:
+            while page_num <= last_page_num:
+                url = self._get_url(city_name, page_num, query_params)
+                await self._scrape_job_page(url, page_num, location, session)
+                page_num += 1
+
+    async def _scrape_game_page(self, url, page_num, session):
+        # Max of 5 consecutive requests can be made
+        # To cover the cases of poor inirial responce, network problems
+        # or server error
+        for count in range(5):
+            try:
+                headers = {'User-Agent': REQUEST_HEADER}
+                async with session.get(url,
+                                       headers=headers,
+                                       params=self.params,
+                                       allow_redirects=True) as response:
+                    page = await response.text()
                     page = soup(page, 'lxml')
                     base_url = url.split(f'/{page_num}')[0] + '/'
                     games_list = self._get_games_list(page)
@@ -314,7 +308,6 @@ class ScraperBase:
             # In sync with website's pagination
             # Since results ar ethe same
             else:
-                print('Native pagination')
                 last_page_num = page_num
 
                 # Since pagination is in sync with source website,
@@ -330,13 +323,11 @@ class ScraperBase:
                 page_num += 1
 
             await asyncio.gather(*async_tasks)
-            print(len(self.output))
             self._filter_games_output(
                 discount_filter=discount_filter,
                 psplus_filter=psplus_filter,
                 free=free
             )
-            print(len(self.output))
             # Adjust output according to artificial pagination
             if self.artificial_pagination:
                 self._set_artificial_last_page()

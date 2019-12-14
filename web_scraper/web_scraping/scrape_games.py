@@ -5,14 +5,6 @@ class PSStoreScraper(ScraperBase):
     def _get_url(self, page_num=1, query_params=None):
         '''
         Get url for parsing with specified query params
-        Return following url format if title is specified:
-        - https://store.playstation.com/ru-ua/grid/search-игра/{pagenum}?query={title}
-
-        Return following url for discounts:
-        - https://store.playstation.com/ru-ua/grid/STORE-MSF75508-PRICEDROPSCHI/1?price={price_min}-{pricemax}
-
-        Return following url by default:
-        - https://store.playstation.com/ru-ua/grid/STORE-MSF75508-FULLGAMES/
         '''
         DEFAULT_MIN_PRICE = 0
         DEFAULT_MAX_PRICE = 1000000

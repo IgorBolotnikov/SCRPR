@@ -19,16 +19,16 @@ LINKS = (
 
 RABOTAUA_BASELINK = 'https://rabota.ua'
 # TODO: Use site's API
-RABOTAUA_LINK = 'https://rabota.ua/jobsearch/vacancy_list?keyWords='
+RABOTAUA_LINK = 'https://rabota.ua/jobsearch/vacancy_list'
 RABOTAUA_FILE = BASE_DIR + '/json/jobs_list__rabota_ua.json'
 RABOTAUA_CITIES = {
-    'Киев': '&regionId=1',
-    'Одесса': '&regionId=3',
-    'Днепр': '&regionId=4',
-    # 'Харьков': '&regionId=0',
-    'Львов': '&regionId=2'
+    'Киев': 'regionId=1&',
+    'Одесса': 'regionId=3&',
+    'Днепр': 'regionId=4&',
+    'Харьков': '&regionId=21&',
+    'Львов': '&regionId=2&'
 }
-
+'https://www.work.ua/ru/jobs-mariupol-один+два/?advs=1&salaryfrom=2&salaryto=5'
 WORKUA_BASELINK = 'https://www.work.ua'
 WORKUA_LINK = 'https://www.work.ua/ru/jobs-'
 WORKUA_FILE = BASE_DIR + '/json/jobs_list__work_ua.json'
@@ -41,7 +41,7 @@ WORKUA_CITIES = {
 }
 
 JOBSUA_BASELINK = 'https://jobs.ua'
-JOBSUA_LINK = 'https://jobs.ua/rus/vacancy/'
+JOBSUA_LINK = 'https://jobs.ua/rus/vacancy'
 JOBSUA_FILE = BASE_DIR + '/json/jobs_list__jobs_ua.json'
 JOBSUA_CITIES = {
     'Киев': 'kiev',
@@ -52,7 +52,7 @@ JOBSUA_CITIES = {
 }
 
 JOOBLEORG_BASELINK = 'https://ua.jooble.org'
-JOOBLEORG_LINK = 'https://ua.jooble.org/%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0/'
+JOOBLEORG_LINK = 'https://ua.jooble.org'
 JOOBLEORG_FILE = BASE_DIR + '/json/jobs_list__jooble_org.json'
 JOOBLEORG_CITIES = {
     'Киев': '%D0%9A%D0%B8%D0%B5%D0%B2',
@@ -110,7 +110,7 @@ JOBISCOMUA_CATEGORIES = (
 )
 
 NOVAROBOTAUA_BASELINK = 'http://novarobota.ua'
-NOVAROBOTAUA_LINK = 'https://novarobota.ua/city/'
+NOVAROBOTAUA_LINK = 'https://novarobota.ua/zapros'
 NOVAROBOTAUA_FILE = BASE_DIR + '/json/jobs_list__novarobota_ua.json'
 NOVAROBOTAUA_CITIES = {
     'Киев': 'kiev',
@@ -121,7 +121,8 @@ NOVAROBOTAUA_CITIES = {
 }
 
 TRUDUA_BASELINK = 'http://www.trud.ua'
-TRUDUA_LINK = 'https://trud.ua/state/'
+TRUDUA_LINK = 'https://trud.ua/jobs/list/filter_show/state/q'
+TRUDUA_LINK_CITY = 'https://trud.ua/state'
 TRUDUA_FILE = BASE_DIR + '/json/jobs_list__trud_ua.json'
 TRUDUA_CITIES = {
     'Киев': 'kiev',

@@ -1,5 +1,4 @@
-# from secrets import token_hex
-# from os import path
+import asyncio
 from urllib.parse import urlencode, parse_qs
 from django.http import Http404
 from django.db.models import Q
@@ -26,10 +25,12 @@ from .models import *
 from .constants import *
 from.paginator import VirtualPaginator
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
+from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
 
 
 def generate_cache_key(query):
-    return ','.join([f'{key}-{str(value).lower()}' for key, value in query.items()])
+    key = ','.join([f'{key}-{str(value).lower()}' for key, value in query.items()])
+    return hash(key)
 
 
 class FormListView(FormView):
@@ -51,6 +52,11 @@ class FormListView(FormView):
             'params': self.params,
             'object_list': self.get_queryset(self.form.initial)
         }
+        if self.last_page > 1:
+            context['page_obj'] = VirtualPaginator(
+                self.current_page,
+                self.last_page
+            )
         context.update(kwargs)
         return super().get_context_data(**context)
 
@@ -262,7 +268,6 @@ class GamesView(FormListView):
         query_params.update({'page': page_num})
         return generate_cache_key(query_params)
 
-    # TODO: Change db query to web scraping query
     def get_queryset(self, query_params=None):
         cache_key = self.get_cache_key(query_params)
         cached_query = cache.get(cache_key)
@@ -280,8 +285,6 @@ class GamesView(FormListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] =  _('Games')
-        if self.last_page > 1:
-            context['page_obj'] = VirtualPaginator(self.current_page, self.last_page)
         return context
 
 
@@ -290,25 +293,27 @@ class JobsView(FormListView):
     form_class = JobsForm
     url = 'scrpr:jobs'
 
+    def get_cache_key(self, query_params):
+        page_num = self.current_page if self.current_page else 1
+        query_params = query_params if query_params else {'jobs': 'all'}
+        query_params.update({'page': page_num})
+        return generate_cache_key(query_params)
+
     # TODO: Change db query to web scraping query
-    def get_queryset(self, query_items=None):
-        return
-        # if not query_items:
-        #     return super().get_queryset()
-        # queryset = self.model.objects
-        # for key, value in query_items.items():
-        #     if key == 'title':
-        #         queryset = queryset.filter(title__icontains=value)
-        #     elif key == 'city':
-        #         queryset = queryset.filter(location=value)
-        #     elif key == 'salary_min':
-        #         queryset = queryset.filter(salary_min__gte=value)
-        #     elif key == 'salary_max':
-        #         queryset = queryset.filter(salary_max__lte=value)
-        #     elif key == 'with_salary':
-        #         queryset = queryset.filter(
-        #             salary_min__isnull=False, salary_max__isnull=False)
-        # return queryset
+    def get_queryset(self, query_params=None):
+        cache_key = self.get_cache_key(query_params)
+        cached_query = cache.get(cache_key)
+        if cached_query:
+            query_results = cached_query
+        else:
+            query_results = JobsSitesScraper().scrape_websites(
+                location=query_params.get('city') if query_params else None,
+                query_params=query_params,
+                page_num=self.current_page,
+            )
+            cache.set(cache_key, query_results, 600)
+        self.last_page = query_results.get('last_page', 1)
+        return query_results.get('object_list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
