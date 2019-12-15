@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
-from django_resized import ResizedImageField
 from .constants import *
 
 
@@ -11,13 +10,7 @@ class User(AbstractUser):
         unique=True,
         error_messages={'unique': USER_EMAIL_CONSTRAINT_MESSAGE}
     )
-    image = ResizedImageField(
-        upload_to='user_avatar',
-        size=[100, 100],
-        crop=['middle', 'center'],
-        default='user_avatar/default_image.jpg',
-        blank=True,
-    )
+    image = models.TextField(null=True, blank=True, default=DEFAULT_USER_IMAGE) # Image is saved as base64 string
     slug = models.SlugField(max_length=200, blank=True)
     sharing_with = models.ManyToManyField(
         'self',

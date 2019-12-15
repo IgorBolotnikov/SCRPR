@@ -166,7 +166,6 @@ class FavoritesGameDetailView(FavoritesMixin, UpdateView):
         form = self.form_class(**form_kwargs)
         if form.is_valid():
             self.form_valid(form)
-            # self.object = form.save()
         return redirect(self.success_url)
 
     def get_context_data(self, **kwargs):

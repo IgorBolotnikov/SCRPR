@@ -7,6 +7,7 @@ from django.contrib.auth.forms import (
 )
 from django.forms import (
     ModelForm,
+    ImageField,
     TextInput,
     PasswordInput,
     EmailInput,
@@ -52,13 +53,17 @@ class CustomSetPasswordForm(SetPasswordForm):
 
 
 class UpdateUserForm(ModelForm):
+    image = ImageField(
+        required=False,
+        widget=FileInput(attrs=ACCOUNT_IMAGE_FIELD_ATTRS)
+    )
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'image']
+        fields = ['username', 'email']
         widgets = {
             'username': TextInput(attrs=ACCOUNT_FIELD_ATTRS),
             'email': EmailInput(attrs=ACCOUNT_FIELD_ATTRS),
-            'image': FileInput(attrs=ACCOUNT_IMAGE_FIELD_ATTRS)
         }
 
 

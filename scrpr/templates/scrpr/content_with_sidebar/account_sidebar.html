@@ -2,7 +2,7 @@
 
 <div class="window account_header">
   <div class="account_header_upper">
-    <img class="user_image" src="{% if user.image %}{{ user.image.url }}{% else %}{{ MEDIA_URL }}user_avatar/default_image.jpg{% endif %}" alt="{{ user.username }}" height="60px" width="60px">
+    <img class="user_image" src="{{ user.image }}" alt="{{ user.username }}" height="60px" width="60px">
     <div class="user_info">
       <h2 class="account_name">{{ user.username }}</h2>
       <small class="account_email">{{ user.email }}</small>

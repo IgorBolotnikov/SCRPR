@@ -1,5 +1,8 @@
 import urllib.parse
 import os
+import io
+from base64 import b64encode
+from PIL import Image
 
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -122,7 +125,7 @@ class DeleteAccountView(DeleteView):
     template_name = 'authentication/delete_account.html'
     twmplate_name_suffix = ''
     model = User
-    success_url = '/authentication/register'
+    success_url = '/auth/register'
     context_object_name = 'account'
 
 
@@ -130,7 +133,7 @@ class EditAccountView(LoginRequiredMixin, UpdateView):
     template_name = 'authentication/edit_account.html'
     model = User
     form_class = UpdateUserForm
-    success_url = '/scrpr'
+    success_url = '/favorites'
     login_url = '/auth/login/'
     context_object_name = 'account'
 
@@ -138,3 +141,20 @@ class EditAccountView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Edit Account'
         return context
+
+    def form_valid(self, form):
+        image = self.request.FILES.get('image')
+        if image:
+            image = self.get_encoded_image(image)
+            self.object.image = image
+        return super().form_valid(form)
+
+    @staticmethod
+    def get_encoded_image(image):
+        image = Image.open(image)
+        image.resize(USER_IMAGE_SIZE)
+        filepath = io.BytesIO()
+        image.save(filepath, image.format)
+        image_binary = filepath.getvalue()
+        image_string = b64encode(image_binary).decode("utf-8")
+        return f'data:image/jpeg;base64,{image_string}'
