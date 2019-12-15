@@ -48,6 +48,13 @@ input, textarea, select, option {
   border-color: grey;
 }
 
+.button_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px;
+}
+
 /* ===============
 ===== NAVBAR =====
 ================== */
@@ -1425,7 +1432,7 @@ input, textarea, select, option {
     float: left;
     position: sticky;
     left: 0px;
-    top: 15px;
+    top: 0px;
   }
 
   .paragraph {
@@ -1529,6 +1536,10 @@ input, textarea, select, option {
     max-width: 400px;
   }
 
+  .button_container {
+    margin-top: 0px;
+  }
+
 }
 
 @media (max-width: 400px) {
@@ -1558,4 +1569,15 @@ input, textarea, select, option {
     justify-content: center;
   }
 
+}
+
+/* Classes for toggling items with JS */
+
+.hidden {
+  visibility: hidden;
+  max-height: 0px;
+  overflow: hidden;
+  margin: 0px;
+  padding: 0px;
+  border-bottom-width: 0px;
 }
