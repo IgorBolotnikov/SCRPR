@@ -66,19 +66,20 @@ class ScraperBase:
         asyncio.run(self._scrape_game_pages(
             query_params=query_params,
             page_num=page_num,
-        ))
+        ), debug=True)
         return {
             'object_list': self.output,
             'last_page': self.last_page_num
         }
 
-    def _request_first_page(self, url):
+    def _request_first_page(self, url, session):
         for count in range(5):
             try:
                 headers = {'User-Agent': REQUEST_HEADER}
-                with session.get(url, headers=headers, params=self.params) as response:
-                    page = soup(response.text, 'lxml')
-                    return page
+                response = requests.get(url, headers=headers, params=self.params)
+                page = response.text
+                page = soup(page, 'lxml')
+                return page
             except Exception as exeption:
                 print(exeption)
 
@@ -288,8 +289,8 @@ class ScraperBase:
                 # Exclude any query string from url and extract page number
                 base_url = url.split('/1')[0] + '/'
                 last_page_num = self._get_last_page_num(
-                    self._request_first_page(url),
-                    base_url
+                    self._request_first_page(url, session),
+                    base_url,
                 )
                 current_page_num = page_num
                 self.last_page_num = last_page_num
