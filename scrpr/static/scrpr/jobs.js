@@ -32,9 +32,31 @@ function adjustCityButton(x) {
   }
 }
 
+function showMoreResults() {
+  let jobsList = document.getElementsByClassName('list_item hidden');
+  console.log('Total hidden items: ' + jobsList.length);
+  if (jobsList.length > 20) {
+    console.log('Still more than 20 elements');
+    for (let index = 0; index < 20; index++) {
+      jobsList[0].classList.remove('hidden');
+    }
+  } else {
+    console.log('Already less than 20 elements');
+    const listLength = jobsList.length;
+    for (let index = 0; index < listLength; index++) {
+      console.log(index, jobsList.length);
+      jobsList[0].classList.remove('hidden');
+    }
+    let button = document.getElementsByClassName('button_container')[0];
+    button.classList.add('hidden');
+  }
+}
+
 if (document.getElementsByClassName('city_filter')[0] !== undefined) {
-  for (var i = 0; i < xList.length; i++) {
+  for (let i = 0; i < xList.length; i++) {
     adjustCityButton(xList[i]);
     xList[i].addListener(adjustCityButton);
   }
 }
+
+window.onload = showMoreResults();

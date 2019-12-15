@@ -509,12 +509,13 @@ class JobsSitesScraper:
     def _adjust_results_number(results):
         object_list = []
         last_page_list = []
-        websites_num = len(
-            [item['object_list'] for item in results if len(item['object_list']) != 0])
+        # websites_num = len(
+        #     [item['object_list'] for item in results if len(item['object_list']) != 0])
         for item in results:
-            results_num = len(item['object_list'])
-            adjusted_num = results_num // websites_num
-            object_list.extend(item['object_list'][:adjusted_num])
+            # results_num = len(item['object_list'])
+            # adjusted_num = results_num // websites_num
+            # object_list.extend(item['object_list'][:adjusted_num])
+            object_list.extend(item['object_list'])
             last_page_list.append(item['last_page'])
         return {
             'object_list': object_list,
