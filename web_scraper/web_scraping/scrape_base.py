@@ -243,6 +243,7 @@ class ScraperBase:
                 page_num += 1
 
     async def _scrape_game_page(self, url, page_num, session):
+        print(url, page_num)
         # Max of 5 consecutive requests can be made
         # To cover the cases of poor inirial responce, network problems
         # or server error
@@ -257,6 +258,7 @@ class ScraperBase:
                     page = soup(page, 'lxml')
                     base_url = url.split(f'/{page_num}')[0] + '/'
                     games_list = self._get_games_list(page)
+                    print(f'Scraped {games_list} games')
                     self._add_games_to_result(games_list)
                     # If last page was not explicitly defined
                     # Assign the value of website's own pagination data
