@@ -489,20 +489,34 @@ class JobsSitesScraper:
     async def _scrape_websites(self, location, page_num, query_params):
         async_tasks = []
         websites = [
-            # TODO: Include categoriesto job search
+            # TODO: Include categories to job search
             # Otherwise Jobis will not work
             #
             # JobisScraper().scrape_job_website,
-            JobsScraper().scrape_job_website,
-            JoobleScraper().scrape_job_website,
-            NovarobotaScraper().scrape_job_website,
-            RabotaScraper().scrape_job_website,
-            TrudScraper().scrape_job_website,
-            WorkScraper().scrape_job_website
+            JobsScraper(),
+            JoobleScraper(),
+            NovarobotaScraper(),
+            RabotaScraper(),
+            TrudScraper(),
+            WorkScraper()
         ]
-        for scrape_job in websites:
-            async_task = asyncio.create_task(scrape_job(location, page_num, query_params))
-            async_tasks.append(async_task)
+        if location:
+            for website in websites:
+                async_task = asyncio.create_task(website.scrape_job_website(
+                    location,
+                    page_num,
+                    query_params
+                ))
+                async_tasks.append(async_task)
+        else:
+            for website in websites:
+                for location in website.cities.keys():
+                    async_task = asyncio.create_task(website.scrape_job_website(
+                        location,
+                        page_num,
+                        query_params
+                    ))
+                    async_tasks.append(async_task)
         return await asyncio.gather(*async_tasks)
 
     @staticmethod
