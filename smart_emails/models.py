@@ -13,7 +13,7 @@ class SavedSuggestion(models.Model):
 
     saved_datetime = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=10, choices=SUCCESTION_TYPES)
-    link = models.URLField(max_length=200)
+    link = models.URLField(max_length=500)
     account = models.ForeignKey(
         User,
         related_name='suggestions',
