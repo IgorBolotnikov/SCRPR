@@ -18,6 +18,7 @@ from django.forms import (
     FileInput
 )
 from django.core.mail import send_mail
+from django.conf import settings
 from .models import Comment, FavoriteGameQuery, FavoriteJobQuery
 from .constants import *
 from authentication.models import User
@@ -44,8 +45,8 @@ class RateForm(ModelForm):
         send_mail(
             MESSAGE_SUBJECT,
             message,
-            environ.get('MAIL_USERNAME'),
-            [environ.get('OWN_EMAIL')]
+            settings.EMAIL_HOST_USER,
+            [settings.OWN_EMAIL]
         )
 
 
