@@ -246,7 +246,7 @@ class AboutView(TemplateView):
 class RateView(CreateView):
     template_name = 'scrpr/rate.html'
     form_class = RateForm
-    success_url = '/scrpr'
+    success_url = '/'
 
     def get_context_data(self, **kwargs):
         context = {
