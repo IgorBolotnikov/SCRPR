@@ -31,24 +31,14 @@ def timer(func):
 class ScraperBase:
     async def scrape_job_website(self, location, page_num, query_params=None):
         print(f'Scraping with {self.__class__.__name__}')
+        print(f'Scraping for {location}')
         self.output = []
-        if location:
-            print(f'Scraping for {location}')
-            await self._scrape_job_pages(
+        await self._scrape_job_pages(
                 location=location,
                 city_name=self.cities[location],
                 page_num=page_num,
                 query_params=query_params
             )
-        else:
-            for location, city_name in self.cities.items():
-                print(f'Scraping for {location}')
-                await self._scrape_job_pages(
-                    location=location,
-                    city_name=city_name,
-                    page_num=page_num,
-                    query_params=query_params
-                )
         print(f'Scraped {len(self.output)} results')
         return {
             'object_list': self.output,
