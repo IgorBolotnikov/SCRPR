@@ -10,7 +10,7 @@
       {% csrf_token %}
       <div class="button_options">
         <input type="submit" value="{% trans 'DELETE' %}" class="auth_button danger_button">
-        <a href="{% url 'authentication:edit_account' slug=user.slug %}" class="auth_button big_button"">{% trans 'BACK' %}</a>
+        <a href="{% url 'authentication:edit_account' pk=user.pk %}" class="auth_button big_button"">{% trans 'BACK' %}</a>
       </div>
 
     </form>

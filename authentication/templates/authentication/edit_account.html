@@ -46,7 +46,7 @@
     </form>
     <div class="additional_options">
       <a class="account_button big_button" href="{% url 'authentication:change_password' %}">{% trans 'Change Password' %}</a>
-      <a class="account_button danger_button" href="{% url 'authentication:delete_account' slug=user.slug %}">{% trans 'Delete Account' %}</a>
+      <a class="account_button danger_button" href="{% url 'authentication:delete_account' pk=user.pk %}">{% trans 'Delete Account' %}</a>
     </div>
   </div>
 {% endif %}
