@@ -11,6 +11,6 @@ urlpatterns = [
     path('reset_password_complete', CompleteResetPasswordView.as_view(), name='reset_password_complete'),
     path('change_password', ChangePasswordView.as_view(), name='change_password'),
     path('change_password_done', ChangePasswordDoneView.as_view(), name='change_password_done'),
-    path('delete_account/<slug:slug>', DeleteAccountView.as_view(), name='delete_account'),
-    path('edit_account/<slug:slug>', EditAccountView.as_view(), name='edit_account'),
+    path('delete_account/<int:pk>', DeleteAccountView.as_view(), name='delete_account'),
+    path('edit_account/<int:pk>', EditAccountView.as_view(), name='edit_account'),
 ]

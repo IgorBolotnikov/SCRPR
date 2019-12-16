@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-09 18:07+0200\n"
+"POT-Creation-Date: 2019-12-16 17:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -144,12 +144,12 @@ msgstr "ПОДТВЕРДИТЬ"
 
 #: authentication/templates/authentication/footer.html:6
 #: scrpr/templates/scrpr/about.html:5 scrpr/templates/scrpr/footer.html:6
-#: scrpr/views.py:223
+#: scrpr/views.py:240
 msgid "About"
 msgstr "О проекте"
 
 #: authentication/templates/authentication/footer.html:7
-#: scrpr/templates/scrpr/footer.html:7 scrpr/views.py:236
+#: scrpr/templates/scrpr/footer.html:7 scrpr/views.py:253
 msgid "Rate!"
 msgstr "Оценить!"
 
@@ -187,17 +187,17 @@ msgid "Forgot your password?"
 msgstr "Забыли пароль?"
 
 #: authentication/templates/authentication/navbar.html:16
-#: scrpr/templates/scrpr/navbar.html:16 scrpr/views.py:96
+#: scrpr/templates/scrpr/navbar.html:16 scrpr/views.py:114
 msgid "News"
 msgstr "Новости"
 
 #: authentication/templates/authentication/navbar.html:17
-#: scrpr/templates/scrpr/navbar.html:17 scrpr/views.py:273
+#: scrpr/templates/scrpr/navbar.html:17 scrpr/views.py:287
 msgid "Games"
 msgstr "Игры"
 
 #: authentication/templates/authentication/navbar.html:18
-#: scrpr/templates/scrpr/navbar.html:18 scrpr/views.py:307
+#: scrpr/templates/scrpr/navbar.html:18 scrpr/views.py:320
 msgid "Jobs"
 msgstr "Работа"
 
@@ -266,11 +266,11 @@ msgstr "Пожалуйста, введите свой email."
 msgid "A message will be sent with instructions."
 msgstr "Сообщение будет отправлено с инструкциями."
 
-#: project/settings.py:151
+#: project/settings.py:152
 msgid "Russian"
 msgstr "Русский"
 
-#: project/settings.py:152
+#: project/settings.py:153
 msgid "English"
 msgstr "Английский"
 
@@ -291,7 +291,7 @@ msgid "With discount"
 msgstr "Со скидкой"
 
 #: scrpr/constants.py:10
-#: scrpr/templates/scrpr/content_with_sidebar/games.html:57
+#: scrpr/templates/scrpr/content_with_sidebar/games.html:58
 msgid "FREE"
 msgstr "Бесплатно"
 
@@ -412,32 +412,36 @@ msgstr "Управление Параметрами"
 msgid "SAVE"
 msgstr "СОХРАНИТЬ"
 
-#: scrpr/templates/scrpr/content_with_sidebar/games.html:11
+#: scrpr/templates/scrpr/content_with_sidebar/games.html:12
 #: scrpr/templates/scrpr/content_with_sidebar/jobs.html:12
 msgid "Filters"
 msgstr "Фильтры"
 
-#: scrpr/templates/scrpr/content_with_sidebar/games.html:13
+#: scrpr/templates/scrpr/content_with_sidebar/games.html:14
 msgid "Prices"
 msgstr "Цены"
 
-#: scrpr/templates/scrpr/content_with_sidebar/games.html:35
+#: scrpr/templates/scrpr/content_with_sidebar/games.html:36
 #: scrpr/templates/scrpr/content_with_sidebar/jobs.html:31
 msgid "Save to Favorites"
 msgstr "Сохранить в Избранное"
 
-#: scrpr/templates/scrpr/content_with_sidebar/games.html:42
+#: scrpr/templates/scrpr/content_with_sidebar/games.html:43
 #: scrpr/templates/scrpr/content_with_sidebar/jobs.html:38
 msgid "No results :("
 msgstr "Нет результатов :("
 
-#: scrpr/templates/scrpr/content_with_sidebar/games.html:63
+#: scrpr/templates/scrpr/content_with_sidebar/games.html:64
 msgid "PS Plus FREE"
 msgstr "PS Plus Бесплатно"
 
 #: scrpr/templates/scrpr/content_with_sidebar/jobs.html:15
 msgid "Salary"
 msgstr "Зарплата"
+
+#: scrpr/templates/scrpr/content_with_sidebar/jobs.html:62
+msgid "SHOW MORE RESULTS"
+msgstr "ПОКАЗАТЬ БОЛЬШЕ РЕЗУЛЬТАТОВ"
 
 #: scrpr/templates/scrpr/index.html:6
 msgid "Search in one place"
@@ -521,26 +525,26 @@ msgstr ""
 "Пожалуйста, оцените приложение и не стесняйтесь оставлять свое мнение. Любые "
 "замечания и предложения приветствуются."
 
-#: scrpr/views.py:84
+#: scrpr/views.py:102
 msgid "Home"
 msgstr "Начало"
 
-#: scrpr/views.py:114
+#: scrpr/views.py:132
 msgid "Favorites"
 msgstr "Избранное"
 
-#: scrpr/views.py:156 scrpr/views.py:186
+#: scrpr/views.py:173 scrpr/views.py:203
 msgid "Favorites (Edit)"
 msgstr "Избранное (Изменить)"
 
-#: scrpr/views.py:199 scrpr/views.py:212
+#: scrpr/views.py:216 scrpr/views.py:229
 msgid "Favorites (Delete)"
 msgstr "Избранное (Удалить)"
 
 #: smart_emails/templates/smart_emails/games_email_body_template.html:159
-#: smart_emails/templates/smart_emails/games_email_body_template.txt:3
-#, python-format
-msgid "You asked me to notify you %(frequency)s about PS4 games. "
+#, fuzzy, python-format
+#| msgid "You asked me to notify you %(frequency)s about PS4 games. "
+msgid "You asked me to notify you %(frequency|lower)s about PS4 games. "
 msgstr ""
 "Вы просили меня присылать Вам уведомления %(frequency)s об играх на PS4."
 
@@ -575,7 +579,20 @@ msgstr ""
 msgid "Go to Website"
 msgstr "Перейти на Сайт"
 
+#: smart_emails/templates/smart_emails/games_email_body_template.txt:3
+#, python-format
+msgid "You asked me to notify you %(frequency)s about PS4 games. "
+msgstr ""
+"Вы просили меня присылать Вам уведомления %(frequency)s об играх на PS4."
+
 #: smart_emails/templates/smart_emails/jobs_email_body_template.html:158
+#, fuzzy, python-format
+#| msgid "You asked me to notify you %(frequency)s about job offers. "
+msgid "You asked me to notify you %(frequency|lower)s about job offers. "
+msgstr ""
+"Вы просили меня присылать Вам уведомления %(frequency)s об открытых "
+"вакансиях."
+
 #: smart_emails/templates/smart_emails/jobs_email_body_template.txt:3
 #, python-format
 msgid "You asked me to notify you %(frequency)s about job offers. "

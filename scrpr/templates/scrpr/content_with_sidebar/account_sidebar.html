@@ -8,5 +8,5 @@
       <small class="account_email">{{ user.email }}</small>
     </div>
   </div>
-  <a href="{% url 'authentication:edit_account' slug=user.slug %}" class="account_button big_button">{% trans 'Edit' %}</a>
+  <a href="{% url 'authentication:edit_account' pk=user.pk %}" class="account_button big_button">{% trans 'Edit' %}</a>
 </div>

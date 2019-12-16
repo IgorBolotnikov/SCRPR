@@ -59,7 +59,7 @@
       {% endfor %}
     </ul>
     <div class="button_container">
-      <button type="button" class="big_button" onclick="showMoreResults()" ontouchend="showMoreResults()">SHOW MORE RESULTS</button>
+      <button type="button" class="big_button" onclick="showMoreResults()" ontouchend="showMoreResults()">{% trans 'SHOW MORE RESULTS' %}</button>
     </div>
     {% if page_obj %}
       {% include 'scrpr/content_with_sidebar/pagination.html' %}
