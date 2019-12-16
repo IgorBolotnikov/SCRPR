@@ -36,12 +36,12 @@ class RateForm(ModelForm):
         }
 
     @staticmethod
-    def _make_message(name, email, subject, message_body):
-        message_header = f'From: {name}, email: <{email}>\nSubject: {subject}\n\n'
+    def _make_message(name, message_body):
+        message_header = f'From {name}\n\n'
         return message_header + message_body
 
-    def send_message(self, name, email, subject, message_body):
-        message = self._make_message(name, email, subject, message_body)
+    def send_message(self, name, message_body):
+        message = self._make_message(name, message_body)
         send_mail(
             MESSAGE_SUBJECT,
             message,

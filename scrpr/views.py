@@ -255,6 +255,13 @@ class RateView(CreateView):
         context.update(**kwargs)
         return super().get_context_data(**context)
 
+    def form_valid(self, form):
+        form.send_message(
+            name=form.cleaned_data['name'],
+            message_body=form.cleaned_data['comment']
+        )
+        return super().form_valid(form)
+
 
 class GamesView(FormListView):
     template_name = 'scrpr/content_with_sidebar/games.html'

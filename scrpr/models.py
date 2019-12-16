@@ -61,7 +61,7 @@ class Comment(models.Model):
     datetime_sent = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.subject
+        return f'From: {self.name}'
 
 
 class NewsPost(models.Model):
