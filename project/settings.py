@@ -226,5 +226,20 @@ TINYMCE_DEFAULT_CONFIG = {
 TINYMCE_SPELLCHECKER = True
 TINYMCE_COMPRESSOR = True
 
+
+# Cache settings
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'scraping_cache_table',
+        'TIMEOUT': 1200,
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
+
 # adapt paths for deployment on Heroku
 django_heroku.settings(locals())

@@ -30,7 +30,7 @@ from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
 
 def generate_cache_key(query):
     key = ','.join([f'{key}-{str(value).lower()}' for key, value in query.items()])
-    return hash(key)
+    return str(hash(key))
 
 
 class FormListView(FormView):
@@ -277,7 +277,7 @@ class GamesView(FormListView):
                 query_params=query_params,
                 page_num=self.current_page,
             )
-            cache.set(cache_key, query_results, 600)
+            cache.set(cache_key, query_results)
         self.last_page = query_results.get('last_page', 1)
         return query_results.get('object_list')
 
