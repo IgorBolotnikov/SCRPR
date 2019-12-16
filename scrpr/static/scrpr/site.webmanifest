@@ -1,6 +1,6 @@
 {
     "name": "SCRPR",
-    "short_name": "SCRPR",
+    "short_name": "SCRPR App",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -15,5 +15,7 @@
     ],
     "theme_color": "#ff4d4d",
     "background_color": "#ff4d4d",
-    "display": "standalone"
+    "display": "standalone",
+    "start_url": "/",
+    "display": "standalone",
 }
