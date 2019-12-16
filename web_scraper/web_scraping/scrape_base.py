@@ -52,7 +52,7 @@ class ScraperBase:
         asyncio.run(self._scrape_game_pages(
             query_params=query_params,
             page_num=page_num,
-        ), debug=True)
+        ))
         return {
             'object_list': self.output,
             'last_page': self.last_page_num
@@ -237,22 +237,25 @@ class ScraperBase:
                 headers = {'User-Agent': REQUEST_HEADER}
                 async with session.get(url,
                                        headers=headers,
-                                       params=self.params,
-                                       allow_redirects=True) as response:
+                                       params=self.params) as response:
                     page = await response.text()
                     page = soup(page, 'lxml')
                     base_url = url.split(f'/{page_num}')[0] + '/'
-                    games_list = self._get_games_list(page)
-                    self._add_games_to_result(games_list)
-                    # If last page was not explicitly defined
-                    # Assign the value of website's own pagination data
-                    if not hasattr(self, 'last_page_num'):
-                        self.last_page_num = self._get_last_page_num(page, base_url)
+                    if response.status == 200:
+                        games_list = self._get_games_list(page)
+                        self._add_games_to_result(games_list)
+                        # If last page was not explicitly defined
+                        # Assign the value of website's own pagination data
+                        if not hasattr(self, 'last_page_num'):
+                            self.last_page_num = self._get_last_page_num(
+                                page,
+                                base_url
+                            )
 
-                    # If nothing gives an exception,
-                    # Regard this page scraping as successfull
-                    # And don't send more requests
-                    break
+                        # If nothing gives an exception,
+                        # Regard this page scraping as successfull
+                        # And don't send more requests
+                        break
             except Exception as exeption:
                 print(exeption)
 
