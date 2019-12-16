@@ -1,5 +1,6 @@
 from os import environ
-import sendgrid
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from django.forms import (
     Form,
     ModelForm,
@@ -41,25 +42,18 @@ class RateForm(ModelForm):
         return message_header + message_body
 
     def send_message(self, name, message_body):
-        sg_client = sendgrid.SendGridClient(settings.EMAIL_HOST_PASSWORD)
         message_body = self._make_message(name, message_body)
-        message = sendgrid.Mail(
-            to=settings.OWN_EMAIL,
+        message = Mail(
+            from_email='bolotnikovprojects@gmail.com',
+            to_emails=settings.OWN_EMAIL,
             subject=MESSAGE_SUBJECT,
-            html=message_body,
-            text=message_body,
-            from_email='SCRPR'
+            html_content=message_body,
         )
-        status, message = sg_client.send(message)
-        print(status)
-        print(message)
-
-        # send_mail(
-        #     MESSAGE_SUBJECT,
-        #     message_body,
-        #     settings.EMAIL_HOST_USER,
-        #     [settings.OWN_EMAIL]
-        # )
+        sg_client = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
+        try:
+            response = sg_client.send(message)
+        except Exception as exception:
+            print(str(exception))
 
 
 class GamesForm(ModelForm):

@@ -1,9 +1,9 @@
 from django.db.models import Q
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
 from django.conf import settings
-
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from authentication.models import User
 from .models import SavedSuggestion
 from scrpr.models import Game, Job
@@ -102,14 +102,17 @@ class Suggestion:
         rendered_subject = subject_template.render().strip()
         txt_with_context = text_email_template.render(email_context)
         html_with_context = html_email_template.render(email_context)
-        message = EmailMultiAlternatives(
-            rendered_subject,
-            txt_with_context,
-            settings.EMAIL_HOST_USER,
-            [receiver_email]
+        message = Mail(
+            from_email='bolotnikovprojects@gmail.com',
+            to_emails=settings.OWN_EMAIL,
+            subject=rendered_subject,
+            html_content=html_with_context,
         )
-        message.attach_alternative(html_with_context, 'text/html')
-        message.send()
+        sg_client = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
+        try:
+            response = sg_client.send(message)
+        except Exception as exception:
+            print(str(exception))
 
     def _get_game_suggestions_from_query(self, query_params):
         query_results = PSStoreScraper().scrape_game_website(
