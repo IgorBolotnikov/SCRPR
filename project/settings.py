@@ -57,6 +57,8 @@ SECURE_HSTS_SECONDS = 60
 SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
+LOGIN_REDIRECT_URL = '/'
+
 
 # Application definition
 
@@ -178,7 +180,7 @@ except ImportError:
 
 print(f'Debug: {DEBUG}')
 
-LOGIN_REDIRECT_URL = ''
+DIRECT_URL = ''
 
 CRONJOBS = [
     (
