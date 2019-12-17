@@ -36,11 +36,9 @@ class PSStoreScraper(ScraperBase):
     @staticmethod
     def _get_last_page_num(page, base_link):
         last = page.find_all('a', class_='paginator-control__end')
-        if last:
-            last_page = int(last[0].get('href').split('/')[-1].split('?')[0])
-        else:
-            last_page = 1
-        return last_page
+        if last: last = last[0].get('href')
+        if last: last = last.split('/')[-1].split('?')[0]
+        return int(last) if last else 1
 
     @staticmethod
     def _get_games_list(page):
