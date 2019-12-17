@@ -11,7 +11,6 @@ class User(AbstractUser):
         error_messages={'unique': USER_EMAIL_CONSTRAINT_MESSAGE}
     )
     image = models.TextField(null=True, blank=True, default=DEFAULT_USER_IMAGE) # Image is saved as base64 string
-    slug = models.SlugField(max_length=200, blank=True)
     sharing_with = models.ManyToManyField(
         'self',
         symmetrical=True,
@@ -37,5 +36,4 @@ class User(AbstractUser):
             models.Q(username=username) | models.Q(email=email)).first()
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.username)
         return super().save(*args, **kwargs)

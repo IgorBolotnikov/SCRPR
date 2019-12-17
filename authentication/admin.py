@@ -21,7 +21,6 @@ class UserUpdateForm(UserChangeForm):
             'first_name',
             'last_name',
             'image',
-            'slug',
             'password',
             'is_active',
             'is_staff',
@@ -37,7 +36,7 @@ class UserAdmin(BaseUserAdmin):
     form = UserUpdateForm
     add_form = UserCreateForm
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'image', 'slug')}),
+        (None, {'fields': ('username', 'password', 'image')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')})
