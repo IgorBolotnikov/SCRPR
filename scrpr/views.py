@@ -152,7 +152,7 @@ class FavoritesGameDetailView(FavoritesMixin, UpdateView):
     model = FavoriteGameQuery
     form_class = GamesForm
     template_name_suffix = ''
-    success_url = '/favorites/'
+    success_url = '/favorites'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -181,7 +181,7 @@ class FavoritesJobDetailView(FavoritesMixin, UpdateView):
     model = FavoriteJobQuery
     form_class = JobsForm
     template_name_suffix = ''
-    success_url = '/favorites/'
+    success_url = '/favorites'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -329,7 +329,7 @@ class JobsView(FormListView):
 
 
 class CustomLogoutView(LogoutView):
-    next_page = '/scrpr/'
+    next_page = '/'
     template_name = 'scrpr/index.html'
 
 
