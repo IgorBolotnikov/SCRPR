@@ -4,7 +4,7 @@ from django.test import TestCase, SimpleTestCase, Client
 
 from .views import *
 from .models import *
-from authentication.models import
+from authentication.models import *
 
 
 LOGIN_URL = '/auth/login/?next='

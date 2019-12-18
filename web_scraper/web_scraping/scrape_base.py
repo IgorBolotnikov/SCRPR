@@ -288,21 +288,12 @@ class ScraperBase:
         # Since results ar ethe same
         else:
             last_page_num = page_num
+            self.last_page_num = page_num
 
             # Since pagination is in sync with source website,
             # Flag should be set to False so that output is returned as is
             self.artificial_pagination = False
-            
-            # Else just scrape first page and make pagination
-            # In sync with website's pagination
-            # Since results are the same
-            else:
-                last_page_num = page_num
-                self.last_page_num = page_num
-
-                # Since pagination is in sync with source website,
-                # Flag should be set to False so that output is returned as is
-                self.artificial_pagination = False
+        
         async with aiohttp.ClientSession() as session:
             while page_num <= last_page_num:
                 async_task = asyncio.create_task(self._scrape_game_page(
