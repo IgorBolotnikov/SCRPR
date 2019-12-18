@@ -32,12 +32,6 @@ ALLOWED_HOSTS = ['*']
 
 INTERNAL_IPS = ['127.0.0.1',]
 
-# frontend will be working from port 3000
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-]
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('SENDGRID_SMTP_SERVER')
 EMAIL_PORT = 587
@@ -58,6 +52,8 @@ SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 LOGIN_REDIRECT_URL = '/'
+
+PROJECT_EMAIL = 'bolotnikovprojects@gmail.com'
 
 
 # Application definition
@@ -183,12 +179,6 @@ print(f'Debug: {DEBUG}')
 DIRECT_URL = ''
 
 CRONJOBS = [
-    (
-        '0 */6 * * *',
-        'django.core.management.call_command',
-        ['updatescrapeddata'],
-        f'>> {os.path.join(BASE_DIR, "web_scraper/web_scraping/web_scraping.log")}'
-    ),
     (
         '0 12 * * *',
         'smart_emails.cron_daily.send_suggestions'

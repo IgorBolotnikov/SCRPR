@@ -188,12 +188,12 @@ class TestCaseWithDatabase(TestCase):
     @classmethod
     def setUpTestData(cls):
         test_user1 = User.objects.create(
-            email = 'testuser1@testemail.com',
-            username = 'TestUser1',
+            email='testuser1@testemail.com',
+            username='TestUser1',
         )
         test_user2 = User.objects.create(
-            email = 'testuser2@testemail.com',
-            username = 'TestUser2'
+            email='testuser2@testemail.com',
+            username='TestUser2'
         )
         test_user1.set_password('testuser1password')
         test_user2.set_password('testuser2password')
@@ -369,6 +369,7 @@ class TestEditAccountView(TestCaseWithDatabase,
         )
 
     def test_successfull_user_edit(self):
+        # TODO: implement sending of comment via email
         response = self.client.post(self.url, self.valid_form_sample)
         self.assertRedirects(response, self.success_url)
         user = User.objects.get(pk=1)
