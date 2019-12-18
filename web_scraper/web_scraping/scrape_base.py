@@ -293,7 +293,7 @@ class ScraperBase:
             # Since pagination is in sync with source website,
             # Flag should be set to False so that output is returned as is
             self.artificial_pagination = False
-        
+
         async with aiohttp.ClientSession() as session:
             while page_num <= last_page_num:
                 async_task = asyncio.create_task(self._scrape_game_page(
@@ -304,13 +304,13 @@ class ScraperBase:
                 async_tasks.append(async_task)
                 page_num += 1
 
-            await asyncio.gather(*async_tasks)
-            self._filter_games_output(
-                discount_filter=discount_filter,
-                psplus_filter=psplus_filter,
-                free=free
-            )
-            # Adjust output according to artificial pagination
-            if self.artificial_pagination:
-                self._set_artificial_last_page()
-                self._paginate_games_output(current_page_num)
+        await asyncio.gather(*async_tasks)
+        self._filter_games_output(
+            discount_filter=discount_filter,
+            psplus_filter=psplus_filter,
+            free=free
+        )
+        # Adjust output according to artificial pagination
+        if self.artificial_pagination:
+            self._set_artificial_last_page()
+            self._paginate_games_output(current_page_num)
