@@ -52,6 +52,18 @@ class ScraperBase:
             query_params=query_params,
             page_num=page_num,
         ))
+
+        # Filters are applied if they are found in query_params
+        self._filter_games_output(
+            discount_filter=self.discount_filter,
+            psplus_filter=self.psplus_filter,
+            free=self.free
+        )
+
+        # Adjust output according to artificial pagination, if any
+        if self.artificial_pagination:
+            self._set_artificial_last_page()
+            self._paginate_games_output(self.current_page_num)
         return {
             'object_list': self.output,
             'last_page': self.last_page_num
@@ -238,8 +250,10 @@ class ScraperBase:
                     page = await response.text()
                     page = soup(page, 'lxml')
                     if response.status == 200 and page:
+                        print('Response was 200 and page exists')
                         games_list = self._get_games_list(page)
                         self._add_games_to_result(games_list)
+                        print(f'Scraped {len(games_list)} games')
                         # If last page was not explicitly defined
                         # Assign the value of website's own pagination data
                         if not self.artificial_pagination:
@@ -254,11 +268,12 @@ class ScraperBase:
 
     async def _scrape_game_pages(self, page_num, query_params):
         title = query_params.get('title')
-        discount_filter = bool(query_params.get('initial_price'))
-        psplus_filter = bool(query_params.get('psplus_price'))
-        free = bool(query_params.get('free'))
-        any_filters = discount_filter or psplus_filter or free
+        self.discount_filter = bool(query_params.get('initial_price'))
+        self.psplus_filter = bool(query_params.get('psplus_price'))
+        self.free = bool(query_params.get('free'))
+        any_filters = self.discount_filter or self.psplus_filter or self.free
         async_tasks = []
+
         # If title search is filtered, then first get the first page
         # Syncronously and define last page
         # It is needed for accumulating all search results asyncronously
@@ -269,19 +284,20 @@ class ScraperBase:
             # Exclude any query string from url and extract page number
             first_page = self._request_first_page(url)
             last_page_num = self._get_last_page_num(first_page)
-            current_page_num = page_num
+            self.current_page_num = page_num
             self.last_page_num = last_page_num
+
             # Set a flag of artificial pagination to True
             # so that output splits itself accordingly
             self.artificial_pagination = True
 
-        # If only Ps Plus offers are selected
-        # Get all pages one by one from the list
-        elif psplus_filter:
-            page_num = 1
-            current_page_num = 1
-            self.last_page_num = last_page_num = len(PS_STORE_PSPLUS_GAMES)
-            self.artificial_pagination = True
+            # If only Ps Plus offers are selected
+            # Get all pages one by one from the list
+        elif self.psplus_filter:
+                page_num = 1
+                self.current_page_num = 1
+                self.last_page_num = last_page_num = len(PS_STORE_PSPLUS_GAMES)
+                self.artificial_pagination = True
 
         # Else just scrape first page and make pagination
         # In sync with website's pagination
@@ -289,28 +305,24 @@ class ScraperBase:
         else:
             last_page_num = page_num
             self.last_page_num = page_num
+            print(f'There are no filters, last page num: {self.last_page_num}')
 
             # Since pagination is in sync with source website,
             # Flag should be set to False so that output is returned as is
             self.artificial_pagination = False
-
+        print('Now running before async session')
         async with aiohttp.ClientSession() as session:
+            print('Now running inside async session')
             while page_num <= last_page_num:
+                print(f'Current page: {page_num}, last page: {last_page_num}')
+                print('Creating async task...')
                 async_task = asyncio.create_task(self._scrape_game_page(
                     self._get_url(page_num, query_params),
                     page_num,
                     session
                 ))
+                print('Created async task')
                 async_tasks.append(async_task)
                 page_num += 1
-
-        await asyncio.gather(*async_tasks)
-        self._filter_games_output(
-            discount_filter=discount_filter,
-            psplus_filter=psplus_filter,
-            free=free
-        )
-        # Adjust output according to artificial pagination
-        if self.artificial_pagination:
-            self._set_artificial_last_page()
-            self._paginate_games_output(current_page_num)
+            print('Gathering async tasks')
+            await asyncio.gather(*async_tasks)
