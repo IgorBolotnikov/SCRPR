@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-from django.test import TestCase
-=======
 from datetime import datetime, timezone
 from django.core import mail
 from django.test import TestCase, SimpleTestCase, Client
 
 from .views import *
 from .models import *
-from authentication.models import User
+from authentication.models import
 
 
 LOGIN_URL = '/auth/login/?next='
@@ -451,4 +448,3 @@ class TestLogoutView(TestCase):
         self.assertRedirects(response, self.next)
         response = self.client.get(self.protected_url)
         self.assertEqual(response.status_code, 302)
->>>>>>> b508ff0c47446db6dd7c67d7dcfc00dd5a9b2658
