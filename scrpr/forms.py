@@ -20,6 +20,7 @@ from django.forms import (
     FileInput
 )
 from django.conf import settings
+from django.core.mail import send_mail
 from .models import Comment, FavoriteGameQuery, FavoriteJobQuery
 from .constants import *
 from authentication.models import User
@@ -43,17 +44,26 @@ class RateForm(ModelForm):
 
     def send_message(self, name, message_body):
         message_body = self._make_message(name, message_body)
-        message = Mail(
-            from_email='bolotnikovprojects@gmail.com',
-            to_emails=settings.OWN_EMAIL,
-            subject=MESSAGE_SUBJECT,
-            html_content=message_body,
-        )
-        sg_client = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
-        try:
-            response = sg_client.send(message)
-        except Exception as exception:
-            print(str(exception))
+        if settings.DEBUG:
+            send_mail(
+                MESSAGE_SUBJECT,
+                message_body,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.OWN_EMAIL],
+                fail_silently=False,
+            )
+        else:
+            message = Mail(
+                settings.PROJECT_EMAIL,
+                to_emails=settings.OWN_EMAIL,
+                subject=MESSAGE_SUBJECT,
+                html_content=message_body,
+            )
+            sg_client = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
+            try:
+                response = sg_client.send(message)
+            except Exception as exception:
+                print(str(exception))
 
 
 class GamesForm(ModelForm):

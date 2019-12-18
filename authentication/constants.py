@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 USER_EMAIL_CONSTRAINT_MESSAGE = _('A user with that email already exists.')
 
 LOGIN_TITLE = _('Login')
-LOGIN_ERROR_MESSAGE = _('Incorrect username and password. Please try again.')
 REGISTER_TITLE = _('Register')
 REGISTER_SUCCESS_MESSAGE = _('Registration is successfull! Now you can login.')
 RESET_PASSWORD_TITLE = _('Reset Password')

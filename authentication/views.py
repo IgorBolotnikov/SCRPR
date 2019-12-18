@@ -38,7 +38,11 @@ class CustomLoginView(LoginView):
         return context
 
     def form_invalid(self, form):
-        messages.add_message(self.request, messages.ERROR, LOGIN_ERROR_MESSAGE)
+        messages.add_message(
+            self.request,
+            messages.ERROR,
+            form.errors['__all__'][0]
+        )
         return super().form_invalid(form)
 
 
@@ -76,7 +80,7 @@ class RegisterView(FormView):
 
 class ResetPasswordRequestView(PasswordResetView):
     template_name = 'authentication/reset_request.html'
-    success_url = '/auth/login'
+    success_url = '/auth/reset_password_done'
     model = User
     form_class = CustomPasswordResetForm
     email_template_name = 'authentication/reset_password_message.html'
@@ -95,7 +99,7 @@ class ResetPasswordRequestDoneView(PasswordResetDoneView):
 
 class ResetPasswordView(PasswordResetConfirmView):
     template_name = 'authentication/reset_password.html'
-    success_url = '/auth/reset_password_done'
+    success_url = '/auth/reset_password_complete'
     form_class = CustomSetPasswordForm
 
     def get_context_data(self, **kwargs):
@@ -110,15 +114,15 @@ class CompleteResetPasswordView(PasswordResetCompleteView):
 
 class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'authentication/change_password.html'
-    login_url = 'auth/login/'
+    login_url = '/auth/login/'
     model = User
     form_class = CustomChangePasswordForm
-    success_url = 'auth/change_password_done'
+    success_url = '/auth/change_password_done'
 
 
 class ChangePasswordDoneView(LoginRequiredMixin, TemplateView):
     template_name = 'authentication/change_password_done.html'
-    login_url = 'auth/login/'
+    login_url = '/auth/login/'
 
 
 class DeleteAccountView(DeleteView):

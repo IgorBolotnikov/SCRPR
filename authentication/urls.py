@@ -3,8 +3,8 @@ from .views import *
 
 app_name = 'authentication'
 urlpatterns = [
-    re_path(r'^login/$', CustomLoginView.as_view(), name='login'),
-    re_path(r'^register/$', RegisterView.as_view(), name='register'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('register', RegisterView.as_view(), name='register'),
     path('reset_password', ResetPasswordRequestView.as_view(), name='reset_request'),
     path('reset_password/<str:uidb64>/<str:token>', ResetPasswordView.as_view(), name='reset_password'),
     path('reset_password_done', ResetPasswordRequestDoneView.as_view(), name='reset_password_done'),
