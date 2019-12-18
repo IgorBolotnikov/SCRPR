@@ -240,17 +240,13 @@ class ScraperBase:
                                        params=self.params) as response:
                     page = await response.text()
                     page = soup(page, 'lxml')
-                    base_url = url.split(f'/{page_num}')[0] + '/'
                     if response.status == 200:
                         games_list = self._get_games_list(page)
                         self._add_games_to_result(games_list)
                         # If last page was not explicitly defined
                         # Assign the value of website's own pagination data
-                        if not hasattr(self, 'last_page_num'):
-                            self.last_page_num = self._get_last_page_num(
-                                page,
-                                base_url
-                            )
+                        if not self.artificial_pagination:
+                            self.last_page_num = self._get_last_page_num(page)
 
                         # If nothing gives an exception,
                         # Regard this page scraping as successfull
@@ -300,6 +296,7 @@ class ScraperBase:
             # Since results ar ethe same
             else:
                 last_page_num = page_num
+                self.last_page_num = page_num
 
                 # Since pagination is in sync with source website,
                 # Flag should be set to False so that output is returned as is

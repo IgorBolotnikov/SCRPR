@@ -34,7 +34,7 @@ class PSStoreScraper(ScraperBase):
         return f'{PS_STORE_INIT_LINK}{page_num}'
 
     @staticmethod
-    def _get_last_page_num(page, base_link):
+    def _get_last_page_num(page):
         last = page.find_all('a', class_='paginator-control__end')
         if last: last = last[0].get('href')
         if last: last = last.split('/')[-1].split('?')[0]
