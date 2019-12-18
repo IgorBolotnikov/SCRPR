@@ -293,7 +293,7 @@ class ScraperBase:
 
             # Else just scrape first page and make pagination
             # In sync with website's pagination
-            # Since results ar ethe same
+            # Since results are the same
             else:
                 last_page_num = page_num
                 self.last_page_num = page_num

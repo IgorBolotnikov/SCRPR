@@ -27,7 +27,7 @@ class PSStoreScraper(ScraperBase):
         elif initial_price:
             return f'{PS_STORE_DISCOUNT_LINK}{page_num}'
         elif psplus_price:
-            # Get page nums are simply used to iterate through each link
+            # In this case page nums are simply used to iterate through each link
             # In a list of different PS Plus offers, because these pages
             # Never get more than 1 page each
             return PS_STORE_PSPLUS_GAMES[page_num - 1]
