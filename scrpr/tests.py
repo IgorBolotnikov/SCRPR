@@ -103,9 +103,14 @@ class TestRedirectIfWrongUserMixin:
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-
-class TestWebScrapingResults:
+#
+class TestWebScrapingResultsMixin:
     def test_scraping_results_with_var_queries(self):
+        response = self.client.get(self.url)
+        self.assertTrue(
+            len(response.context['object_list']) > 0,
+            f'Web search from URL "{self.url} did not return any results"'
+        )
         for query in self.queries:
             query_url = self.url + query
             response = self.client.get(query_url)
@@ -385,13 +390,12 @@ class TestRateView(TestCase,
         self.assertTrue(object.comment, RATE_VALID_FORM['comment'])
 
 
-class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResults):
+class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin):
     def setUp(self):
         self.url = '/games/'
         self.template_name = 'scrpr/content_with_sidebar/games.html'
         self.template_base = 'scrpr/content_with_sidebar/content_with_sidebar_base.html'
         self.queries = [
-            '',
             '?title=deus+ex',
             '?initial_price=on',
             '?psplus_price=on',
@@ -402,13 +406,12 @@ class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResults):
         ]
 
 
-class TestJobsView(TestCase, TestGetResponseMixin, TestWebScrapingResults):
+class TestJobsView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin):
     def setUp(self):
         self.url = '/jobs/'
         self.template_name = 'scrpr/content_with_sidebar/jobs.html'
         self.template_base = 'scrpr/content_with_sidebar/content_with_sidebar_base.html'
         self.queries = [
-            '',
             '?title=Python',
             '?city=Одесса',
             '?title=Python?city=Киев',

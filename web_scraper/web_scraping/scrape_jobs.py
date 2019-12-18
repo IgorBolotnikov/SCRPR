@@ -100,7 +100,9 @@ class JobsScraper(ScraperBase):
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('div', class_='b-vacancy__pages-title').span.find_all('b')
+        last = page.find('div', class_='b-vacancy__pages-title')
+        if last: last = last.span
+        if last: last = last.find_all('b')
         return int(last[1].get_text()) if last else 1
 
     @staticmethod

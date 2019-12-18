@@ -39,7 +39,6 @@ class ScraperBase:
                 page_num=page_num,
                 query_params=query_params
             )
-        print(f'Scraped {len(self.output)} results')
         return {
             'object_list': self.output,
             'last_page': self.last_page_num
@@ -58,7 +57,7 @@ class ScraperBase:
             'last_page': self.last_page_num
         }
 
-    def _request_first_page(self, url, session):
+    def _request_first_page(self, url):
         for count in range(5):
             try:
                 headers = {'User-Agent': REQUEST_HEADER}
@@ -212,10 +211,9 @@ class ScraperBase:
                         jobs_list = []
                     else:
                         jobs_list = self._get_jobs_list(page)
-                    if response.status == 200:
+                    if response.status == 200 and page:
                         self._add_jobs_to_result(jobs_list, location)
                         break
-
             except Exception as exeption:
                 print(exeption)
         return page
@@ -229,28 +227,23 @@ class ScraperBase:
                 page_num += 1
 
     async def _scrape_game_page(self, url, page_num, session):
+        print(url)
         # Max of 5 consecutive requests can be made
         # To cover the cases of poor inirial responce, network problems
         # or server error
         for count in range(5):
             try:
                 headers = {'User-Agent': REQUEST_HEADER}
-                async with session.get(url,
-                                       headers=headers,
-                                       params=self.params) as response:
+                async with session.get(url, headers=headers) as response:
                     page = await response.text()
                     page = soup(page, 'lxml')
-                    base_url = url.split(f'/{page_num}')[0] + '/'
-                    if response.status == 200:
+                    if response.status == 200 and page:
                         games_list = self._get_games_list(page)
                         self._add_games_to_result(games_list)
                         # If last page was not explicitly defined
                         # Assign the value of website's own pagination data
-                        if not hasattr(self, 'last_page_num'):
-                            self.last_page_num = self._get_last_page_num(
-                                page,
-                                base_url
-                            )
+                        if not self.artificial_pagination:
+                            self.last_page_num = self._get_last_page_num(page)
 
                         # If nothing gives an exception,
                         # Regard this page scraping as successfull
@@ -266,44 +259,41 @@ class ScraperBase:
         free = bool(query_params.get('free'))
         any_filters = discount_filter or psplus_filter or free
         async_tasks = []
+        # If title search is filtered, then first get the first page
+        # Syncronously and define last page
+        # It is needed for accumulating all search results asyncronously
+        # And then create artificial pagination from results quantity
+        if title and any_filters:
+            url = self._get_url(1, query_params)
+
+            # Exclude any query string from url and extract page number
+            first_page = self._request_first_page(url)
+            last_page_num = self._get_last_page_num(first_page)
+            current_page_num = page_num
+            self.last_page_num = last_page_num
+            # Set a flag of artificial pagination to True
+            # so that output splits itself accordingly
+            self.artificial_pagination = True
+
+        # If only Ps Plus offers are selected
+        # Get all pages one by one from the list
+        elif psplus_filter:
+            page_num = 1
+            current_page_num = 1
+            self.last_page_num = last_page_num = len(PS_STORE_PSPLUS_GAMES)
+            self.artificial_pagination = True
+
+        # Else just scrape first page and make pagination
+        # In sync with website's pagination
+        # Since results ar ethe same
+        else:
+            last_page_num = page_num
+
+            # Since pagination is in sync with source website,
+            # Flag should be set to False so that output is returned as is
+            self.artificial_pagination = False
+
         async with aiohttp.ClientSession() as session:
-
-            # If title search is filtered, then first get the first page
-            # Syncronously and define last page
-            # It is needed for accumulating all search results asyncronously
-            # And then create artificial pagination from results quantity
-            if title and any_filters:
-                url = self._get_url(1, query_params)
-
-                # Exclude any query string from url and extract page number
-                base_url = url.split('/1')[0] + '/'
-                last_page_num = self._get_last_page_num(
-                    self._request_first_page(url, session),
-                    base_url,
-                )
-                current_page_num = page_num
-                self.last_page_num = last_page_num
-                # Set a flag of artificial pagination to True
-                # so that output splits itself accordingly
-                self.artificial_pagination = True
-
-            # If only Ps Plus offers are selected
-            # Get all pages one by one from the list
-            elif psplus_filter:
-                page_num = 1
-                current_page_num = 1
-                self.last_page_num = last_page_num = len(PS_STORE_PSPLUS_GAMES)
-                self.artificial_pagination = True
-
-            # Else just scrape first page and make pagination
-            # In sync with website's pagination
-            # Since results ar ethe same
-            else:
-                last_page_num = page_num
-
-                # Since pagination is in sync with source website,
-                # Flag should be set to False so that output is returned as is
-                self.artificial_pagination = False
             while page_num <= last_page_num:
                 async_task = asyncio.create_task(self._scrape_game_page(
                     self._get_url(page_num, query_params),
