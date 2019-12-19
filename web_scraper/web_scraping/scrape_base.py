@@ -293,7 +293,7 @@ class ScraperBase:
 
             # If only Ps Plus offers are selected
             # Get all pages one by one from the list
-        elif self.psplus_filter:
+        elif self.psplus_filter or self.free:
                 page_num = 1
                 self.current_page_num = 1
                 self.last_page_num = last_page_num = len(PS_STORE_PSPLUS_GAMES)
