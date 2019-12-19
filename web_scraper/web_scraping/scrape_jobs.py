@@ -49,10 +49,9 @@ class JobisScraper(ScraperBase):
         return JOBISCOMUA_BASELINK
 
     @staticmethod
-    def _check_end_of_pagination(page):
+    def _check_end_of_pagination(self, page):
         if page.find('ul', class_='pagination'):
-            if page.find('li', class_='next disabled'):
-                return True
+            return bool(page.find('li', class_='next disabled'))
         else:
             return True
         return False
@@ -176,8 +175,8 @@ class JoobleScraper(ScraperBase):
 
     @staticmethod
     def _get_jobs_list(page):
-        return page.find(
-            'div', id='jobs_list__page').find_all('div', class_='vacancy_wrapper')
+        jobs = page.find('div', id='jobs_list__page')
+        return jobs.find_all('div', class_='vacancy_wrapper') if jobs else []
 
     @staticmethod
     def _get_job_title(offer):
@@ -533,7 +532,7 @@ class JobsSitesScraper:
             'last_page': max(last_page_list)
         }
 
-    @timer
+    # @timer
     def scrape_websites(self, location, page_num, query_params):
         results = asyncio.run(self._scrape_websites(location, page_num, query_params), debug=True)
         return self._adjust_results_number(results)

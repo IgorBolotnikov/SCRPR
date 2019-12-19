@@ -54,9 +54,7 @@
               {% if result.initial_price is not none %}
                 <div class="list_price strikethrough">{{ result.initial_price }} UAH</div>
               {% endif %}
-              {% if result.price == 0 %}
-                <div class="list_price">{% trans 'FREE' %}</div>
-              {% else %}
+              {% if result.price != 0 %}
                 <div class="list_price">{{ result.price }} UAH</div>
               {% endif %}
               {% if result.psplus_price is not none %}

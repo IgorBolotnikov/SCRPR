@@ -13,25 +13,26 @@ from bs4 import BeautifulSoup as soup
 from .constants import *
 
 
+# This wrapper is purely for benchmarking
 def timer(func):
     def wrapper(*args, **kwargs):
         time1 = round(time(), 4)
-        print(f'{datetime.now()} - Commencing scraping')
+        # print(f'{datetime.now()} - Commencing scraping')
         result = func(*args, **kwargs)
         time2 = round(time(), 4)
         timespan = time2 - time1
         minutes = timespan // 60
         seconds = round(timespan - minutes * 60, 2)
-        print(f'{datetime.now()} - Scraping completed in {minutes} m, {seconds} s.')
-        print('----------')
+        # print(f'{datetime.now()} - Scraping completed in {minutes} m, {seconds} s.')
+        # print('----------')
         return result
     return wrapper
 
 
 class ScraperBase:
     async def scrape_job_website(self, location, page_num, query_params=None):
-        print(f'Scraping with {self.__class__.__name__}')
-        print(f'Scraping for {location}')
+        # print(f'Scraping with {self.__class__.__name__}')
+        # print(f'Scraping for {location}')
         self.output = []
         await self._scrape_job_pages(
                 location=location,
@@ -44,9 +45,9 @@ class ScraperBase:
             'last_page': self.last_page_num
         }
 
-    @timer
+    # @timer
     def scrape_game_website(self, page_num, query_params=None):
-        print(f'Scraping with {self.__class__.__name__}')
+        # print(f'Scraping with {self.__class__.__name__}')
         self.output = []
         asyncio.run(self._scrape_game_pages(
             query_params=query_params,
@@ -208,7 +209,6 @@ class ScraperBase:
         self.output = self.output[start_index:end_index]
 
     async def _scrape_job_page(self, url, page_num, location, session):
-        print(url)
         # Max of 5 consecutive requests can be made
         # To cover the cases of poor inirial responce, network problems
         # or server error
@@ -239,21 +239,21 @@ class ScraperBase:
                 page_num += 1
 
     async def _scrape_game_page(self, url, page_num, session):
-        print(url)
         # Max of 5 consecutive requests can be made
         # To cover the cases of poor inirial responce, network problems
         # or server error
         for count in range(5):
             try:
                 headers = {'User-Agent': REQUEST_HEADER}
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url,
+                                       headers=headers,
+                                       params=self.params
+                                       ) as response:
                     page = await response.text()
                     page = soup(page, 'lxml')
                     if response.status == 200 and page:
-                        print('Response was 200 and page exists')
                         games_list = self._get_games_list(page)
                         self._add_games_to_result(games_list)
-                        print(f'Scraped {len(games_list)} games')
                         # If last page was not explicitly defined
                         # Assign the value of website's own pagination data
                         if not self.artificial_pagination:
@@ -305,24 +305,17 @@ class ScraperBase:
         else:
             last_page_num = page_num
             self.last_page_num = page_num
-            print(f'There are no filters, last page num: {self.last_page_num}')
 
             # Since pagination is in sync with source website,
             # Flag should be set to False so that output is returned as is
             self.artificial_pagination = False
-        print('Now running before async session')
         async with aiohttp.ClientSession() as session:
-            print('Now running inside async session')
             while page_num <= last_page_num:
-                print(f'Current page: {page_num}, last page: {last_page_num}')
-                print('Creating async task...')
                 async_task = asyncio.create_task(self._scrape_game_page(
                     self._get_url(page_num, query_params),
                     page_num,
                     session
                 ))
-                print('Created async task')
                 async_tasks.append(async_task)
                 page_num += 1
-            print('Gathering async tasks')
             await asyncio.gather(*async_tasks)
