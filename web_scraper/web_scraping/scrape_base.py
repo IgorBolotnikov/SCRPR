@@ -171,7 +171,7 @@ class ScraperBase:
             self.output.append(self._get_game_items(game))
 
 
-    def _filter_free_games(game):
+    def _filter_free_games(self, game):
         price_is_free = game.get('price') == 0
         psplus_price = game.get('psplus_price')
         psplus_is_free = not psplus_price or psplus_price == 0
