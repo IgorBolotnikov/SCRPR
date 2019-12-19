@@ -17,7 +17,6 @@ class PSStoreScraper(ScraperBase):
         initial_price = bool(query_params.get('initial_price'))
         free = bool(query_params.get('free'))
         price_min, price_max = (0, 0) if query_params.get('free') else (price_min, price_max)
-        # page_num = query_params.get('page') if query_params.get('page') else page_num
         self.params = {
             'gameContentType': 'games,bundles',
             'query': title,

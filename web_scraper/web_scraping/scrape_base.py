@@ -254,7 +254,8 @@ class ScraperBase:
                     if response.status == 200 and page:
                         games_list = self._get_games_list(page)
                         self._add_games_to_result(games_list)
-                        # If last page was not explicitly defined
+
+                        # If artificial pagination flag is True
                         # Assign the value of website's own pagination data
                         if not self.artificial_pagination:
                             self.last_page_num = self._get_last_page_num(page)
