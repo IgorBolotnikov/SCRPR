@@ -25,14 +25,14 @@ class CommandBase(BaseCommand):
 
     @staticmethod
     def scrape_websites():
-        # scrape_jobs.JobisScraper().scrape_job_website()
-        # scrape_jobs.JobsScraper().scrape_job_website()
-        # scrape_jobs.JoobleScraper().scrape_job_website()
-        # scrape_jobs.NovarobotaScraper().scrape_job_website()
-        # scrape_jobs.RabotaScraper().scrape_job_website()
-        # scrape_jobs.TrudScraper().scrape_job_website()
+        scrape_jobs.JobisScraper().scrape_job_website()
+        scrape_jobs.JobsScraper().scrape_job_website()
+        scrape_jobs.JoobleScraper().scrape_job_website()
+        scrape_jobs.NovarobotaScraper().scrape_job_website()
+        scrape_jobs.RabotaScraper().scrape_job_website()
+        scrape_jobs.TrudScraper().scrape_job_website()
         scrape_jobs.WorkScraper().scrape_job_website()
-        # scrape_games.PSStoreScraper().scrape_game_website()
+        scrape_games.PSStoreScraper().scrape_game_website()
 
     @staticmethod
     def _load_json_file(filename):
