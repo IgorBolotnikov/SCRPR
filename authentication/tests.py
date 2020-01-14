@@ -28,7 +28,7 @@ EMAIL_ERROR_1 = 'Enter a valid email address.'
 # Errors for checking User fields uniqueness validations
 USERNAME_ERROR_2 = 'A user with that username already exists.'
 EMAIL_ERROR_2 = 'A user with that email already exists.'
-CONFIRM_PASSWORD_ERROR_1 = "The two password fields didn't match."
+CONFIRM_PASSWORD_ERROR_1 = ["The two password fields didn't match."]
 CONFIRM_PASSWORD_ERRORS_2 = [
     'This password is too short. It must contain at least 8 characters.',
     'This password is too common.',

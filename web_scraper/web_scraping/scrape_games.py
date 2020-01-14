@@ -18,6 +18,7 @@ class PSStoreScraper(ScraperBase):
         free = bool(query_params.get('free'))
         price_min, price_max = (0, 0) if query_params.get('free') else (price_min, price_max)
         self.params = {
+            'gameContentType': 'games,bundles',
             'query': title,
             'price': f'{price_min}-{price_max}',
         }

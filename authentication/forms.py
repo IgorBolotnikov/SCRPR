@@ -17,6 +17,7 @@ from django.forms import (
 from django.conf import settings
 from .constants import *
 from .models import User
+from authentication.tasks import send_reset_password_email
 
 
 class LoginForm(AuthenticationForm):
@@ -43,6 +44,12 @@ class CustomPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['email'].widget = EmailInput(attrs=EMAIL_ATTRS)
+
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        send_reset_password_email.delay(
+            subject_template_name, email_template_name,
+            context, from_email, to_email, html_email_template_name)
 
 
 class CustomSetPasswordForm(SetPasswordForm):

@@ -169,13 +169,6 @@ STATICFILES_STORAGE = 'whitenoise.django.CompressedManifestStaticFilesStorage'
 
 # Miscellaneous
 
-try:
-    from .local_settings import *
-except ImportError:
-    pass
-
-print(f'Debug: {DEBUG}')
-
 DIRECT_URL = ''
 
 CRONJOBS = [
@@ -233,6 +226,21 @@ CACHES = {
     }
 }
 
+# Celery settings
+
+BROKER_URL = 'redis://h:pe07cd7884cd727beb23110f618b544d41c10e8aaa6cb64dc7d0a2255e32a4be8@ec2-52-211-78-98.eu-west-1.compute.amazonaws.com:31089'
+CELERY_RESULT_BACKEND = 'redis://h:pe07cd7884cd727beb23110f618b544d41c10e8aaa6cb64dc7d0a2255e32a4be8@ec2-52-211-78-98.eu-west-1.compute.amazonaws.com:31089'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+
+print(f'Debug: {DEBUG}')
 
 # adapt paths for deployment on Heroku
 django_heroku.settings(locals())

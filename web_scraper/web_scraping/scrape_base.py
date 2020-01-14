@@ -5,7 +5,6 @@ import asyncio
 import aiohttp
 import requests
 from random import random
-from urllib.request import urlopen, Request
 from urllib.parse import quote, urlencode
 from time import time, sleep
 from datetime import datetime
