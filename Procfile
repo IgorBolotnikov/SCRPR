@@ -1,1 +1,1 @@
-web: uvicorn project.asgi
+web: uvicorn project.asgi:application
