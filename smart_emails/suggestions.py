@@ -6,7 +6,6 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from authentication.models import User
 from .models import SavedSuggestion
-from scrpr.models import Game, Job
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
 from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
 
@@ -40,11 +39,6 @@ class Suggestion:
     def __init__(self, frequency_in_days):
         self.frequency_in_days = frequency_in_days
 
-    def _get_users_with_favorites(self):
-        return User.objects.filter(
-            Q(favoritegamequery__notification_freq=self.frequency_in_days) | Q(
-              favoritejobquery__notification_freq=self.frequency_in_days))
-
     @staticmethod
     def _get_job_favorites(user):
         return user.favoritejobquery_set.all()
@@ -61,20 +55,12 @@ class Suggestion:
                 suggestion.delete()
         return suggestions[:50]
 
-    def _get_filtered_suggestions(self, new_suggestions, user, type):
-        prev_suggestions = self._get_saved_suggestions(user, type)
-        return self._remove_dublicates(
-            new_suggestions,
-            prev_suggestions
-        )[:self.MAX_SUGGESTIONS]
-
     @staticmethod
-    def _remove_dublicates(new_list, old_list):
+    def _remove_duplicates(new_list, old_list):
         old_list = [item.link for item in old_list]
         result = []
         for entry in new_list:
             if entry['link'] not in old_list:
-                print('Appending new entry')
                 result.append(entry)
         return result
 
@@ -87,9 +73,13 @@ class Suggestion:
         }
 
     @staticmethod
-    def save_new_suggestions(new_suggestions, type, user):
+    def _save_new_suggestions(new_suggestions, type, user):
         new_entries = [
-            SavedSuggestion(type=type, link=suggestion['link'], account=user) for suggestion in new_suggestions
+            SavedSuggestion(
+                type=type,
+                link=suggestion['link'],
+                account=user
+            ) for suggestion in new_suggestions
         ]
         SavedSuggestion.objects.bulk_create(new_entries)
 
@@ -104,15 +94,24 @@ class Suggestion:
         html_with_context = html_email_template.render(email_context)
         message = Mail(
             from_email='bolotnikovprojects@gmail.com',
-            to_emails=settings.OWN_EMAIL,
+            to_emails=receiver_email,
             subject=rendered_subject,
             html_content=html_with_context,
         )
         sg_client = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
-        try:
-            response = sg_client.send(message)
-        except Exception as exception:
-            print(str(exception))
+        response = sg_client.send(message)
+
+    def _get_users_with_favorites(self):
+        return User.objects.filter(
+            Q(favoritegamequery__notification_freq=self.frequency_in_days) | Q(
+              favoritejobquery__notification_freq=self.frequency_in_days))
+
+    def _get_filtered_suggestions(self, new_suggestions, user, type):
+        prev_suggestions = self._get_saved_suggestions(user, type)
+        return self._remove_duplicates(
+            new_suggestions,
+            prev_suggestions
+        )[:self.MAX_SUGGESTIONS]
 
     def _get_game_suggestions_from_query(self, query_params):
         query_results = PSStoreScraper().scrape_game_website(
@@ -148,7 +147,7 @@ class Suggestion:
                         receiver_email=user.email,
                         email_context=email_context
                     )
-                    self.save_new_suggestions(filtered_suggestions, 'GAME', user)
+                    self._save_new_suggestions(filtered_suggestions, 'GAME', user)
 
     def _send_job_suggestions(self, job_favorites, user):
         for job_favorite in job_favorites.values():
@@ -169,7 +168,7 @@ class Suggestion:
                         receiver_email=user.email,
                         email_context=email_context
                     )
-                    self.save_new_suggestions(filtered_suggestions, 'JOB', user)
+                    self._save_new_suggestions(filtered_suggestions, 'JOB', user)
 
     def send_suggestions(self):
         users = self._get_users_with_favorites()
