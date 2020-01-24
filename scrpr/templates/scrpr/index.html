@@ -12,14 +12,14 @@
     <ul class="features_list">
       <li class="features_item"><figure class="figure_one">
         <img src="{% static 'scrpr/Img/Icons/games.png' %}" height="100px" width="100px" alt="Games">
-        <figcaption class="first_item">{% trans 'PS4 game prices' %}</figcaption></figure>
+        <figcaption><a class="first_item" href="{% url 'scrpr:games' %}">{% trans 'PS4 game prices' %}</a></figcaption></figure>
         <ul class="websites_list">
           <li class="websites_list_item">store.playstation.com</li>
         </ul>
       </li>
         <li class="features_item"><figure class="figure_two">
         <img src="{% static 'scrpr/Img/Icons/jobs.png' %}" height="100px" width="100px" alt="Jobs">
-        <figcaption class="second_item">{% trans 'Job offers' %}</figcaption></figure>
+        <figcaption><a class="second_item" href="{% url 'scrpr:jobs' %}">{% trans 'Job offers' %}</a></figcaption></figure>
         <ul class="websites_list">
           <li class="websites_list_item">www.work.ua</li>
           <li class="websites_list_item">www.rabota.ua</li>
@@ -33,7 +33,7 @@
       </li>
       <li class="features_item"><figure class="figure_three">
         <img src="{% static 'scrpr/Img/Icons/freelance.png' %}" height="100px" width="100px" alt="Freelance">
-        <figcaption class="third_item">{% trans 'Freelance job offers' %}</figcaption></figure>
+        <figcaption><a class="third_item" href="{% url 'scrpr:freelance' %}">{% trans 'Freelance job offers' %}</a></figcaption></figure>
         <ul class="websites_list">
           <li class="websites_list_item">- IN PROGRESS -</li>
         </ul>
