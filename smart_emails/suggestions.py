@@ -43,7 +43,8 @@ class Suggestion:
 
     @staticmethod
     def _get_saved_suggestions(user, type):
-        suggestions = SavedSuggestion.objects.filter(account=user, type=type)
+        suggestions = SavedSuggestion.objects.filter(
+            account=user, type=type).order_by('-saved_datetime')
         if len(suggestions) > 50:
             for suggestion in suggestions[51:]:
                 suggestion.delete()
