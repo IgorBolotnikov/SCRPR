@@ -6,6 +6,6 @@
 {% trans "I'm glad to be helpful!" %}
 
 {% trans "If you want to change the parameters, add something else for me to look for, or delete this suggestion, feel free to follow the link below:" %}
-{% url 'scrpr:index' %}"
+https://scrpr-project.herokuapp.com
 
 Bolotnikov Projects
