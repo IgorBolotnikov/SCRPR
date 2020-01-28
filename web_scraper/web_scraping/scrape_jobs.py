@@ -604,7 +604,12 @@ class HeadDunterAPIScraper(ScraperBase):
     @staticmethod
     def _get_job_body(offer):
         body = offer.get("snippet")
-        return f'{body.get("requirement")}\n{body.get("responsibility")}'
+        body = [
+            body.get("requirement") or '',
+            body.get("responsibility") or ''
+        ]
+        body = "\n".join(body)
+        return f'{body}'
 
     @staticmethod
     def _get_job_salary(offer): return offer.get("salary")
