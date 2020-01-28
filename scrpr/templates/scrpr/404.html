@@ -1,0 +1,12 @@
+{% extends 'scrpr/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<div class="message_404_container">
+  <div class="window">
+    <h1 class="message_404">404</h1>
+    <h3 class="page_not_found">{% trans 'Ooops...' %}</h3>
+    <h3 class="page_not_found">{% trans 'Page not found :(' %}</h3>
+  </div>
+</div>
+{% endblock %}

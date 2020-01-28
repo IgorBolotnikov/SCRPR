@@ -55,6 +55,30 @@ input, textarea, select, option {
   margin: 15px;
 }
 
+.message_404_container {
+  padding-top: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.message_404 {
+  font-size: 100px;
+  min-width: 300px;
+  text-align: center;
+  border-bottom: 2px solid #333333;
+  margin: 20px 20px 50px 20px;
+  padding-bottom: 10px;
+}
+
+.page_not_found {
+  font-size: 30px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
 /* ===============
 ===== NAVBAR =====
 ================== */

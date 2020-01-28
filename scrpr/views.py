@@ -1,6 +1,6 @@
 import asyncio
 from urllib.parse import urlencode, parse_qs
-from django.http import Http404
+from django.http import Http404, HttpResponseNotFound
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
@@ -336,3 +336,9 @@ class CustomLogoutView(LogoutView):
 def freelance(request):
     context = None
     return render(request, 'scrpr/index.html', context)
+
+
+def page_not_found_view(request, exception, template_name="scrpr/404.html"):
+    response = render(request, template_name, context={'user': request.user})
+    response.status_code = 404
+    return response
