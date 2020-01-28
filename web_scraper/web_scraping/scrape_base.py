@@ -78,7 +78,7 @@ class ScraperBase:
                 page = soup(page, 'lxml')
                 return page
             except Exception as exeption:
-                print(exeption)
+                print(f'Scraping exception: {exeption}')
 
     @staticmethod
     def _get_query_string(params):
@@ -142,7 +142,7 @@ class ScraperBase:
         return {
             'title': self._get_job_title(offer),
             'body': self._get_job_body(offer),
-            'location': location,
+            'location': location if location else '',
             'salary_min': salary_min,
             'salary_max': salary_max,
             'currency': currency,
@@ -226,7 +226,7 @@ class ScraperBase:
                         self._add_jobs_to_result(jobs_list, location)
                         break
             except Exception as exeption:
-                print(exeption)
+                print(f'Scraping exception: {exeption}')
         return page
 
     async def _scrape_job_pages(self, location, city_name, page_num, query_params):
@@ -264,7 +264,7 @@ class ScraperBase:
                         # And don't send more requests
                         break
             except Exception as exeption:
-                print(exeption)
+                print(f'Scraping exception: {exeption}')
 
     async def _scrape_game_pages(self, page_num, query_params):
         title = query_params.get('title')

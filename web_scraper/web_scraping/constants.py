@@ -1,7 +1,7 @@
 from os import path
 
 BASE_DIR = path.dirname(path.realpath(__file__))
-REQUEST_HEADER = 'Web-scraping project (bolotnikovprojects@gmail.com)'
+REQUEST_HEADER = 'SCRPR/1.0 (bolotnikovprojects@gmail.com)'
 
 DIVIDERS = ['-', '–', '—']
 
@@ -18,21 +18,30 @@ LINKS = (
         )
 
 RABOTAUA_BASELINK = 'https://rabota.ua'
-# TODO: Use site's API
 RABOTAUA_LINK = 'https://rabota.ua/jobsearch/vacancy_list'
-RABOTAUA_FILE = BASE_DIR + '/json/jobs_list__rabota_ua.json'
 RABOTAUA_CITIES = {
+    None: '',
     'Киев': 'regionId=1&',
     'Одесса': 'regionId=3&',
     'Днепр': 'regionId=4&',
     'Харьков': '&regionId=21&',
     'Львов': '&regionId=2&'
 }
-'https://www.work.ua/ru/jobs-mariupol-один+два/?advs=1&salaryfrom=2&salaryto=5'
+
+RABOTAUA_API_LINK = 'https://api.rabota.ua/vacancy/search'
+RABOTAUA_API_CITIES = {
+    None: '',
+    'Киев': 'cityId=1&',
+    'Одесса': 'cityId=3&',
+    'Днепр': 'cityId=4&',
+    'Харьков': '&cityId=21&',
+    'Львов': '&cityId=2&'
+}
+
 WORKUA_BASELINK = 'https://www.work.ua'
 WORKUA_LINK = 'https://www.work.ua/ru/jobs-'
-WORKUA_FILE = BASE_DIR + '/json/jobs_list__work_ua.json'
 WORKUA_CITIES = {
+    None: '',
     'Киев': 'kyiv',
     'Одесса': 'odesa',
     'Днепр': 'dnipro',
@@ -42,8 +51,8 @@ WORKUA_CITIES = {
 
 JOBSUA_BASELINK = 'https://jobs.ua'
 JOBSUA_LINK = 'https://jobs.ua/rus/vacancy'
-JOBSUA_FILE = BASE_DIR + '/json/jobs_list__jobs_ua.json'
 JOBSUA_CITIES = {
+    None: '',
     'Киев': 'kiev',
     'Одесса': 'odessa',
     'Днепр': 'dnepr',
@@ -53,8 +62,8 @@ JOBSUA_CITIES = {
 
 JOOBLEORG_BASELINK = 'https://ua.jooble.org'
 JOOBLEORG_LINK = 'https://ua.jooble.org'
-JOOBLEORG_FILE = BASE_DIR + '/json/jobs_list__jooble_org.json'
 JOOBLEORG_CITIES = {
+    None: '',
     'Киев': '%D0%9A%D0%B8%D0%B5%D0%B2',
     'Одесса': '%D0%9E%D0%B4%D0%B5%D1%81%D1%81%D0%B0',
     'Днепр': '%D0%94%D0%BD%D0%B5%D0%BF%D1%80',
@@ -64,8 +73,8 @@ JOOBLEORG_CITIES = {
 
 JOBISCOMUA_BASELINK = 'https://jobis.com.ua'
 JOBISCOMUA_LINK = 'https://jobis.com.ua/jobs-city-'
-JOBISCOMUA_FILE = BASE_DIR + '/json/jobs_list__jobis_com_ua.json'
 JOBISCOMUA_CITIES = {
+    None: '',
     'Киев': 'kiev',
     'Одесса': 'odessa',
     'Днепр': 'dnepr',
@@ -111,8 +120,8 @@ JOBISCOMUA_CATEGORIES = (
 
 NOVAROBOTAUA_BASELINK = 'http://novarobota.ua'
 NOVAROBOTAUA_LINK = 'https://novarobota.ua/zapros'
-NOVAROBOTAUA_FILE = BASE_DIR + '/json/jobs_list__novarobota_ua.json'
 NOVAROBOTAUA_CITIES = {
+    None: '',
     'Киев': 'kiev',
     'Одесса': 'odessa',
     'Днепр': 'dnepr',
@@ -123,13 +132,25 @@ NOVAROBOTAUA_CITIES = {
 TRUDUA_BASELINK = 'http://www.trud.ua'
 TRUDUA_LINK = 'https://trud.ua/jobs/list/filter_show/state/q'
 TRUDUA_LINK_CITY = 'https://trud.ua/state'
-TRUDUA_FILE = BASE_DIR + '/json/jobs_list__trud_ua.json'
 TRUDUA_CITIES = {
+    None: '',
     'Киев': 'kiev',
     'Одесса': 'odessa',
     'Днепр': 'dnepr',
     'Харьков': 'kharkov',
     'Львов': 'lvov'
+}
+
+HEADHUNTER_BASELINK = 'https://hh.ua'
+HEADHUNTER_API_LINK = 'https://api.hh.ru/vacancies'
+HEADHUNTER_LINK = 'https://hh.ua/vacancy/'
+HEADHUNTER_API_CITIES = {
+    None: 'area=5&',
+    'Киев': 'area=115&',
+    'Одесса': 'area=127&',
+    'Днепр': 'area=117&',
+    'Харьков': 'area=135&',
+    'Львов': 'area=125&'
 }
 
 PS_STORE_BASELINK = 'https://store.playstation.com'

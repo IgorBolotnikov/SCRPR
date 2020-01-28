@@ -15,7 +15,7 @@ class VirtualPaginator:
 
     def _get_previous_page_number(self):
         if self.number > self.num_pages:
-            return self.num.pages - 1
+            return self.num_pages - 1
         return self.number - 1
 
     def _get_next_page_number(self):
