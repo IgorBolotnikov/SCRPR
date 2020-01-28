@@ -284,7 +284,7 @@ class GamesView(FormListView):
                 query_params=query_params,
                 page_num=self.current_page,
             )
-            if query_results['object_list']:
+            if query_results.get('object_list') and len(query_results['object_list']) > 0:
                 cache.set(cache_key, query_results)
         self.last_page = query_results.get('last_page', 1)
         return query_results.get('object_list')
@@ -317,7 +317,7 @@ class JobsView(FormListView):
                 query_params=query_params,
                 page_num=self.current_page,
             )
-            if query_results['object_list']:
+            if query_results.get('object_list') and len(query_results['object_list']) > 0:
                 cache.set(cache_key, query_results)
         self.last_page = query_results.get('last_page', 1)
         return query_results.get('object_list')

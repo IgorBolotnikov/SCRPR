@@ -47,6 +47,9 @@ class CustomPasswordResetForm(PasswordResetForm):
 
     def send_mail(self, subject_template_name, email_template_name,
                   context, from_email, to_email, html_email_template_name=None):
+        if not context.get('user'):
+            return
+        context['user'] = context['user'].id
         send_reset_password_email.delay(
             subject_template_name, email_template_name,
             context, from_email, to_email, html_email_template_name)

@@ -28,7 +28,7 @@ EMAIL_ERROR_1 = 'Enter a valid email address.'
 # Errors for checking User fields uniqueness validations
 USERNAME_ERROR_2 = 'A user with that username already exists.'
 EMAIL_ERROR_2 = 'A user with that email already exists.'
-CONFIRM_PASSWORD_ERROR_1 = ["The two password fields didn't match."]
+CONFIRM_PASSWORD_ERROR_1 = ['The two password fields didn’t match.']
 CONFIRM_PASSWORD_ERRORS_2 = [
     'This password is too short. It must contain at least 8 characters.',
     'This password is too common.',
@@ -210,7 +210,7 @@ class TestCaseWithDatabase(TestCase):
 class TestLoginView(TestCaseWithDatabase,
                     TestGetResponseMixin):
     def setUp(self):
-        self.url = '/auth/login'
+        self.url = '/auth/login/'
         self.template_name = 'authentication/login.html'
         self.redirect_url = '/'
         self.invalid_form_samples = (
