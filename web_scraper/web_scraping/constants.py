@@ -18,7 +18,6 @@ LINKS = (
         )
 
 RABOTAUA_BASELINK = 'https://rabota.ua'
-# TODO: Use site's API
 RABOTAUA_LINK = 'https://rabota.ua/jobsearch/vacancy_list'
 RABOTAUA_FILE = BASE_DIR + '/json/jobs_list__rabota_ua.json'
 RABOTAUA_CITIES = {
@@ -28,7 +27,16 @@ RABOTAUA_CITIES = {
     'Харьков': '&regionId=21&',
     'Львов': '&regionId=2&'
 }
-'https://www.work.ua/ru/jobs-mariupol-один+два/?advs=1&salaryfrom=2&salaryto=5'
+
+RABOTAUA_API_LINK = 'https://api.rabota.ua/vacancy/search'
+RABOTAUA_API_CITIES = {
+    'Киев': 'cityId=1&',
+    'Одесса': 'cityId=3&',
+    'Днепр': 'cityId=4&',
+    'Харьков': '&cityId=21&',
+    'Львов': '&cityId=2&'
+}
+
 WORKUA_BASELINK = 'https://www.work.ua'
 WORKUA_LINK = 'https://www.work.ua/ru/jobs-'
 WORKUA_FILE = BASE_DIR + '/json/jobs_list__work_ua.json'

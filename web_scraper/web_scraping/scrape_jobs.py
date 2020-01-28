@@ -3,7 +3,6 @@ from .scrape_base import *
 
 
 class JobisScraper(ScraperBase):
-
     def __init__(self):
         self.cities = JOBISCOMUA_CITIES
         self.filename = JOBISCOMUA_FILE
@@ -147,7 +146,6 @@ class JobsScraper(ScraperBase):
 
 
 class JoobleScraper(ScraperBase):
-
     def __init__(self):
         self.cities = JOOBLEORG_CITIES
 
@@ -219,7 +217,6 @@ class JoobleScraper(ScraperBase):
 
 
 class NovarobotaScraper(ScraperBase):
-
     def __init__(self):
         self.cities = NOVAROBOTAUA_CITIES
 
@@ -282,7 +279,6 @@ class NovarobotaScraper(ScraperBase):
 
 
 class RabotaScraper(ScraperBase):
-
     def __init__(self):
         self.cities = RABOTAUA_CITIES
 
@@ -340,8 +336,93 @@ class RabotaScraper(ScraperBase):
         return RABOTAUA_BASELINK
 
 
-class TrudScraper(ScraperBase):
+class RabotaAPIScraper(ScraperBase):
+    def __init__(self):
+        self.cities = RABOTAUA_API_CITIES
 
+    def _get_url(self, city_name, page_num, query_params):
+        title = self._convert_title(query_params.get('title')) if query_params else ''
+        salary_min = query_params.get('salary_min')
+        with_salary = query_params.get('with_salary')
+        page_num = f'page={page_num}'
+        salary = f'salary={salary_min}&' if salary_min else ''
+        with_salary = 'noSalary=false&' if with_salary else ''
+        return f'{RABOTAUA_API_LINK}?keyWords={title}&{city_name}{salary}{page_num}'
+
+    @staticmethod
+    def _convert_title(title):
+        return '+'.join(title.lower().split()) if title else ''
+
+    def _parse_salary(self, salary):
+        return None, salary, 'UAH'
+
+    @staticmethod
+    def _get_last_page_num(response):
+        total_results = response["total"]
+        if total_results == 0:
+            return 1
+        results_per_page = response["count"]
+        return total_results // results_per_page
+
+    @staticmethod
+    def _get_jobs_list(response): return response["documents"]
+
+    @staticmethod
+    def _get_job_title(offer): return offer["name"]
+
+    @staticmethod
+    def _get_job_body(offer): return offer["shortDescription"]
+
+    @staticmethod
+    def _get_job_salary(offer):
+        return offer["salary"] if offer["salary"] != 0 else None
+
+    @staticmethod
+    def _get_job_employer(offer):
+        return offer["companyName"] if offer["companyName"] else None
+
+    @staticmethod
+    def _get_job_link(offer):
+        company_id = offer["notebookId"]
+        offer_id = offer["id"]
+        return f'https://rabota.ua/ua/company{company_id}/vacancy{offer_id}'
+
+    @staticmethod
+    def _get_job_source():
+        return RABOTAUA_BASELINK
+
+    async def _scrape_job_page(self, url, page_num, location, session):
+        # Max of 5 consecutive requests can be made
+        # To cover the cases of poor inirial responce, network problems
+        # or server error
+        for count in range(5):
+            try:
+                headers = {'Accept': 'application/json'}
+                async with session.get(url, headers=headers) as response:
+                    response_data = await response.json()
+                    self.last_page_num = self._get_last_page_num(response_data)
+                    if self.last_page_num < page_num:
+                        jobs_list = []
+                    else:
+                        jobs_list = self._get_jobs_list(response_data)
+                    if response.status == 200:
+                        self._add_jobs_to_result(jobs_list, location)
+                        break
+            except Exception as exeption:
+                print(f'Scraping exception: {exeption}')
+        return response_data
+
+    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+        last_page_num = self.last_page_num = page_num
+        async with aiohttp.ClientSession() as session:
+            while page_num <= last_page_num:
+                url = self._get_url(city_name, page_num, query_params)
+                await self._scrape_job_page(url, page_num, location, session)
+                page_num += 1
+
+
+
+class TrudScraper(ScraperBase):
     def __init__(self):
         self.cities = TRUDUA_CITIES
 
@@ -414,7 +495,6 @@ class TrudScraper(ScraperBase):
 
 
 class WorkScraper(ScraperBase):
-
     def __init__(self):
         self.cities = WORKUA_CITIES
 
@@ -471,11 +551,14 @@ class WorkScraper(ScraperBase):
 
     @staticmethod
     def _get_job_salary(offer):
-        return offer.h2.find('span', class_='nowrap')
+        tag = offer.h2.next_sibling.next_sibling
+        if tag.get('class'):
+            return None
+        return tag.b
 
     @staticmethod
     def _get_job_employer(offer):
-        return offer.b.get_text().strip() if offer.b else None
+        return offer.find('div', class_='add-top-xs').b.get_text()
 
     @staticmethod
     def _get_job_link(offer):
@@ -497,7 +580,8 @@ class JobsSitesScraper:
             JobsScraper(),
             JoobleScraper(),
             NovarobotaScraper(),
-            RabotaScraper(),
+            # RabotaScraper(),
+            RabotaAPIScraper(),
             TrudScraper(),
             WorkScraper()
         ]
@@ -534,5 +618,8 @@ class JobsSitesScraper:
 
     # @timer
     def scrape_websites(self, location, page_num, query_params):
-        results = asyncio.run(self._scrape_websites(location, page_num, query_params), debug=True)
+        results = asyncio.run(
+            self._scrape_websites(location, page_num, query_params),
+            debug=True
+        )
         return self._adjust_results_number(results)
