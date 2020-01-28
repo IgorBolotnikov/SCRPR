@@ -53,7 +53,7 @@
             <span class="list_location">{{ result.location }}</span>{% if result.employer %} | <span class='list_employer'>{{ result.employer }}</span>{% endif %}
           </div>
           <div class="list_body">
-            <p>{{ result.body|linebreaks }}</p>
+            <p>{{ result.body|safe|linebreaks }}</p>
           </div>
         </li>
       {% endfor %}

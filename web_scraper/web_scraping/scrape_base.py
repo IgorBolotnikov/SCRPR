@@ -142,7 +142,7 @@ class ScraperBase:
         return {
             'title': self._get_job_title(offer),
             'body': self._get_job_body(offer),
-            'location': location,
+            'location': location if location else '',
             'salary_min': salary_min,
             'salary_max': salary_max,
             'currency': currency,

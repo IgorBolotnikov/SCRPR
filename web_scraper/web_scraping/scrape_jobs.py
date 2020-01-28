@@ -421,7 +421,6 @@ class RabotaAPIScraper(ScraperBase):
                 page_num += 1
 
 
-
 class TrudScraper(ScraperBase):
     def __init__(self):
         self.cities = TRUDUA_CITIES
@@ -569,6 +568,87 @@ class WorkScraper(ScraperBase):
         return WORKUA_BASELINK
 
 
+class HeadDunterAPIScraper(ScraperBase):
+    def __init__(self):
+        self.cities = HEADHUNTER_API_CITIES
+
+    def _get_url(self, city_name, page_num, query_params):
+        title = self._convert_title(query_params.get('title')) if query_params else ''
+        salary_min = query_params.get('salary_min')
+        with_salary = query_params.get('with_salary')
+        page_num = f'page={page_num}'
+        salary = f'salary={salary_min}&' if salary_min else ''
+        with_salary = 'only_with_salary=true&' if with_salary else ''
+        return f'{HEADHUNTER_API_LINK}?text={title}&{city_name}{salary}{page_num}'
+
+    @staticmethod
+    def _convert_title(title):
+        return '+'.join(title.lower().split()) if title else ''
+
+    def _parse_salary(self, salary):
+        if not salary:
+            return None, None, None
+        if not salary.get("to"):
+            return None, salary.get("from"), salary.get("currency")
+        return salary.get("from"), salary.get("to"), salary.get("currency")
+
+    @staticmethod
+    def _get_last_page_num(response): return response.get("pages") or 1
+
+    @staticmethod
+    def _get_jobs_list(response): return response.get("items")
+
+    @staticmethod
+    def _get_job_title(offer): return offer.get("name")
+
+    @staticmethod
+    def _get_job_body(offer):
+        body = offer.get("snippet")
+        return f'{body.get("requirement")}\n{body.get("responsibility")}'
+
+    @staticmethod
+    def _get_job_salary(offer): return offer.get("salary")
+
+    @staticmethod
+    def _get_job_employer(offer): return offer["employer"].get("name")
+
+    @staticmethod
+    def _get_job_link(offer): return f'{HEADHUNTER_LINK}{offer["id"]}'
+
+    @staticmethod
+    def _get_job_source(): return HEADHUNTER_BASELINK
+
+    async def _scrape_job_page(self, url, page_num, location, session):
+        # Max of 5 consecutive requests can be made
+        # To cover the cases of poor inirial responce, network problems
+        # or server error
+        for count in range(5):
+            try:
+                headers = {'User-Agent': REQUEST_HEADER}
+                async with session.get(url, headers=headers) as response:
+                    response_data = await response.json()
+                    self.last_page_num = self._get_last_page_num(response_data)
+                    if self.last_page_num < page_num:
+                        jobs_list = []
+                    else:
+                        jobs_list = self._get_jobs_list(response_data)
+                    if response.status == 200:
+                        self._add_jobs_to_result(jobs_list, location)
+                        break
+            except Exception as exeption:
+                print(f'Scraping exception: {exeption}')
+        return response_data
+
+    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+        last_page_num = self.last_page_num = page_num
+        async with aiohttp.ClientSession() as session:
+            while page_num <= last_page_num:
+                url = self._get_url(city_name, page_num, query_params)
+                await self._scrape_job_page(url, page_num, location, session)
+                page_num += 1
+
+
+
 class JobsSitesScraper:
     async def _scrape_websites(self, location, page_num, query_params):
         async_tasks = []
@@ -577,31 +657,22 @@ class JobsSitesScraper:
             # Otherwise Jobis will not work
             #
             # JobisScraper().scrape_job_website,
+            RabotaScraper(),
+            HeadDunterAPIScraper(),
+            RabotaAPIScraper(),
+            WorkScraper(),
             JobsScraper(),
             JoobleScraper(),
             NovarobotaScraper(),
-            # RabotaScraper(),
-            RabotaAPIScraper(),
-            TrudScraper(),
-            WorkScraper()
+            TrudScraper()
         ]
-        if location:
-            for website in websites:
-                async_task = asyncio.create_task(website.scrape_job_website(
-                    location,
-                    page_num,
-                    query_params
-                ))
-                async_tasks.append(async_task)
-        else:
-            for website in websites:
-                for location in website.cities.keys():
-                    async_task = asyncio.create_task(website.scrape_job_website(
-                        location,
-                        page_num,
-                        query_params
-                    ))
-                    async_tasks.append(async_task)
+        for website in websites:
+            async_task = asyncio.create_task(website.scrape_job_website(
+                location,
+                page_num,
+                query_params
+            ))
+            async_tasks.append(async_task)
         return await asyncio.gather(*async_tasks)
 
     @staticmethod
