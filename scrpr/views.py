@@ -25,13 +25,9 @@ from .models import *
 from .constants import *
 from .paginator import VirtualPaginator
 from .tasks import send_500_error_email
+from project.cache import generate_cache_key
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
 from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
-
-
-def generate_cache_key(query):
-    key = ','.join([f'{key}-{str(value).lower()}' for key, value in query.items()])
-    return str(hash(key))
 
 
 class FormListView(FormView):
