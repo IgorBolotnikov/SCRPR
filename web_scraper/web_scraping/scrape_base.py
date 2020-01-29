@@ -214,7 +214,6 @@ class ScraperBase:
             start_index = zero_based_index * GAMES_PER_PAGE
             end_index = zero_based_index + GAMES_PER_PAGE
             self.params.update({'page': self.current_page_num})
-            print('self.params')
             cache_key = generate_cache_key(self.params)
             cache.set(cache_key, self.output[start_index:end_index])
 
