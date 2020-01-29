@@ -395,7 +395,7 @@ class TestRateView(TestCase,
 
 class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin):
     def setUp(self):
-        self.url = '/games/'
+        self.url = '/games'
         self.template_name = 'scrpr/content_with_sidebar/games.html'
         self.template_base = 'scrpr/content_with_sidebar/content_with_sidebar_base.html'
         self.queries = [
@@ -413,7 +413,7 @@ class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin)
 
 class TestJobsView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin):
     def setUp(self):
-        self.url = '/jobs/'
+        self.url = '/jobs'
         self.template_name = 'scrpr/content_with_sidebar/jobs.html'
         self.template_base = 'scrpr/content_with_sidebar/content_with_sidebar_base.html'
         self.queries = [
