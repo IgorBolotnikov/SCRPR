@@ -15,5 +15,5 @@ urlpatterns = [
     path('rate', RateView.as_view(), name='rate'),
     re_path(r'^games/$', GamesView.as_view(), name='games'),
     re_path(r'^jobs/$', JobsView.as_view(), name='jobs'),
-    path('freelance', freelance, name='freelance'),
+    path('freelance', freelance, name='freelance')
 ]

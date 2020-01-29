@@ -46,6 +46,7 @@ urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = 'scrpr.views.page_not_found_view'
+handler500 = 'scrpr.views.internal_server_error_view'
 
 # Django Debug Toolbar
 if settings.DEBUG:

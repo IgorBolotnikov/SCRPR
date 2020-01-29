@@ -1,0 +1,12 @@
+{% extends 'scrpr/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<div class="message_500_container">
+  <div class="window broken_gears">
+    <h1 class="message_500">500</h1>
+    <h3 class="smth_went_wrong">{% trans 'Something went wrong...' %}</h3>
+    <h3 class="smth_went_wrong">{% trans 'We\'re working on it.' %}</h3>
+  </div>
+</div>
+{% endblock %}
