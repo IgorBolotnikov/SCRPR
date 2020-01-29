@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from .views import *
-from .api import *
+from .api_v1 import *
 
 app_name = 'scrpr'
 urlpatterns = [
@@ -21,5 +21,6 @@ urlpatterns = [
     path('freelance', freelance, name='freelance'),
 
     # REST API
-    re_path(r'^api/games$', GamesAPIView.as_view(), name='games'),
+    re_path(r'^api/v1/games$', GamesAPIView.as_view(), name='games'),
+    re_path(r'^api/v1/jobs$', JobsAPIView.as_view(), name='jobs'),
 ]

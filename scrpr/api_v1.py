@@ -23,10 +23,23 @@ class PaginatorMixin:
         }
 
 
-class GamesAPIView(APIView, PaginatorMixin):
-    permission_classes = [AllowAny]
-
+class BaseListAPIView(APIView):
+    '''
+    Child classes have to have 'get_scraped_data' method defined,
+    which takes two params: query_params, page_num
+    This method should return dictionary in the following format:
+    {
+        'object_list': [<list of results>],
+        'last_page': <int: last page number>
+    }
+    '''
     def get_queryset(self):
+        # Check that 'get_scraped_data' method exists
+        if not hasattr(self, 'get_scraped_data'):
+            raise AttributeError(
+                "%s class doesn't have 'get_scraped_data' "
+                "method defined" % self.__class__.__name__
+            )
         # Get query params
         query_params = self.request.query_params.dict()
         pane_num = int(query_params.get("page", "1")) or 1
@@ -38,10 +51,7 @@ class GamesAPIView(APIView, PaginatorMixin):
             query_results = cached_query
         else:
             # Return results from scraping the website
-            query_results = PSStoreScraper().scrape_game_website(
-                query_params=query_params,
-                page_num=pane_num,
-            )
+            query_results = self.get_scraped_data(query_params, pane_num)
             # Don't cache if no results were returned
             if query_results.get('object_list') and len(query_results['object_list']) > 0:
                 cache.set(cache_key, query_results)
@@ -57,3 +67,24 @@ class GamesAPIView(APIView, PaginatorMixin):
     def get(self, request, *args, **kwargs):
         results = self.get_queryset()
         return Response(results, status=status.HTTP_200_OK)
+
+
+class GamesAPIView(BaseListAPIView, PaginatorMixin):
+    permission_classes = [AllowAny]
+
+    def get_scraped_data(self, query_params, page_num):
+        return PSStoreScraper().scrape_game_website(
+            query_params=query_params,
+            page_num=page_num
+        )
+
+
+class JobsAPIView(BaseListAPIView, PaginatorMixin):
+    permission_classes = [AllowAny]
+
+    def get_scraped_data(self, query_params, page_num):
+        return JobsSitesScraper().scrape_websites(
+            query_params=query_params,
+            page_num=page_num,
+            location=query_params.get("location")
+        )
