@@ -9,7 +9,9 @@ from urllib.parse import quote, urlencode
 from time import time, sleep
 from datetime import datetime
 from bs4 import BeautifulSoup as soup
+from django.core.cache import cache
 from .constants import *
+from project.cache import generate_cache_key
 
 
 # This wrapper is purely for benchmarking
@@ -62,7 +64,12 @@ class ScraperBase:
 
         # Adjust output according to artificial pagination, if any
         if self.artificial_pagination:
+            # Create artificial pagination for results
             self._set_artificial_last_page()
+            # If there are more than one page of results, then save
+            # pages 2-... to cache and return first page
+            if self.last_page_num > 1:
+                self._cache_next_pages()
             self._paginate_games_output(self.current_page_num)
         return {
             'object_list': self.output,
@@ -200,6 +207,16 @@ class ScraperBase:
         pages = output_num // GAMES_PER_PAGE
         extra_page = 1 if output_num % GAMES_PER_PAGE > 0 else 0
         self.last_page_num = pages + extra_page
+
+    def _cache_next_pages(self):
+        for page_num in range(2, self.last_page_num + 1):
+            zero_based_index = self.current_page_num - 1
+            start_index = zero_based_index * GAMES_PER_PAGE
+            end_index = zero_based_index + GAMES_PER_PAGE
+            self.params.update({'page': self.current_page_num})
+            print('self.params')
+            cache_key = generate_cache_key(self.params)
+            cache.set(cache_key, self.output[start_index:end_index])
 
     def _paginate_games_output(self, current_page_num):
         zero_based_index = current_page_num - 1
