@@ -1,9 +1,9 @@
 {% extends 'scrpr/content_with_sidebar/content_with_sidebar_base.html' %}
 {% load i18n %}
-{% load cache %}
+{% load static %}
 
 {% block sidebar %}
-  <form method="POST" action="">
+  <form method="POST" onsubmit="event.preventDefault(); fetchGames();">
     {% csrf_token %}
     <div class="search_tab">
       {{ form.title }}<input type="submit" class="search_button" value="">
@@ -47,7 +47,7 @@
         <li class="list_item_games">
           <a class="list_link_gamebox" href="{{ result.link }}" target="_blank">
             <div class="game_image">
-              <img src="{{ result.image }}" alt="No icon :(" width='124px' hwight='124px'>
+              <img src="{{ result.image }}" alt="No icon :(" width='124px' height='124px' class="list_image">
             </div>
             <div class="description_container_games">
               <div class="list_header_games">{{ result.title }}</div>
