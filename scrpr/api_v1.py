@@ -73,8 +73,7 @@ class GamesAPIView(BaseListAPIView, PaginatorMixin):
     permission_classes = [AllowAny]
 
     def get_scraped_data(self, query_params, page_num):
-        if not query_params:
-            query_params = {'games': 'all'}
+        query_params["type"] = "games"
         return PSStoreScraper().scrape_game_website(
             query_params=query_params,
             page_num=page_num
@@ -85,8 +84,7 @@ class JobsAPIView(BaseListAPIView, PaginatorMixin):
     permission_classes = [AllowAny]
 
     def get_scraped_data(self, query_params, page_num):
-        if not query_params:
-            query_params = {'jobs': 'all'}
+        query_params["type"] = "jobs"
         return JobsSitesScraper().scrape_websites(
             query_params=query_params,
             page_num=page_num,

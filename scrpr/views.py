@@ -266,12 +266,11 @@ class GamesView(FormListView):
     url = 'scrpr:games'
 
     def get_cache_key(self, query_params):
-        page_num = self.current_page if self.current_page else 1
-        query_params = query_params if query_params else {'games': 'all'}
-        query_params.update({'page': page_num})
+        query_params['page'] = self.current_page if self.current_page else 1
         return generate_cache_key(query_params)
 
     def get_queryset(self, query_params=None):
+        query_params['type'] = 'games'
         cache_key = self.get_cache_key(query_params)
         cached_query = cache.get(cache_key)
         if cached_query:
@@ -298,12 +297,11 @@ class JobsView(FormListView):
     url = 'scrpr:jobs'
 
     def get_cache_key(self, query_params):
-        page_num = self.current_page if self.current_page else 1
-        query_params = query_params if query_params else {'jobs': 'all'}
-        query_params.update({'page': page_num})
+        query_params['page'] = self.current_page if self.current_page else 1
         return generate_cache_key(query_params)
 
     def get_queryset(self, query_params=None):
+        query_params['type'] = 'jobs'
         cache_key = self.get_cache_key(query_params)
         cached_query = cache.get(cache_key)
         if cached_query:
