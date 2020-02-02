@@ -34,6 +34,12 @@ class BaseListAPIView(APIView):
     }
     '''
     def get_queryset(self):
+        # Check that 'get_query_params' method exists
+        if not hasattr(self, 'get_query_params'):
+            raise AttributeError(
+                "%s class doesn't have 'get_query_params' "
+                "method defined" % self.__class__.__name__
+            )
         # Check that 'get_scraped_data' method exists
         if not hasattr(self, 'get_scraped_data'):
             raise AttributeError(
@@ -41,7 +47,7 @@ class BaseListAPIView(APIView):
                 "method defined" % self.__class__.__name__
             )
         # Get query params
-        query_params = self.request.query_params.dict()
+        query_params = self.get_query_params()
         pane_num = int(query_params.get("page", "1")) or 1
         # Check if cache has any value for generated key
         cache_key = generate_cache_key(query_params)
@@ -72,8 +78,12 @@ class BaseListAPIView(APIView):
 class GamesAPIView(BaseListAPIView, PaginatorMixin):
     permission_classes = [AllowAny]
 
-    def get_scraped_data(self, query_params, page_num):
+    def get_query_params(self):
+        query_params = self.request.query_params.dict()
         query_params["type"] = "games"
+        return query_params
+
+    def get_scraped_data(self, query_params, page_num):
         return PSStoreScraper().scrape_game_website(
             query_params=query_params,
             page_num=page_num
@@ -83,8 +93,12 @@ class GamesAPIView(BaseListAPIView, PaginatorMixin):
 class JobsAPIView(BaseListAPIView, PaginatorMixin):
     permission_classes = [AllowAny]
 
-    def get_scraped_data(self, query_params, page_num):
+    def get_query_params(self):
+        query_params = self.request.query_params.dict()
         query_params["type"] = "jobs"
+        return query_params
+
+    def get_scraped_data(self, query_params, page_num):
         return JobsSitesScraper().scrape_websites(
             query_params=query_params,
             page_num=page_num,
