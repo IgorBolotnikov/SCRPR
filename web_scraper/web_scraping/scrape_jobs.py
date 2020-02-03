@@ -347,7 +347,7 @@ class RabotaAPIScraper(ScraperBase):
         page_num = f'page={page_num}'
         salary = f'salary={salary_min}&' if salary_min else ''
         with_salary = 'noSalary=false&' if with_salary else ''
-        return f'{RABOTAUA_API_LINK}?keyWords={title}&{city_name}{salary}{page_num}'
+        return f'{RABOTAUA_API_LINK}?keyWords={title}&{city_name}{salary}{with_salary}{page_num}'
 
     @staticmethod
     def _convert_title(title):
@@ -579,7 +579,7 @@ class HeadDunterAPIScraper(ScraperBase):
         page_num = f'page={page_num}'
         salary = f'salary={salary_min}&' if salary_min else ''
         with_salary = 'only_with_salary=true&' if with_salary else ''
-        return f'{HEADHUNTER_API_LINK}?text={title}&{city_name}{salary}{page_num}'
+        return f'{HEADHUNTER_API_LINK}?text={title}&{city_name}{salary}{with_salary}{page_num}'
 
     @staticmethod
     def _convert_title(title):
