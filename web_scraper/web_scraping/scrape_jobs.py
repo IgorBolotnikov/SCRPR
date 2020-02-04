@@ -662,10 +662,11 @@ class JobsSitesScraper:
             # Otherwise Jobis will not work
             #
             # JobisScraper().scrape_job_website,
-            RabotaScraper(),
-            HeadDunterAPIScraper(),
+            # RabotaScraper(),
+
             RabotaAPIScraper(),
             WorkScraper(),
+            HeadDunterAPIScraper(),
             JobsScraper(),
             JoobleScraper(),
             NovarobotaScraper(),
