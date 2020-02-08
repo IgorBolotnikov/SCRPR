@@ -6,4 +6,6 @@ app_name = 'api_v1'
 
 urlpatterns = [
     path('news', NewsListView.as_view(), name='news-list'),
+    path('favorites/games', FavoritesGamesListView.as_view()),
+    path('favorites/jobs', FavoritesJobsListView.as_view()),
 ]

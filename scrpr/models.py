@@ -3,57 +3,6 @@ from tinymce import models as tinymce_models
 from authentication.models import User
 from .constants import *
 
-class Job(models.Model):
-    title = models.TextField()
-    body = models.TextField()
-    location = models.CharField(max_length=100)
-    salary_min = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-    salary_max = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-    currency = models.CharField(max_length=50, null=True, blank=True)
-    employer = models.TextField(null=True, blank=True)
-    link = models.URLField(max_length=800)
-    source = models.URLField(max_length=100)
-
-    def __str__(self):
-        return self.title
-
-
-class Game(models.Model):
-    title = models.CharField(max_length=100, blank=True)
-    price = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-    psplus_price = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-    initial_price = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-    image = models.URLField(max_length=200)
-    link = models.URLField(max_length=200)
-
-    def __str__(self):
-        return self.title
-
 
 class Comment(models.Model):
     name = models.CharField(max_length=100)
