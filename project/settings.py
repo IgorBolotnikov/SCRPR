@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'smart_emails',
     'rest_framework',
     'corsheaders',
+    'api_v1',
 ]
 
 MIDDLEWARE = [

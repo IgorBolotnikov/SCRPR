@@ -32,6 +32,9 @@ urlpatterns = [
     path('', include('scrpr.urls')),
     path('auth/', include('authentication.urls')),
 
+    # API V1
+    path('api/v1/', include('api_v1.urls')),
+
     # Tinymce app
     re_path(r'^tinymce/', include('tinymce.urls')),
 

@@ -10,3 +10,11 @@ local_settings.py
 media/
 !default_image.png
 staticfiles/
+
+# Testing
+htmlcov/
+.pytest_cache
+.coverage
+.coveragerc
+pytest.ini
+test_settings.py
