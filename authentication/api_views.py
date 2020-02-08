@@ -7,16 +7,28 @@ from authentication.serializers import UserSerializer, UserWithTokenSerializer
 from authentication.models import User
 
 
-class RetrieveUserView(APIView):
+class UserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        '''
-        Get user by their token and return user data
-        '''
-
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+    def put(self, request, format=None):
+        instance = User.objects.get(pk=request.user.id)
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.update(instance, serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                serializer.data,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def delete(self, request, format=None):
+        User.objects.filter(pk=request.user.id).delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 class CreateUserView(APIView):

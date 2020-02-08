@@ -136,3 +136,21 @@ class TestFavoritesJobsListView(PaginationMixin):
         response = self.view_class.as_view(self.viewset_method)(request)
         assert response.status_code == 200, \
             'Should be accessible only by authenticated users'
+
+
+class TestUserView:
+    def test_get_response_for_anonymous_user(self):
+        request = APIRequestFactory().get('/')
+        request.user = AnonymousUser()
+        response = UserView.as_view()(request)
+        assert response.status_code == 401, \
+            'Should not be accessible by anonymous users'
+
+    def test_get_response_for_authenticated_user(self):
+        request = APIRequestFactory().get('/')
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = UserView.as_view()(request)
+        assert response.status_code == 200, \
+            'Should be accessible only by authenticated users'
+        assert user.id = response.data['id'], 'Should return current user info'

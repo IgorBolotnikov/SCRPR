@@ -4,15 +4,17 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.contrib.auth.models import AnonymousUser
 from authentication import api_views
 
+from authentication.models import User
+
 
 pytestmark = pytest.mark.django_db
 
 
-class TestRetrieveUserView:
+class TestUserView:
     def test_get_response_for_anonymous_user(self):
         request = APIRequestFactory().get('/')
         request.user = AnonymousUser()
-        response = api_views.RetrieveUserView.as_view()(request)
+        response = api_views.UserView.as_view()(request)
         assert response.status_code == 401, ('Should not be accessible '
                                              'by anonymous users')
 
@@ -20,7 +22,7 @@ class TestRetrieveUserView:
         request = APIRequestFactory().get('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
-        response = api_views.RetrieveUserView.as_view()(request)
+        response = api_views.UserView.as_view()(request)
         assert response.status_code == 200, ('Should be accessible only '
                                              'by authenticated users')
 
@@ -28,7 +30,7 @@ class TestRetrieveUserView:
         request = APIRequestFactory().get('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
-        response = api_views.RetrieveUserView.as_view()(request)
+        response = api_views.UserView.as_view()(request)
         assert response.data['username'] == request.user.username, (
             'Should return User data of a user, who have sent a request')
 
@@ -36,9 +38,33 @@ class TestRetrieveUserView:
         request = APIRequestFactory().post('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
-        response = api_views.RetrieveUserView.as_view()(request)
+        response = api_views.UserView.as_view()(request)
         assert response.status_code == 405, ('Should not accept POST requests')
 
+    def test_put_method(self):
+        post_body = {
+            "username": "testusername",
+            "email": "testemail@testemail.com",
+        }
+        request = APIRequestFactory().put('/', post_body)
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = api_views.UserView.as_view()(request)
+        data = response.data
+        assert response.status_code == 200, 'Should return 200 OK response'
+        assert data['username'] == post_body['username'], \
+            'Should update username'
+        assert data['email'] == post_body['email'], \
+            'Should update email'
+
+    def test_delete_method(self):
+        request = APIRequestFactory().delete('/')
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = api_views.UserView.as_view()(request)
+        remaining_users = User.objects.all()
+        assert response.status_code == 200, 'Should return 200 OK'
+        assert not remaining_users, 'Should delete user'
 
 class TestCreateUserView:
     def test_get_response_for_anonymous_user(self):

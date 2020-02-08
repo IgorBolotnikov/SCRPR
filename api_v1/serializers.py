@@ -23,8 +23,7 @@ class FavoriteGameQuerySerializer(serializers.ModelSerializer):
             'psplus_price',
             'initial_price',
             'free',
-            'notification_frequency',
-            'account_id'
+            'notification_frequency'
         )
 
 class FavoriteJobQuerySerializer(serializers.ModelSerializer):
@@ -41,5 +40,4 @@ class FavoriteJobQuerySerializer(serializers.ModelSerializer):
             'salary_max',
             'with_salary',
             'notification_frequency',
-            'account_id'
         )
