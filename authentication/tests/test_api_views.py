@@ -15,31 +15,31 @@ class TestUserView:
         request = APIRequestFactory().get('/')
         request.user = AnonymousUser()
         response = api_views.UserView.as_view()(request)
-        assert response.status_code == 401, ('Should not be accessible '
-                                             'by anonymous users')
+        assert response.status_code == 401, \
+            'Should not be accessible by anonymous users'
 
     def test_get_response_for_authenticated_user(self):
         request = APIRequestFactory().get('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
         response = api_views.UserView.as_view()(request)
-        assert response.status_code == 200, ('Should be accessible only '
-                                             'by authenticated users')
+        assert response.status_code == 200, \
+            'Should be accessible only by authenticated users'
 
     def test_response_content(self):
         request = APIRequestFactory().get('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
         response = api_views.UserView.as_view()(request)
-        assert response.data['username'] == request.user.username, (
-            'Should return User data of a user, who have sent a request')
+        assert response.data['username'] == request.user.username, \
+            'Should return User data of a user, who have sent a request'
 
     def test_post_method_not_allowed(self):
         request = APIRequestFactory().post('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
         response = api_views.UserView.as_view()(request)
-        assert response.status_code == 405, ('Should not accept POST requests')
+        assert response.status_code == 405, 'Should not accept POST requests'
 
     def test_put_method(self):
         post_body = {
@@ -67,7 +67,7 @@ class TestUserView:
         assert not remaining_users, 'Should delete user'
 
 class TestCreateUserView:
-    def test_get_response_for_anonymous_user(self):
+    def test_get_response(self):
         request = APIRequestFactory().get('/')
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
@@ -83,13 +83,12 @@ class TestCreateUserView:
         request = APIRequestFactory().post('/', post_body)
         request.user = AnonymousUser()
         response = api_views.CreateUserView.as_view()(request)
-        assert response.status_code == 201, ('Should successfully '
-                                             'create new user')
-        assert response.data.get('token') is not None, ('Should return JWT '
-                                                        'together with '
-                                                        'user data')
-        assert 'password' not in response.data.keys(), ('Should not return '
-                                                        'password to user')
+        assert response.status_code == 201, \
+            'Should successfully create new user'
+        assert response.data.get('token') is not None, \
+            'Should return JWT together with user data'
+        assert 'password' not in response.data.keys(), \
+            'Should not return password to user'
 
     def test_invalid_form_bad_request(self):
         post_body = {
@@ -100,5 +99,38 @@ class TestCreateUserView:
         request = APIRequestFactory().post('/', post_body)
         request_user = AnonymousUser()
         response = api_views.CreateUserView.as_view()(request)
-        assert response.status_code == 400, ('Should return 400: Bad request '
-                                             'if user have sent invalid data')
+        assert response.status_code == 400, \
+            'Should return 400: Bad request if user have sent invalid data'
+
+
+class TestUpdatePasswordView:
+    def test_put_response_for_anonymous_user(self):
+        request = APIRequestFactory().put('/')
+        request.user = AnonymousUser()
+        response = api_views.UpdatePasswordView.as_view()(request)
+        assert response.status_code == 401, \
+            'Should be accessible only by authorized users'
+
+    def test_valid_password_response(self):
+        password = 'securepassword'
+        user = mixer.blend('authentication.User')
+        user.set_password(password)
+        request = APIRequestFactory().put('/', {
+            'old_password': password,
+            'new_password': 'anotherpassword'
+        })
+        force_authenticate(request, user=user)
+        response = api_views.UpdatePasswordView.as_view()(request)
+        assert not response.data, 'Should not return any data'
+        assert response.status_code == 200, 'Should return 200 OK'
+
+    def test_invalid_password_response(self):
+        user = mixer.blend('authentication.User', password='securepassword')
+        request = APIRequestFactory().put('/', {
+            'old_password': 'wrongpassword',
+            'new_password': 'anotherpassword'
+        })
+        force_authenticate(request, user=user)
+        response = api_views.UpdatePasswordView.as_view()(request)
+        assert response.status_code == 400, 'Should return 400 BAD REQUEST'
+        assert response.data, 'Should return error message'

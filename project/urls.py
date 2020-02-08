@@ -40,14 +40,28 @@ urlpatterns = [
     path('api/auth/obtain-token', obtain_jwt_token),
     path('api/auth/refresh-token', refresh_jwt_token),
 
+    # Reset password
+    re_path(
+        r'^api/password_reset/',
+        include('django_rest_passwordreset.urls', namespace='password_reset')
+    ),
+
     # Tinymce app
     re_path(r'^tinymce/', include('tinymce.urls')),
 
     # robots.txt
-    re_path(r'^robots.txt$', TemplateView.as_view(template_name='scrpr/robots.txt', content_type='text/plain')),
+    re_path(r'^robots.txt$', TemplateView.as_view(
+        template_name='scrpr/robots.txt',
+        content_type='text/plain')
+    ),
 
     # Sitemap
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    )
 ]
 
 urlpatterns += staticfiles_urlpatterns()
