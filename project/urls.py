@@ -20,6 +20,7 @@ from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from .sitemap import *
 
 
@@ -34,6 +35,10 @@ urlpatterns = [
 
     # API V1
     path('api/v1/', include('api_v1.urls')),
+
+    # JWT
+    path('api/auth/obtain-token', obtain_jwt_token),
+    path('api/auth/refresh-token', refresh_jwt_token),
 
     # Tinymce app
     re_path(r'^tinymce/', include('tinymce.urls')),
