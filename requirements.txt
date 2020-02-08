@@ -57,7 +57,6 @@ pyparsing==2.4.6
 pytest==5.3.5
 pytest-cov==2.8.1
 pytest-django==3.8.0
-pytest-ipdb==0.1
 python-dateutil==2.8.1
 python-decouple==3.3
 python-http-client==3.2.1
