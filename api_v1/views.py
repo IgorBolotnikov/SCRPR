@@ -2,8 +2,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from api_v1.serializers import NewsPostSerializer, FavoriteGameQuerySerializer
-from scrpr.models import NewsPost, FavoriteGameQuery
+from scrpr.models import *
+from api_v1.serializers import *
 from api_v1.permissions import IsCreator
 
 
@@ -21,3 +21,12 @@ class FavoritesGamesListView(ModelViewSet):
 
     def get_queryset(self, *args, **kwargs):
         return FavoriteGameQuery.objects.filter(account=self.request.user)
+
+
+class FavoritesJobsListView(ModelViewSet):
+    serializer_class = FavoriteJobQuerySerializer
+    permission_classes = [IsAuthenticated, IsCreator]
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        return FavoriteJobQuery.objects.filter(account=self.request.user)

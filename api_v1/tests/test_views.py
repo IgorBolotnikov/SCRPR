@@ -104,6 +104,30 @@ class TestFavoritesGamesListView(PaginationMixin):
         assert response.status_code == 401, \
             'Should not be accessible by anonymous users'
 
+    def test_get_response_for_authenticated_user(self):
+        request = APIRequestFactory().get('/')
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = self.view_class.as_view(self.viewset_method)(request)
+        assert response.status_code == 200, \
+            'Should be accessible only by authenticated users'
+
+
+class TestFavoritesJobsListView(PaginationMixin):
+    model_class = 'scrpr.FavoriteJobQuery'
+    view_class = views.FavoritesJobsListView
+    authenticate = True
+    models_owner = True
+    objects_num = 20
+    viewset = True
+    viewset_method = {'get': 'list'}
+
+    def test_get_response_for_anonymous_user(self):
+        request = APIRequestFactory().get('/')
+        request.user = AnonymousUser()
+        response = self.view_class.as_view(self.viewset_method)(request)
+        assert response.status_code == 401, \
+            'Should not be accessible by anonymous users'
 
     def test_get_response_for_authenticated_user(self):
         request = APIRequestFactory().get('/')
