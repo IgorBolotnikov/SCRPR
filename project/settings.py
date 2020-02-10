@@ -256,7 +256,7 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
   'JWT_AUTH_COOKIE': 'jwt_auth_token',
-  'CSRF_COOKIE': True,
+  'CSRF_COOKIE': False,
   'JWT_RESPONSE_PAYLOAD_HANDLER': 'project.utils.jwt_response_handler',
   'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
   'JWT_ALLOW_REFRESH': True,
