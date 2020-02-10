@@ -14,7 +14,7 @@ class FavoriteGameQuerySerializer(serializers.ModelSerializer):
     notification_frequency = serializers.CharField(
         source='get_notification_freq_display',
         required=False,
-        allow_null=True
+        allow_blank=True
     )
 
     class Meta:
@@ -39,7 +39,7 @@ class FavoriteJobQuerySerializer(serializers.ModelSerializer):
     notification_frequency = serializers.CharField(
         source='get_notification_freq_display',
         required=False,
-        allow_null=True
+        allow_blank=True
     )
 
     class Meta:
