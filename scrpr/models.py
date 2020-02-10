@@ -107,6 +107,7 @@ class FavoriteJobQuery(models.Model):
     @property
     def details(self):
         details = ''
+        details += f', {self.city}' if self.city else ''
         details += f', {NUMERIC_MIN_LABEL}: {self.salary_min} UAH' if self.salary_min else ''
         details += f', {NUMERIC_MAX_LABEL}: {self.salary_max} UAH' if self.salary_max else ''
         details += f', {WITH_SALARY_LABEL}.' if self.with_salary else ''
