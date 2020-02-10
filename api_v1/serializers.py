@@ -28,7 +28,8 @@ class FavoriteGameQuerySerializer(serializers.ModelSerializer):
             'initial_price',
             'free',
             'notification_frequency',
-            'details'
+            'details',
+            'account_id',
         )
 
     def get_details(self, obj):
@@ -52,7 +53,8 @@ class FavoriteJobQuerySerializer(serializers.ModelSerializer):
             'salary_max',
             'with_salary',
             'notification_frequency',
-            'details'
+            'details',
+            'account_id',
         )
 
     def get_details(self, obj):
