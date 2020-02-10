@@ -12,7 +12,9 @@ class NewsPostSerializer(serializers.ModelSerializer):
 class FavoriteGameQuerySerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
     notification_frequency = serializers.CharField(
-        source='get_notification_freq_display'
+        source='get_notification_freq_display',
+        required=False,
+        allow_null=True
     )
 
     class Meta:
