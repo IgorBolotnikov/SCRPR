@@ -11,11 +11,6 @@ class NewsPostSerializer(serializers.ModelSerializer):
 
 class FavoriteGameQuerySerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
-    notification_frequency = serializers.CharField(
-        source='get_notification_freq_display',
-        required=False,
-        allow_blank=True
-    )
 
     class Meta:
         model = FavoriteGameQuery
@@ -27,7 +22,7 @@ class FavoriteGameQuerySerializer(serializers.ModelSerializer):
             'psplus_price',
             'initial_price',
             'free',
-            'notification_frequency',
+            'notification_freq',
             'details'
         )
 
@@ -36,11 +31,6 @@ class FavoriteGameQuerySerializer(serializers.ModelSerializer):
 
 class FavoriteJobQuerySerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
-    notification_frequency = serializers.CharField(
-        source='get_notification_freq_display',
-        required=False,
-        allow_blank=True
-    )
 
     class Meta:
         model = FavoriteJobQuery
@@ -51,7 +41,7 @@ class FavoriteJobQuerySerializer(serializers.ModelSerializer):
             'salary_min',
             'salary_max',
             'with_salary',
-            'notification_frequency',
+            'notification_freq',
             'details'
         )
 
