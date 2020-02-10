@@ -37,8 +37,8 @@ urlpatterns = [
     path('api/v1/', include('api_v1.urls')),
 
     # JWT
-    path('api/auth/obtain-token', obtain_jwt_token),
-    path('api/auth/refresh-token', refresh_jwt_token),
+    path('api/v1/auth/obtain-token', obtain_jwt_token),
+    path('api/v1/auth/refresh-token', refresh_jwt_token),
 
     # Reset password
     re_path(
