@@ -96,6 +96,23 @@ class TestFavoritesGamesListView(PaginationMixin):
         assert response.status_code == 200, \
             'Should be accessible only by authenticated users'
 
+    def test_post_response(self):
+        post_boby = {
+            'title': 'title',
+            'price_min': 100,
+            'price_max': 1000,
+            'psplus_price': False,
+            'initial_price': True,
+            'free': False,
+        }
+        request = APIRequestFactory().post('/', post_boby)
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = self.view_class.as_view({'post': 'create'})(request)
+        assert response.status_code == 201, \
+            'Should return 200 OK'
+        assert response.data, 'Should return instance of Game Favorites'
+
 
 class TestFavoritesJobsListView(PaginationMixin):
     model_class = 'scrpr.FavoriteJobQuery'
@@ -120,3 +137,18 @@ class TestFavoritesJobsListView(PaginationMixin):
         response = self.view_class.as_view(self.viewset_method)(request)
         assert response.status_code == 200, \
             'Should be accessible only by authenticated users'
+
+    def test_post_response(self):
+        post_boby = {
+            'title': 'title',
+            'salary_min': 100,
+            'salary_max': 1000,
+            'with_salary': False,
+        }
+        request = APIRequestFactory().post('/', post_boby)
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = self.view_class.as_view({'post': 'create'})(request)
+        assert response.status_code == 201, \
+            'Should return 200 OK'
+        assert response.data, 'Should return instance of Job Favorites'

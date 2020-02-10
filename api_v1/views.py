@@ -19,6 +19,9 @@ class FavoritesGamesListView(ModelViewSet):
     permission_classes = [IsAuthenticated, IsCreator]
     paginate_by = 10
 
+    def perform_create(self, serializer):
+        serializer.save(account=self.request.user)
+
     def get_queryset(self, *args, **kwargs):
         return FavoriteGameQuery.objects.filter(account=self.request.user)
 
@@ -27,6 +30,9 @@ class FavoritesJobsListView(ModelViewSet):
     serializer_class = FavoriteJobQuerySerializer
     permission_classes = [IsAuthenticated, IsCreator]
     paginate_by = 10
+
+    def perform_create(self, serializer):
+        serializer.save(account=self.request.user)
 
     def get_queryset(self, *args, **kwargs):
         return FavoriteJobQuery.objects.filter(account=self.request.user)
