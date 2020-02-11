@@ -56,6 +56,8 @@ LOGIN_REDIRECT_URL = '/'
 
 PROJECT_EMAIL = 'bolotnikovprojects@gmail.com'
 
+FRONTEND_URL = 'https://scrpr-pwa-dev.herokuapp.com'
+
 
 # Application definition
 
