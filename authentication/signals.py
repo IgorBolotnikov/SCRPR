@@ -19,7 +19,7 @@ def password_reset_token_created(sender, instance, reset_password_token,
     context = {
         'user': reset_password_token.user.id,
         'reset_password_url': "{}{}".format(
-            FRONTEND_RESET_PASSWORD_URL,
+            RESET_PASSWORD_URL,
             reset_password_token.key
         )
     }
