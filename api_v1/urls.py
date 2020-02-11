@@ -13,6 +13,7 @@ router.register(r'jobs', FavoritesJobsListView, basename='jobs')
 app_name = 'api_v1'
 urlpatterns = [
     path('news', NewsListView.as_view(), name='news-list'),
+    path('rate', CommentView.as_view(), name='rate'),
     path('favorites/', include(router.urls)),
 
     # From authentication app 'api_views.py'

@@ -4,6 +4,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from api_v1 import views
+from scrpr.models import *
 
 
 pytestmark = pytest.mark.django_db
@@ -63,6 +64,23 @@ class PaginationMixin:
             'Page size should be %s' % self.page_size
 
 
+class TestCommentView:
+    def test_post_response(self):
+        post_boby = {
+            'name': 'Myname',
+            'comment': 'Mycomment'
+        }
+        request = APIRequestFactory().post('/', post_boby)
+        request.user = AnonymousUser()
+        response = views.CommentView.as_view()(request)
+        comments = Comment.objects.all()
+        assert response.status_code == 201, \
+            'Should return 201 CREATED'
+        assert response.data['name'], 'Should return Comment name'
+        assert response.data['name'], 'Should return Comment message'
+        assert len(comments) == 1, 'Should save new comment'
+
+
 class TestNewsView(PaginationMixin):
     model_class = 'scrpr.NewsPost'
     view_class = views.NewsListView
@@ -110,7 +128,7 @@ class TestFavoritesGamesListView(PaginationMixin):
         force_authenticate(request, user=user)
         response = self.view_class.as_view({'post': 'create'})(request)
         assert response.status_code == 201, \
-            'Should return 200 OK'
+            'Should return 201 CREATED'
         assert response.data, 'Should return instance of Game Favorites'
 
 

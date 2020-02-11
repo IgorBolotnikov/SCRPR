@@ -1,10 +1,15 @@
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from scrpr.models import *
 from api_v1.serializers import *
 from api_v1.permissions import IsCreator
+
+
+class CommentView(CreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [AllowAny]
 
 
 class NewsListView(ListAPIView):

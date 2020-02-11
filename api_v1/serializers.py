@@ -3,6 +3,12 @@ from rest_framework import serializers
 from scrpr.models import *
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('name', 'comment')
+
+
 class NewsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewsPost
