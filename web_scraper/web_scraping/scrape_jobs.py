@@ -503,7 +503,7 @@ class WorkScraper(ScraperBase):
         title = self._convert_title(query_params.get('title')) if query_params else ''
         salary_min = query_params.get('salary_min')
         salary_max = query_params.get('salary_max')
-
+        # Pick the closest match for minimum salary
         if salary_min:
             for index in range(1, len(SALARY_OPTIONS)):
                 if SALARY_OPTIONS[index] > int(salary_min):
@@ -511,7 +511,7 @@ class WorkScraper(ScraperBase):
                     break
         else:
             salary_min = ''
-
+        # Pick the closest match for maximum salary
         if salary_max and int(salary_max) > SALARY_OPTIONS[-1]:
             salary_max = ''
         elif salary_max:
@@ -521,6 +521,10 @@ class WorkScraper(ScraperBase):
                     break
         else:
             salary_max = ''
+        # If "only with salary" was chosen instead, then pick the first
+        # non-zero salary amount from standard range
+        if not salary_min and query_params.get('with_salary'):
+            salary_min = f'salaryfrom={SALARY_OPTIONS[0]}&'
 
         page_num = f'?page={page_num}' if page_num else ''
         city_name = f'{city_name}-' if city_name else ''
