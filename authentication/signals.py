@@ -19,7 +19,8 @@ def password_reset_token_created(sender, instance, reset_password_token,
             reset_password_token.key
         )
     }
-    send_reset_password_email.delay(
+    # Add .delay() method when worker is active
+    send_reset_password_email(
         subject_template_name='authentication/reset_password_subject.txt',
         email_template_name='authentication/reset_password_message.html',
         context=context,
