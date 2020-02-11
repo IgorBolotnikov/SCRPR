@@ -16,9 +16,9 @@ class UserView(APIView):
 
     def put(self, request, format=None):
         instance = User.objects.get(pk=request.user.id)
-        serializer = UserSerializer(data=request.data)
+        serializer = UserSerializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.update(instance, serializer.data)
+            serializer.save()
             new_token = serializer.get_token(
                 User.objects.get(pk=request.user.id))
             return Response(
