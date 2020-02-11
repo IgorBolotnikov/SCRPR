@@ -50,8 +50,7 @@ class CustomPasswordResetForm(PasswordResetForm):
         if not context.get('user'):
             return
         context['user'] = context['user'].id
-        # Add .delay method to the function when worker is set up
-        send_reset_password_email(
+        send_reset_password_email.delay(
             subject_template_name, email_template_name,
             context, from_email, to_email, html_email_template_name)
 
