@@ -24,6 +24,8 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from .sitemap import *
 
 
+API_V1_PREFIX = 'api/v1/'
+
 sitemaps = {
     'static': StaticViewSitemap,
 }
@@ -34,15 +36,15 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
 
     # API V1
-    path('api/v1/', include('api_v1.urls')),
+    path(API_V1_PREFIX, include('api_v1.urls')),
 
     # JWT
-    path('api/v1/auth/obtain-token', obtain_jwt_token),
-    path('api/v1/auth/refresh-token', refresh_jwt_token),
+    path(f'{API_V1_PREFIX}auth/obtain-token', obtain_jwt_token),
+    path(f'{API_V1_PREFIX}auth/refresh-token', refresh_jwt_token),
 
     # Reset password
     re_path(
-        r'^api/password_reset/',
+        r'^api/v1/password_reset/',
         include('django_rest_passwordreset.urls', namespace='password_reset')
     ),
 
