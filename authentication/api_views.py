@@ -19,7 +19,12 @@ class UserView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.update(instance, serializer.data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            new_token = serializer.get_token(
+                User.objects.get(pk=request.user.id))
+            return Response(
+                { **serializer.data, 'token': new_token },
+                status=status.HTTP_200_OK
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None):

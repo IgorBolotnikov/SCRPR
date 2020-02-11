@@ -51,11 +51,14 @@ class TestUserView:
         force_authenticate(request, user=user)
         response = api_views.UserView.as_view()(request)
         data = response.data
+        users = User.objects.all()
         assert response.status_code == 200, 'Should return 200 OK response'
         assert data['username'] == post_body['username'], \
             'Should update username'
         assert data['email'] == post_body['email'], \
             'Should update email'
+        assert len(users) == 1, 'Should not create new users'
+        assert 'token' in data, 'Should return new token'
 
     def test_delete_method(self):
         request = APIRequestFactory().delete('/')
