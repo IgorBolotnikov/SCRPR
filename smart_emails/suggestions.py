@@ -1,10 +1,9 @@
+import sendgrid
 from django.db.models import Q
 from django.template.loader import get_template
 from django.template import Context
 from django.conf import settings
 from django.forms.models import model_to_dict
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 from authentication.models import User
 from scrpr.models import FavoriteJobQuery, FavoriteGameQuery
 from .models import SavedSuggestion
@@ -90,13 +89,13 @@ class Suggestion:
         if settings.DEBUG:
             print(len(email_context['object_list']))
         else:
-            message = Mail(
+            message = sendgrid.helpers.mail.Mail(
                 from_email='bolotnikovprojects@gmail.com',
                 to_emails=receiver_email,
                 subject=rendered_subject,
                 html_content=html_with_context,
             )
-            sg_client = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
+            sg_client = sendgrid.SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
             response = sg_client.send(message)
 
     def _get_job_favorites(self):

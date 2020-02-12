@@ -1,5 +1,6 @@
 import pytest
 import tempfile
+from unittest.mock import patch
 from django.core import mail
 from django.urls import reverse
 from django.test import TestCase, SimpleTestCase, Client
@@ -272,12 +273,6 @@ class TestResetPasswordRequestView(TestCaseWithDatabase,
         self.invalid_form_errors = (RESET_PASSWORD_REQUEST_INVALID_ERRORS_1,)
         self.valid_form_sample = RESET_PASSWORD_REQUEST_VALID_FORM
 
-    def test_correct_email_entry(self):
-        response = self.client.post(self.url, self.valid_form_sample)
-        self.assertRedirects(response, self.success_url)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Reset password message')
-
 
 class TestResetPasswordRequestDoneView(TestCaseWithDatabase,
                                        GetResponseMixin):
@@ -294,7 +289,8 @@ class TestResetPasswordView(TestCaseWithDatabase,
         self.success_url = '/auth/reset_password_complete'
         self.valid_form_sample = RESET_PASSWORD_VALID_FORM
 
-    def test_get_response(self):
+    @patch('authentication.tasks.sendgrid')
+    def test_get_response(self, mock_sendgrid):
         response = self.client.post(
             '/auth/reset_password',
             RESET_PASSWORD_REQUEST_VALID_FORM

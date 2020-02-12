@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from datetime import datetime, timezone
 from time import perf_counter
 from functools import wraps
@@ -109,9 +110,26 @@ class RedirectIfWrongUserMixin:
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-#
+
 class WebScrapingResultsMixin:
     def test_scraping_results_with_var_queries(self):
+        # Create mock scrapers to avoid realtime web scraping from websites
+        game_patcher = patch('scrpr.views.PSStoreScraper')
+        game_mock = game_patcher.start()
+        game_mock = game_mock()
+        game_mock.scrape_game_website.return_value = {
+            'object_list': ['result1', 'result2'],
+            'last_page': 1
+        }
+
+        job_patcher = patch('scrpr.views.JobsSitesScraper')
+        job_mock = job_patcher.start()
+        job_mock = job_mock()
+        job_mock.scrape_websites.return_value = {
+            'object_list': ['result1', 'result2'],
+            'last_page': 1
+        }
+
         response = self.client.get(self.url)
         self.assertTrue(
             len(response.context['object_list']) > 0,
