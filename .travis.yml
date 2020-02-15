@@ -7,3 +7,11 @@ install:
 # command to run tests
 script:
   - pytest
+# Deployment on Heroku
+deploy:
+  provider: heroku
+  api_key:
+    secure: "YOUR ENCRYPTED API KEY"
+  app:
+    master: scrpr-develop
+    production: scrpr-project
