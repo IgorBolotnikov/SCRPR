@@ -11,14 +11,8 @@ env:
 deploy:
   provider: heroku
   buildpack: python
-  strategy: git
   api_key:
     secure: S7rju2g8LOpCG3YMIZhk72SD3j55WZGPRYontZHuWrqG44/okjwKCFTQwNpQyvfDLYxdNwxyRNit+B2GslifwnAqqT87vBBRzMvVkdMm1KsCXZTZGiIkXzimAKztctBvMWMCKJzswSFyhUbEEiQCuHU6Uq5eXZyK4r2ju3c/t+9osAtRoG1Ld7UuZKEUU85lDIKbYKp1JVcKA3uouGAQyHa7MoSiUiH+2gcPw9DzdUK9e8CUo+qWtYgi1+fDh5tLjlMW5Jl2W7rkQkApzytfRI8+V+Tjw9VzmCCnL7zJoWB3Y4y8zqeXLaexa+3yUymNOISugqT9F9FuE6Yja0DPXKIGzsxKa5AxiR0WwYP+TeTq6w02dIUObleek5NK26L2/gSsEuMIRjIfWifWGCT+oOGkhRVJg/8RrSGq2hJHG3WpOFShOAQX4f4xUhYBGJCIXXvQXpUvI0DSXavIjV0b3xqfKmIa14ZiEu64qlodmrW4Cqudgm4xoQyY6QSMfNKZe742zWUc7UdzAtov2pjaKorrCJ7lGLXE4Mp2TRkCYeavJ8mJtv0WFdpZO08bTopktTcH2eG73u952YthctEku9Cwc5dt/iaP4yCopHABue/rxIn+ySN7ntpTeKd21zAV5ITU6GKW5pWBybCskPOb6sleKZAumbHlFDe2fdfiQwE=
-  app: scrpr-develop
-  on:
-    repo: IgorBolotnikov/SCRPR
-    branch: develop
-  run:
-    - "python manage.py syncdb --noinput"
-    - "python manage.py migrate --all"
-    - restart
+  app:
+    develop: scrpr-develop
+    # master: scrpr-project
