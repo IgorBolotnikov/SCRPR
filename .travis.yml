@@ -1,17 +1,16 @@
 language: python
 python:
-  - "3.8"
-# command to install dependencies
+  - '3.8'
 install:
   - pip install -r requirements.txt
-# command to run tests
 script:
   - pytest
-# Deployment on Heroku
+after_success:
+  - coveralls
 deploy:
   provider: heroku
   api_key:
-    secure: "YOUR ENCRYPTED API KEY"
+    secure: p1FiTP9nzbImG6c9S1UwZjeTanvdY+9OeP05zA+nhzhO1NOLfYAh6+3m18J5ClbcePJP5W+z/cVojVL/Vy14m1+uDNTqwJ3w/oEaeXcIvNSwEqYp3P/jRdReSWc3jRHzdLmBMFkux07nII4Hi8FM2HqGrkgwl0a3UPIicxhfP24N+nv+FmkqG2Q7J7zYpcG+bn/tesd5zB6bKRDQpcnB4KF8f+TXjb7aSk9TicHCh3yCz1pwRdRLDOkEb2jAn3kh/KIs/ZpjjUIAicw4bGOWHY73bJiGMuAyIFimnL1LSSpuNnm3F7mPIHGvtc1W53e8p9kJaKANLeFkEqUxTQj+OfZ3HCviDl+Pg+Xx2RuaCBvTEewRue2Ih/MdMZUttu4PYpSE6xKPEBp2Xb68Rm8+zslXI1qWWG17+u12oLXMZ8nov6XuK2h1PrjNaXtq5sEZCjIxk3jbF84QjM+KA4FjhjUdko6vcbogHobmJ7ffe+gOH4adxD6Wyc1x5VceAG85uKvirhY6hMUN3RuDrmJDmdV3ZW8TSp1+AbfK9vfovglAlZjMN4Nc+AN6IZbjAfBSUgdlpiqmQrKYIctH6NSPdizjG2+LMXdoeKYk5+Al1hie8kHJtNFcXQ73vhIysjaMMGmp7QQCKB5M8ybpBLV89Ku6hm6PRqx+VXX4ajrrurs=
   app:
     master: scrpr-develop
     production: scrpr-project
