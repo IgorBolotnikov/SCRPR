@@ -20,8 +20,11 @@ from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from .sitemap import *
 
+
+API_V1_PREFIX = 'api/v1/'
 
 sitemaps = {
     'static': StaticViewSitemap,
@@ -32,14 +35,35 @@ urlpatterns = [
     path('', include('scrpr.urls')),
     path('auth/', include('authentication.urls')),
 
+    # API V1
+    path(API_V1_PREFIX, include('api_v1.urls')),
+
+    # JWT
+    path(f'{API_V1_PREFIX}auth/obtain-token', obtain_jwt_token),
+    path(f'{API_V1_PREFIX}auth/refresh-token', refresh_jwt_token),
+
+    # Reset password
+    re_path(
+        r'^api/v1/password_reset/',
+        include('django_rest_passwordreset.urls', namespace='password_reset')
+    ),
+
     # Tinymce app
     re_path(r'^tinymce/', include('tinymce.urls')),
 
     # robots.txt
-    re_path(r'^robots.txt$', TemplateView.as_view(template_name='scrpr/robots.txt', content_type='text/plain')),
+    re_path(r'^robots.txt$', TemplateView.as_view(
+        template_name='scrpr/robots.txt',
+        content_type='text/plain')
+    ),
 
     # Sitemap
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    )
 ]
 
 urlpatterns += staticfiles_urlpatterns()

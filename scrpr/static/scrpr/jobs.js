@@ -34,14 +34,11 @@ function adjustCityButton(x) {
 
 function showMoreResults() {
   let jobsList = document.getElementsByClassName('list_item hidden');
-  console.log('Total hidden items: ' + jobsList.length);
   if (jobsList.length > 20) {
-    console.log('Still more than 20 elements');
     for (let index = 0; index < 20; index++) {
       jobsList[0].classList.remove('hidden');
     }
   } else {
-    console.log('Already less than 20 elements');
     const listLength = jobsList.length;
     for (let index = 0; index < listLength; index++) {
       console.log(index, jobsList.length);

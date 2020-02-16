@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import django_heroku
 import os
 import dj_database_url
+import datetime
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -55,6 +56,8 @@ LOGIN_REDIRECT_URL = '/'
 
 PROJECT_EMAIL = 'bolotnikovprojects@gmail.com'
 
+FRONTEND_URL = 'https://scrpr-pwa-dev.herokuapp.com'
+
 
 # Application definition
 
@@ -72,11 +75,16 @@ INSTALLED_APPS = [
     'scrpr',
     'web_scraper',
     'authentication',
-    'smart_emails'
+    'smart_emails',
+    'rest_framework',
+    'corsheaders',
+    'api_v1',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -234,6 +242,27 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+# CORS settings
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# REST API settings
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'project.pagination.DetailedPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ]
+}
+
+JWT_AUTH = {
+  'JWT_AUTH_COOKIE': 'jwt_auth_token',
+  'CSRF_COOKIE': False,
+  'JWT_RESPONSE_PAYLOAD_HANDLER': 'project.utils.jwt_response_handler',
+  'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
+  'JWT_ALLOW_REFRESH': True,
+}
 
 try:
     from .local_settings import *

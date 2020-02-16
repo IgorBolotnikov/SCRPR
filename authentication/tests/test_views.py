@@ -1,12 +1,16 @@
+import pytest
 import tempfile
+from unittest.mock import patch
 from django.core import mail
 from django.urls import reverse
 from django.test import TestCase, SimpleTestCase, Client
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from .views import *
-from .models import *
+from authentication.views import *
+from authentication.models import *
 
+
+pytestmark = pytest.mark.django_db
 
 # Virtual image file to test proper user image formatting and saving
 IMAGE_MOCK = tempfile.NamedTemporaryFile(suffix=".jpg").name
@@ -142,7 +146,7 @@ EDIT_ACCOUNT_ERRORS_2 = {
 
 # Mixins for testing separate features
 
-class TestGetResponseMixin:
+class GetResponseMixin:
     def test_get_response(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -154,7 +158,7 @@ class TestGetResponseMixin:
         self.assertTemplateUsed(FOOTER_TEMPLATE)
 
 
-class TestFormValidationMixin:
+class FormValidationMixin:
     def test_form_fields_validation_errors(self):
         for form_sample, form_errors in zip(self.invalid_form_samples,
                                             self.invalid_form_errors):
@@ -164,7 +168,7 @@ class TestFormValidationMixin:
                     response, 'form', field_name, form_errors[field_name])
 
 
-class TestObjectDeletionWithRedirectMixin:
+class ObjectDeletionWithRedirectMixin:
     def test_object_deletion_with_redirect(self):
         response = self.client.post(self.url)
         self.assertRedirects(response, self.redirect_url)
@@ -172,7 +176,7 @@ class TestObjectDeletionWithRedirectMixin:
         self.assertEqual(deleted_object, None)
 
 
-class TestModelInstancesContextMixin:
+class ModelInstancesContextMixin:
     def test_model_instances_context(self):
         test_objects = [repr(object) for object in self.model.objects.all()]
         response = self.client.get(self.url)
@@ -208,7 +212,7 @@ class TestCaseWithDatabase(TestCase):
 
 
 class TestLoginView(TestCaseWithDatabase,
-                    TestGetResponseMixin):
+                    GetResponseMixin):
     def setUp(self):
         self.url = '/auth/login/'
         self.template_name = 'authentication/login.html'
@@ -234,8 +238,8 @@ class TestLoginView(TestCaseWithDatabase,
 
 
 class TestRegisterView(TestCaseWithDatabase,
-                       TestGetResponseMixin,
-                       TestFormValidationMixin):
+                       GetResponseMixin,
+                       FormValidationMixin):
     def setUp(self):
         self.url = '/auth/register'
         self.template_name = 'authentication/register.html'
@@ -259,8 +263,8 @@ class TestRegisterView(TestCaseWithDatabase,
 
 
 class TestResetPasswordRequestView(TestCaseWithDatabase,
-                                   TestGetResponseMixin,
-                                   TestFormValidationMixin):
+                                   GetResponseMixin,
+                                   FormValidationMixin):
     def setUp(self):
         self.url = '/auth/reset_password'
         self.template_name = 'authentication/reset_request.html'
@@ -269,29 +273,24 @@ class TestResetPasswordRequestView(TestCaseWithDatabase,
         self.invalid_form_errors = (RESET_PASSWORD_REQUEST_INVALID_ERRORS_1,)
         self.valid_form_sample = RESET_PASSWORD_REQUEST_VALID_FORM
 
-    def test_correct_email_entry(self):
-        response = self.client.post(self.url, self.valid_form_sample)
-        self.assertRedirects(response, self.success_url)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Reset password message')
-
 
 class TestResetPasswordRequestDoneView(TestCaseWithDatabase,
-                                       TestGetResponseMixin):
+                                       GetResponseMixin):
     def setUp(self):
         self.url = '/auth/reset_password_done'
         self.template_name = 'authentication/reset_password_done.html'
 
 
 class TestResetPasswordView(TestCaseWithDatabase,
-                            TestGetResponseMixin):
+                            GetResponseMixin):
     def setUp(self):
         self.url = ''
         self.template_name = 'authentication/reset_password.html'
         self.success_url = '/auth/reset_password_complete'
         self.valid_form_sample = RESET_PASSWORD_VALID_FORM
 
-    def test_get_response(self):
+    @patch('authentication.tasks.sendgrid')
+    def test_get_response(self, mock_sendgrid):
         response = self.client.post(
             '/auth/reset_password',
             RESET_PASSWORD_REQUEST_VALID_FORM
@@ -305,8 +304,8 @@ class TestResetPasswordView(TestCaseWithDatabase,
 
 
 class TestChangePasswordView(TestCaseWithDatabase,
-                             TestGetResponseMixin,
-                             TestFormValidationMixin):
+                             GetResponseMixin,
+                             FormValidationMixin):
     def setUp(self):
         self.url = '/auth/change_password'
         self.template_name = 'authentication/change_password.html'
@@ -327,15 +326,15 @@ class TestChangePasswordView(TestCaseWithDatabase,
 
 
 class CompleteResetPasswordView(TestCaseWithDatabase,
-                                TestGetResponseMixin):
+                                GetResponseMixin):
     def setUp(self):
         self.url = '/auth/reset_password_complete'
         self.template_name = 'authentication/reset_password_complete.html'
 
 
 class TestDeleteAccountView(TestCaseWithDatabase,
-                            TestGetResponseMixin,
-                            TestObjectDeletionWithRedirectMixin):
+                            GetResponseMixin,
+                            ObjectDeletionWithRedirectMixin):
     def setUp(self):
         self.url = '/auth/delete_account/1'
         self.template_name = 'authentication/delete_account.html'
@@ -348,8 +347,8 @@ class TestDeleteAccountView(TestCaseWithDatabase,
 
 
 class TestEditAccountView(TestCaseWithDatabase,
-                          TestGetResponseMixin,
-                          TestFormValidationMixin):
+                          GetResponseMixin,
+                          FormValidationMixin):
     def setUp(self):
         self.url = '/auth/edit_account/1'
         self.template_name = 'authentication/edit_account.html'

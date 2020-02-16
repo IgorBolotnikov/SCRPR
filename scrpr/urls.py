@@ -1,8 +1,11 @@
 from django.urls import path, re_path
 from .views import *
+from .api_v1 import *
 
 app_name = 'scrpr'
 urlpatterns = [
+
+    # Regular URLs
     path('', MainPageView.as_view(), name='index'),
     path('news', NewsListView.as_view(), name='news'),
     path('favorites', FavoritesView.as_view(), name='favorites_list'),
@@ -13,7 +16,11 @@ urlpatterns = [
     path('logout', CustomLogoutView.as_view(), name='logout'),
     path('about', AboutView.as_view(), name='about'),
     path('rate', RateView.as_view(), name='rate'),
-    re_path(r'^games/$', GamesView.as_view(), name='games'),
-    re_path(r'^jobs/$', JobsView.as_view(), name='jobs'),
-    path('freelance', freelance, name='freelance')
+    re_path(r'^games$', GamesView.as_view(), name='games'),
+    re_path(r'^jobs$', JobsView.as_view(), name='jobs'),
+    path('freelance', freelance, name='freelance'),
+
+    # REST API
+    re_path(r'^api/v1/games$', GamesAPIView.as_view(), name='games_api'),
+    re_path(r'^api/v1/jobs$', JobsAPIView.as_view(), name='jobs_api'),
 ]

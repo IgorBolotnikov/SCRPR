@@ -1,3 +1,5 @@
+import pytest
+from unittest.mock import patch
 from datetime import datetime, timezone
 from time import perf_counter
 from functools import wraps
@@ -5,10 +7,12 @@ from django.core import mail
 from django.test import TestCase, SimpleTestCase, Client, RequestFactory
 from django.contrib.auth.models import AnonymousUser
 
-from .views import *
-from .models import *
+from scrpr.views import *
+from scrpr.models import *
 from authentication.models import *
 
+
+pytestmark = pytest.mark.django_db
 
 LOGIN_URL = '/auth/login/?next='
 
@@ -41,7 +45,7 @@ RATE_ERRORS = {
 }
 
 
-class TestGetResponseMixin:
+class GetResponseMixin:
     def test_get_response(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -53,7 +57,7 @@ class TestGetResponseMixin:
         self.assertTemplateUsed(FOOTER_TEMPLATE)
 
 
-class TestFormValidationMixin:
+class FormValidationMixin:
     def test_form_fields_validation_errors(self):
         for form_sample, form_errors in zip(self.invalid_form_samples,
                                             self.invalid_form_errors):
@@ -63,7 +67,7 @@ class TestFormValidationMixin:
                     response, 'form', field_name, form_errors[field_name])
 
 
-class TestObjectDeletionWithRedirectMixin:
+class ObjectDeletionWithRedirectMixin:
     def test_object_deletion_with_redirect(self):
         response = self.client.post(self.url)
         self.assertRedirects(response, self.redirect_url)
@@ -71,7 +75,7 @@ class TestObjectDeletionWithRedirectMixin:
         self.assertEqual(deleted_object, None)
 
 
-class TestModelInstancesContextMixin:
+class ModelInstancesContextMixin:
     def test_model_instances_context(self):
         test_objects = [repr(object) for object in self.model.objects.all()]
         response = self.client.get(self.url)
@@ -82,7 +86,7 @@ class TestModelInstancesContextMixin:
         )
 
 
-class TestSingleObjectContextMixin:
+class SingleObjectContextMixin:
     def test_object_context(self):
         test_object = self.model.objects.get(pk=1)
         response = self.client.get(self.url)
@@ -90,14 +94,14 @@ class TestSingleObjectContextMixin:
         self.assertEqual(response.context['object'], test_object)
 
 
-class TestRedirectIfNoUserMixin:
+class RedirectIfNoUserMixin:
     def test_redirect_if_no_user(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertRedirects(response, LOGIN_URL + self.next)
 
 
-class TestRedirectIfWrongUserMixin:
+class RedirectIfWrongUserMixin:
     def test_redirect_if_wrong_user(self):
         self.client.login(
             username='TestUser2',
@@ -106,9 +110,26 @@ class TestRedirectIfWrongUserMixin:
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-#
-class TestWebScrapingResultsMixin:
+
+class WebScrapingResultsMixin:
     def test_scraping_results_with_var_queries(self):
+        # Create mock scrapers to avoid realtime web scraping from websites
+        game_patcher = patch('scrpr.views.PSStoreScraper')
+        game_mock = game_patcher.start()
+        game_mock = game_mock()
+        game_mock.scrape_game_website.return_value = {
+            'object_list': ['result1', 'result2'],
+            'last_page': 1
+        }
+
+        job_patcher = patch('scrpr.views.JobsSitesScraper')
+        job_mock = job_patcher.start()
+        job_mock = job_mock()
+        job_mock.scrape_websites.return_value = {
+            'object_list': ['result1', 'result2'],
+            'last_page': 1
+        }
+
         response = self.client.get(self.url)
         self.assertTrue(
             len(response.context['object_list']) > 0,
@@ -123,14 +144,15 @@ class TestWebScrapingResultsMixin:
             )
 
 
-class TestMainPageView(TestCase, TestGetResponseMixin):
+class TestMainPageView(TestCase, GetResponseMixin):
     def setUp(self):
         self.url = ''
         self.template_name = 'scrpr/index.html'
 
+
 class TestNewsListView(TestCase,
-                       TestGetResponseMixin,
-                       TestModelInstancesContextMixin):
+                       GetResponseMixin,
+                       ModelInstancesContextMixin):
     @classmethod
     def setUpTestData(cls):
         news1 = NewsPost.objects.create(
@@ -151,8 +173,8 @@ class TestNewsListView(TestCase,
 
 
 class TestFavoritesView(TestCase,
-                        TestGetResponseMixin,
-                        TestRedirectIfNoUserMixin):
+                        GetResponseMixin,
+                        RedirectIfNoUserMixin):
     @classmethod
     def setUpTestData(cls):
         user = User.objects.create(
@@ -203,10 +225,10 @@ class TestFavoritesView(TestCase,
 
 
 class TestFavoritesGameDetailView(TestCase,
-                                  TestGetResponseMixin,
-                                  TestRedirectIfNoUserMixin,
-                                  TestRedirectIfWrongUserMixin,
-                                  TestSingleObjectContextMixin):
+                                  GetResponseMixin,
+                                  RedirectIfNoUserMixin,
+                                  RedirectIfWrongUserMixin,
+                                  SingleObjectContextMixin):
     @classmethod
     def setUpTestData(cls):
         user1 = User.objects.create(
@@ -250,10 +272,10 @@ class TestFavoritesGameDetailView(TestCase,
 
 
 class TestFavoritesJobDetailView(TestCase,
-                                 TestGetResponseMixin,
-                                 TestRedirectIfNoUserMixin,
-                                 TestRedirectIfWrongUserMixin,
-                                 TestSingleObjectContextMixin):
+                                 GetResponseMixin,
+                                 RedirectIfNoUserMixin,
+                                 RedirectIfWrongUserMixin,
+                                 SingleObjectContextMixin):
     @classmethod
     def setUpTestData(cls):
         user1 = User.objects.create(
@@ -291,10 +313,10 @@ class TestFavoritesJobDetailView(TestCase,
 
 
 class TestFavoritesGameDeleteView(TestCase,
-                                  TestGetResponseMixin,
-                                  TestRedirectIfNoUserMixin,
-                                  TestRedirectIfWrongUserMixin,
-                                  TestObjectDeletionWithRedirectMixin):
+                                  GetResponseMixin,
+                                  RedirectIfNoUserMixin,
+                                  RedirectIfWrongUserMixin,
+                                  ObjectDeletionWithRedirectMixin):
     @classmethod
     def setUpTestData(cls):
         user1 = User.objects.create(
@@ -330,10 +352,10 @@ class TestFavoritesGameDeleteView(TestCase,
 
 
 class TestFavoritesJobDeleteView(TestCase,
-                                 TestGetResponseMixin,
-                                 TestRedirectIfNoUserMixin,
-                                 TestRedirectIfWrongUserMixin,
-                                 TestObjectDeletionWithRedirectMixin):
+                                 GetResponseMixin,
+                                 RedirectIfNoUserMixin,
+                                 RedirectIfWrongUserMixin,
+                                 ObjectDeletionWithRedirectMixin):
     @classmethod
     def setUpTestData(cls):
         user1 = User.objects.create(
@@ -367,15 +389,15 @@ class TestFavoritesJobDeleteView(TestCase,
         self.success_url = '/favorites'
 
 
-class TestAboutView(TestCase, TestGetResponseMixin):
+class TestAboutView(TestCase, GetResponseMixin):
     def setUp(self):
         self.url = '/about'
         self.template_name = 'scrpr/about.html'
 
 
 class TestRateView(TestCase,
-                   TestGetResponseMixin,
-                   TestFormValidationMixin):
+                   GetResponseMixin,
+                   FormValidationMixin):
     def setUp(self):
         self.url = '/rate'
         self.template_name = 'scrpr/rate.html'
@@ -393,9 +415,9 @@ class TestRateView(TestCase,
         self.assertTrue(object.comment, RATE_VALID_FORM['comment'])
 
 
-class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin):
+class TestGamesView(TestCase, GetResponseMixin, WebScrapingResultsMixin):
     def setUp(self):
-        self.url = '/games/'
+        self.url = '/games'
         self.template_name = 'scrpr/content_with_sidebar/games.html'
         self.template_base = 'scrpr/content_with_sidebar/content_with_sidebar_base.html'
         self.queries = [
@@ -411,9 +433,9 @@ class TestGamesView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin)
         ]
 
 
-class TestJobsView(TestCase, TestGetResponseMixin, TestWebScrapingResultsMixin):
+class TestJobsView(TestCase, GetResponseMixin, WebScrapingResultsMixin):
     def setUp(self):
-        self.url = '/jobs/'
+        self.url = '/jobs'
         self.template_name = 'scrpr/content_with_sidebar/jobs.html'
         self.template_base = 'scrpr/content_with_sidebar/content_with_sidebar_base.html'
         self.queries = [
