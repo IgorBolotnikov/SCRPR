@@ -86,17 +86,14 @@ class Suggestion:
         rendered_subject = subject_template.render().strip()
         txt_with_context = text_email_template.render(email_context)
         html_with_context = html_email_template.render(email_context)
-        if settings.DEBUG:
-            print(len(email_context['object_list']))
-        else:
-            message = sendgrid.helpers.mail.Mail(
-                from_email='bolotnikovprojects@gmail.com',
-                to_emails=receiver_email,
-                subject=rendered_subject,
-                html_content=html_with_context,
-            )
-            sg_client = sendgrid.SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
-            response = sg_client.send(message)
+        message = sendgrid.helpers.mail.Mail(
+            from_email='bolotnikovprojects@gmail.com',
+            to_emails=receiver_email,
+            subject=rendered_subject,
+            html_content=html_with_context,
+        )
+        sg_client = sendgrid.SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
+        response = sg_client.send(message)
 
     def _get_job_favorites(self):
         return FavoriteJobQuery.objects.select_related('account'

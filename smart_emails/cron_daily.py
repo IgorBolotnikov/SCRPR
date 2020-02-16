@@ -1,4 +1,5 @@
-from .suggestions import *
+from smart_emails.suggestions import *
+
 
 def send_suggestions():
-    return suggestions.Suggestion(1).send_suggestions()
+    return Suggestion(1).send_suggestions()

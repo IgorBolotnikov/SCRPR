@@ -1,5 +1,7 @@
 import pytest
 import tempfile
+from io import BytesIO
+from PIL import Image
 from unittest.mock import patch
 from django.core import mail
 from django.urls import reverse
@@ -15,6 +17,15 @@ pytestmark = pytest.mark.django_db
 # Virtual image file to test proper user image formatting and saving
 IMAGE_MOCK = tempfile.NamedTemporaryFile(suffix=".jpg").name
 PDF_FILE_MOCK = tempfile.NamedTemporaryFile(suffix=".pdf").name
+
+
+def create_test_image():
+        file = BytesIO()
+        image = Image.new('RGBA', size=(50, 50), color=(155, 0, 0))
+        image.save(file, 'png')
+        file.name = 'test.png'
+        file.seek(0)
+        return file
 
 
 # ===== Always present templates =====
@@ -273,6 +284,13 @@ class TestResetPasswordRequestView(TestCaseWithDatabase,
         self.invalid_form_errors = (RESET_PASSWORD_REQUEST_INVALID_ERRORS_1,)
         self.valid_form_sample = RESET_PASSWORD_REQUEST_VALID_FORM
 
+    def test_nonexisting_email_response(self):
+        response = self.client.post(
+            self.url,
+            {'email': 'useremail@mymail.com'}
+        )
+        self.assertEqual(response.status_code, 302)
+
 
 class TestResetPasswordRequestDoneView(TestCaseWithDatabase,
                                        GetResponseMixin):
@@ -368,7 +386,7 @@ class TestEditAccountView(TestCaseWithDatabase,
         )
 
     def test_successfull_user_edit(self):
-        # TODO: implement sending of comment via email
+        self.valid_form_sample['image'] = ('image', create_test_image().read())
         response = self.client.post(self.url, self.valid_form_sample)
         self.assertRedirects(response, self.success_url)
         user = User.objects.get(pk=1)

@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory, force_authenticate
 from django.conf import settings
@@ -131,6 +132,25 @@ class TestFavoritesGamesListView(PaginationMixin):
             'Should return 201 CREATED'
         assert response.data, 'Should return instance of Game Favorites'
 
+    def test_get_single_object_response(self):
+        request = APIRequestFactory().get('/')
+        user = mixer.blend('authentication.User')
+        obj = mixer.blend('scrpr.FavoriteGameQuery', account=user)
+        force_authenticate(request, user=user)
+        response = self.view_class.as_view({'get': 'retrieve'})(request, pk=1)
+        assert response.status_code == 200, \
+            'Should be accessible only by author users'
+        assert response.data['id'] == obj.id, 'Should return requested object'
+
+    def test_get_not_author_response(self):
+        request = APIRequestFactory().get('/')
+        user = mixer.blend('authentication.User')
+        obj = mixer.blend('scrpr.FavoriteGameQuery')
+        force_authenticate(request, user=user)
+        response = self.view_class.as_view({'get': 'retrieve'})(request, pk=1)
+        assert response.status_code == 404, \
+            'Should not be accessible only by other users'
+
 
 class TestFavoritesJobsListView(PaginationMixin):
     model_class = 'scrpr.FavoriteJobQuery'
@@ -170,3 +190,43 @@ class TestFavoritesJobsListView(PaginationMixin):
         assert response.status_code == 201, \
             'Should return 200 OK'
         assert response.data, 'Should return instance of Job Favorites'
+
+
+class TestGamesView:
+    def test_get_response(self):
+        game_patcher = patch('api_v1.views.PSStoreScraper')
+        game_mock = game_patcher.start()
+        game_mock = game_mock()
+        game_mock.scrape_game_website.return_value = {
+            'object_list': ['result1', 'result2'],
+            'last_page': 1
+        }
+
+        request = APIRequestFactory().get('/')
+        request.user = AnonymousUser()
+        response = views.GamesAPIView.as_view()(request)
+        assert response.status_code == 200, 'Should be accessible by anyone'
+        assert 'results' in response.data, 'Should return results'
+        assert response.data['results'], 'Results should not be empty'
+        assert 'pagination' in response.data, 'Should return pagination'
+        assert response.data['pagination'], 'Pagination should not be empty'
+
+
+class TestJobsView:
+    def test_get_response(self):
+        job_patcher = patch('api_v1.views.JobsSitesScraper')
+        job_mock = job_patcher.start()
+        job_mock = job_mock()
+        job_mock.scrape_websites.return_value = {
+            'object_list': ['result1', 'result2'],
+            'last_page': 1
+        }
+
+        request = APIRequestFactory().get('/')
+        request.user = AnonymousUser()
+        response = views.JobsAPIView.as_view()(request)
+        assert response.status_code == 200, 'Should be accessible by anyone'
+        assert 'results' in response.data, 'Should return results'
+        assert response.data['results'], 'Results should not be empty'
+        assert 'pagination' in response.data, 'Should return pagination'
+        assert response.data['pagination'], 'Pagination should not be empty'

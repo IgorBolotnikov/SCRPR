@@ -24,7 +24,6 @@ from .forms import *
 from .models import *
 from .constants import *
 from .paginator import VirtualPaginator
-from .tasks import send_500_error_email
 from project.cache import generate_cache_key
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
 from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
@@ -341,6 +340,5 @@ def page_not_found_view(request, exception, template_name="scrpr/404.html"):
 
 def internal_server_error_view(request, template_name="scrpr/500.html"):
     response = render(request, template_name, context={'user': request.user})
-    send_500_error_email.delay(request.path)
     response.status_code = 500
     return response
