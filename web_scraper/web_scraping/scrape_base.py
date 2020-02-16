@@ -14,22 +14,6 @@ from .constants import *
 from project.cache import generate_cache_key
 
 
-# This wrapper is purely for benchmarking
-def timer(func):
-    def wrapper(*args, **kwargs):
-        time1 = round(time(), 4)
-        # print(f'{datetime.now()} - Commencing scraping')
-        result = func(*args, **kwargs)
-        time2 = round(time(), 4)
-        timespan = time2 - time1
-        minutes = timespan // 60
-        seconds = round(timespan - minutes * 60, 2)
-        # print(f'{datetime.now()} - Scraping completed in {minutes} m, {seconds} s.')
-        # print('----------')
-        return result
-    return wrapper
-
-
 class ScraperBase:
     async def scrape_job_website(self, location, page_num, query_params=None):
         # print(f'Scraping with {self.__class__.__name__}')

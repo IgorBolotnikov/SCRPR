@@ -1,6 +1,11 @@
 import pytest
 from mixer.backend.django import mixer
-from rest_framework.test import APIRequestFactory, force_authenticate
+from unittest.mock import patch
+from rest_framework.test import (
+    APIRequestFactory,
+    force_authenticate,
+    APIClient
+)
 from django.contrib.auth.models import AnonymousUser
 from authentication import api_views
 
@@ -23,6 +28,7 @@ class TestUserView:
         user = mixer.blend('authentication.User')
         force_authenticate(request, user=user)
         response = api_views.UserView.as_view()(request)
+        assert response.data['id'] == user.id, 'Should return same User'
         assert response.status_code == 200, \
             'Should be accessible only by authenticated users'
 
@@ -60,6 +66,23 @@ class TestUserView:
             'Should update email'
         assert len(users) == 1, 'Should not create new users'
         assert 'token' in data, 'Should return new token'
+
+    def test_put_method_errors(self):
+        post_body = {
+            "username": "newusername",
+            "email": "notemail",
+            "image": "imagestring..."
+        }
+        request = APIRequestFactory().put('/', post_body)
+        user = mixer.blend('authentication.User')
+        force_authenticate(request, user=user)
+        response = api_views.UserView.as_view()(request)
+        data = response.data
+        users = User.objects.all()
+        assert response.status_code == 400, 'Should return 400 BAD REQUEST'
+        assert 'email' in response.data.keys(), 'Email should have error'
+        assert users[0].username == user.username, \
+            'User data should not change'
 
     def test_empty_put_method(self):
         user = mixer.blend('authentication.User')
@@ -173,4 +196,27 @@ class TestUpdatePasswordView:
         force_authenticate(request, user=user)
         response = api_views.UpdatePasswordView.as_view()(request)
         assert response.status_code == 400, 'Should return 400 BAD REQUEST'
-        assert response.data, 'Should return error message'
+        assert response.data['old_password'], 'Should return error message'
+
+    def test_new_password_error_response(self):
+        user = mixer.blend('authentication.User', password='securepassword')
+        request = APIRequestFactory().put('/', {
+            'old_password': 'wrongpassword',
+            'new_password': 'pass'
+        })
+        force_authenticate(request, user=user)
+        response = api_views.UpdatePasswordView.as_view()(request)
+        assert response.status_code == 400, 'Should return 400 BAD REQUEST'
+        assert response.data['new_password'], 'Should return error message'
+
+
+class TestResetPassword:
+    @patch('authentication.tasks.sendgrid')
+    def test_reset_request_response(self, mock_sendgrid):
+        user = mixer.blend('authentication.User')
+        response = APIClient().post(
+            '/api/v1/password_reset/',
+            {'email': user.email},
+            format='json'
+        )
+        assert response.status_code == 200, 'Should return 200 OK'
