@@ -129,7 +129,6 @@ class Suggestion:
         for game_favorite in game_favorites:
             user = game_favorite.account
             game_favorite = model_to_dict(game_favorite)
-            print(game_favorite)
             game_suggestions = self._get_game_suggestions_from_query(game_favorite)
             if game_suggestions:
                 filtered_suggestions = self._get_filtered_suggestions(
@@ -153,7 +152,6 @@ class Suggestion:
         for job_favorite in job_favorites:
             user = job_favorite.account
             job_favorite = model_to_dict(job_favorite)
-            print(job_favorite)
             job_suggestions = self._get_job_suggestions_from_query(job_favorite)
             if job_suggestions:
                 filtered_suggestions = self._get_filtered_suggestions(

@@ -2,76 +2,76 @@ import asyncio
 from .scrape_base import *
 
 
-class JobisScraper(ScraperBase):
-    def __init__(self):
-        self.cities = JOBISCOMUA_CITIES
-        self.filename = JOBISCOMUA_FILE
-
-    @staticmethod
-    def _get_url(city_name):
-        return f'{JOBISCOMUA_LINK}{city_name}'
-
-    @staticmethod
-    def _get_last_page_num(page):
-        last = page.find('div', class_='paging')
-        if last: last = last.find_all('a')[-1]
-        return int(last.get_text()) if last else 1
-
-    @staticmethod
-    def _get_jobs_list(page):
-        offers = page.find_all('div', class_='list-group-item')
-        return [offer for offer in offers if offer.has_attr('id')]
-
-    @staticmethod
-    def _get_job_title(offer):
-        return offer.find('h3').find('a').get_text()
-
-    @staticmethod
-    def _get_job_body(offer):
-        return offer.find('blockquote').get_text().split(' подробнее')[0]
-
-    @staticmethod
-    def _get_job_salary(offer):
-        return offer.find('p', class_='text-danger')
-
-    @staticmethod
-    def _get_job_employer(offer):
-        employer_tag = offer.find('strong')
-        return employer_tag.get_text().strip() if employer_tag else None
-
-    @staticmethod
-    def _get_job_link(offer):
-        return JOBISCOMUA_BASELINK + offer.find('h3').a['href']
-
-    @staticmethod
-    def _get_job_source():
-        return JOBISCOMUA_BASELINK
-
-    @staticmethod
-    def _check_end_of_pagination(self, page):
-        if page.find('ul', class_='pagination'):
-            return bool(page.find('li', class_='next disabled'))
-        else:
-            return True
-        return False
-
-    def _scrape_job_pages(self, location, city_name, page_limit):
-        for job_type in JOBISCOMUA_CATEGORIES:
-            url = f'{self._get_url(city_name)}{job_type}?page='
-            page_num = 1
-            while True:
-                if page_limit and page_num > page_limit:
-                    break
-                page = self._request_page(url, page_num)
-                if page.find('div', class_='alert-danger alert fade in'):
-                    break
-                jobs_list = self._get_jobs_list(page)
-                if not jobs_list:
-                    break
-                self._add_jobs_to_result(jobs_list, location)
-                if self._check_end_of_pagination(page):
-                    break
-                page_num += 1
+# class JobisScraper(ScraperBase):
+#     def __init__(self):
+#         self.cities = JOBISCOMUA_CITIES
+#         self.filename = JOBISCOMUA_FILE
+#
+#     @staticmethod
+#     def _get_url(city_name):
+#         return f'{JOBISCOMUA_LINK}{city_name}'
+#
+#     @staticmethod
+#     def _get_last_page_num(page):
+#         last = page.find('div', class_='paging')
+#         if last: last = last.find_all('a')[-1]
+#         return int(last.get_text()) if last else 1
+#
+#     @staticmethod
+#     def _get_jobs_list(page):
+#         offers = page.find_all('div', class_='list-group-item')
+#         return [offer for offer in offers if offer.has_attr('id')]
+#
+#     @staticmethod
+#     def _get_job_title(offer):
+#         return offer.find('h3').find('a').get_text()
+#
+#     @staticmethod
+#     def _get_job_body(offer):
+#         return offer.find('blockquote').get_text().split(' подробнее')[0]
+#
+#     @staticmethod
+#     def _get_job_salary(offer):
+#         return offer.find('p', class_='text-danger')
+#
+#     @staticmethod
+#     def _get_job_employer(offer):
+#         employer_tag = offer.find('strong')
+#         return employer_tag.get_text().strip() if employer_tag else None
+#
+#     @staticmethod
+#     def _get_job_link(offer):
+#         return JOBISCOMUA_BASELINK + offer.find('h3').a['href']
+#
+#     @staticmethod
+#     def _get_job_source():
+#         return JOBISCOMUA_BASELINK
+#
+#     @staticmethod
+#     def _check_end_of_pagination(self, page):
+#         if page.find('ul', class_='pagination'):
+#             return bool(page.find('li', class_='next disabled'))
+#         else:
+#             return True
+#         return False
+#
+#     def _scrape_job_pages(self, location, city_name, page_limit):
+#         for job_type in JOBISCOMUA_CATEGORIES:
+#             url = f'{self._get_url(city_name)}{job_type}?page='
+#             page_num = 1
+#             while True:
+#                 if page_limit and page_num > page_limit:
+#                     break
+#                 page = self._request_page(url, page_num)
+#                 if page.find('div', class_='alert-danger alert fade in'):
+#                     break
+#                 jobs_list = self._get_jobs_list(page)
+#                 if not jobs_list:
+#                     break
+#                 self._add_jobs_to_result(jobs_list, location)
+#                 if self._check_end_of_pagination(page):
+#                     break
+#                 page_num += 1
 
 
 class JobsScraper(ScraperBase):
@@ -276,64 +276,6 @@ class NovarobotaScraper(ScraperBase):
     @staticmethod
     def _get_job_source():
         return NOVAROBOTAUA_BASELINK
-
-
-class RabotaScraper(ScraperBase):
-    def __init__(self):
-        self.cities = RABOTAUA_CITIES
-
-    def _get_url(self, city_name, page_num, query_params):
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        with_salary = query_params.get('with_salary')
-        page_num = f'page={page_num}'
-        salary = f'salary={salary_min}&currencyId=1&' if salary_min else ''
-        with_salary = 'salaryType=1&' if with_salary else ''
-        return f'{RABOTAUA_LINK}?keyWords={title}{city_name}{salary}{page_num}'
-
-    @staticmethod
-    def _convert_title(title):
-        return '+'.join(title.lower().split()) + '&' if title else ''
-
-    @staticmethod
-    def _get_last_page_num(page):
-        last = page.find('dd', class_='nextbtn')
-        if last: last = last.previous_sibling
-        if last: last = last.find('a')
-        return int(last.get_text()) if last else 1
-
-    @staticmethod
-    def _get_jobs_list(page):
-        return page.find_all('article', class_='f-vacancylist-vacancyblock')
-
-    @staticmethod
-    def _get_job_title(offer):
-        return offer.find(
-            'h3', class_='f-vacancylist-vacancytitle').find(
-            'a', class_='f-visited-enable ga_listing').get_text().split('\n')[0]
-
-    @staticmethod
-    def _get_job_body(offer):
-        return offer.find(
-            'p', class_='f-vacancylist-shortdescr').get_text().strip('\n')
-
-    @staticmethod
-    def _get_job_salary(offer):
-        return offer.find('p', class_='fd-beefy-soldier -price')
-
-    @staticmethod
-    def _get_job_employer(offer):
-        employer_tag = offer.find('p', class_='f-vacancylist-companyname').a
-        return employer_tag.get_text().split('\n')[0] if employer_tag else None
-
-    @staticmethod
-    def _get_job_link(offer):
-        return RABOTAUA_BASELINK + offer.find(
-            'h3', class_='f-vacancylist-vacancytitle').a['href']
-
-    @staticmethod
-    def _get_job_source():
-        return RABOTAUA_BASELINK
 
 
 class RabotaAPIScraper(ScraperBase):
@@ -666,7 +608,6 @@ class JobsSitesScraper:
             # Otherwise Jobis will not work
             #
             # JobisScraper().scrape_job_website,
-            # RabotaScraper(),
 
             RabotaAPIScraper(),
             WorkScraper(),
