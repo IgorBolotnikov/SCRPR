@@ -15,8 +15,8 @@ urlpatterns = [
     path('news', NewsListView.as_view(), name='news-list'),
     path('rate', CommentView.as_view(), name='rate'),
     path('favorites/', include(router.urls)),
-    re_path(r'^api/v1/games$', GamesAPIView.as_view(), name='games_api'),
-    re_path(r'^api/v1/jobs$', JobsAPIView.as_view(), name='jobs_api'),
+    re_path(r'^games$', GamesAPIView.as_view(), name='games_api'),
+    re_path(r'^jobs$', JobsAPIView.as_view(), name='jobs_api'),
 
     # From authentication app 'api_views.py'
     path('user', UserView.as_view(), name='user'),
