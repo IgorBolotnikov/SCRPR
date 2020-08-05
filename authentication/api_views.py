@@ -1,10 +1,13 @@
-from django.shortcuts import render
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from authentication.serializers import *
-from authentication.models import User
+from .models import User
+from .serializers import (
+    ChangePasswordSerializer,
+    UserSerializer,
+    UserWithTokenSerializer,
+)
 
 
 class UserView(APIView):
@@ -20,10 +23,11 @@ class UserView(APIView):
         if serializer.is_valid():
             serializer.save()
             new_token = serializer.get_token(
-                User.objects.get(pk=request.user.id))
+                User.objects.get(pk=request.user.id)
+            )
             return Response(
-                { **serializer.data, 'token': new_token },
-                status=status.HTTP_200_OK
+                {**serializer.data, "token": new_token},
+                status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -33,10 +37,11 @@ class UserView(APIView):
 
 
 class CreateUserView(APIView):
-    '''
+    """
     Accept only POST requests
     Create new user based on submitted email, username and password
-    '''
+    """
+
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, format=None):
@@ -61,7 +66,7 @@ class UpdatePasswordView(APIView):
             if not self.object.check_password(old_password):
                 return Response(
                     {"old_password": ["Wrong password."]},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()

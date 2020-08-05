@@ -1,19 +1,24 @@
-from rest_framework.generics import ListAPIView, CreateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
-
 from django.core.cache import cache
+from rest_framework import status
+from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
-from scrpr.models import *
-from api_v1.serializers import *
-from api_v1.permissions import IsCreator
 from project.cache import generate_cache_key
+from scrpr.models import FavoriteGameQuery, FavoriteJobQuery, NewsPost
+from scrpr.paginator import VirtualPaginator
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
 from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
-from scrpr.paginator import VirtualPaginator
+
+from .permissions import IsCreator
+from .serializers import (
+    CommentSerializer,
+    FavoriteGameQuerySerializer,
+    FavoriteJobQuerySerializer,
+    NewsPostSerializer,
+)
 
 
 class CommentView(CreateAPIView):
@@ -54,18 +59,20 @@ class FavoritesJobsListView(ModelViewSet):
 
 class PaginatorMixin:
     def get_pagination(self, paginator):
-        prev_page = paginator.previous_page_number if paginator.has_previous else None
+        prev_page = (
+            paginator.previous_page_number if paginator.has_previous else None
+        )
         next_page = paginator.next_page_number if paginator.has_next else None
         return {
-            'page': paginator.number,
-            'prev_page': prev_page,
-            'next_page': next_page,
-            'last_page': paginator.num_pages
+            "page": paginator.number,
+            "prev_page": prev_page,
+            "next_page": next_page,
+            "last_page": paginator.num_pages,
         }
 
 
 class BaseListAPIView(APIView):
-    '''
+    """
     Child classes have to have 'get_scraped_data' method defined,
     which takes two params: query_params, page_num
     This method should return dictionary in the following format:
@@ -73,7 +80,8 @@ class BaseListAPIView(APIView):
         'object_list': [<list of results>],
         'last_page': <int: last page number>
     }
-    '''
+    """
+
     def get_queryset(self):
         # Get query params
         query_params = self.get_query_params()
@@ -88,15 +96,18 @@ class BaseListAPIView(APIView):
             # Return results from scraping the website
             query_results = self.get_scraped_data(query_params, pane_num)
             # Don't cache if no results were returned
-            if query_results.get('object_list') and len(query_results['object_list']) > 0:
+            if (
+                query_results.get("object_list")
+                and len(query_results["object_list"]) > 0
+            ):
                 cache.set(cache_key, query_results)
-        results = query_results.get('object_list')
+        results = query_results.get("object_list")
         last_page = query_results.get("last_page")
         # Create virtual paginator, since no model is used
         paginator = VirtualPaginator(pane_num, last_page)
         return {
-            'pagination': self.get_pagination(paginator),
-            'results': results
+            "pagination": self.get_pagination(paginator),
+            "results": results,
         }
 
     def get(self, request, *args, **kwargs):
@@ -114,8 +125,7 @@ class GamesAPIView(BaseListAPIView, PaginatorMixin):
 
     def get_scraped_data(self, query_params, page_num):
         return PSStoreScraper().scrape_game_website(
-            query_params=query_params,
-            page_num=page_num
+            query_params=query_params, page_num=page_num
         )
 
 
@@ -131,5 +141,5 @@ class JobsAPIView(BaseListAPIView, PaginatorMixin):
         return JobsSitesScraper().scrape_websites(
             query_params=query_params,
             page_num=page_num,
-            location=query_params.get("location")
+            location=query_params.get("location"),
         )

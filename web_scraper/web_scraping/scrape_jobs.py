@@ -1,6 +1,34 @@
 import asyncio
-from .scrape_base import *
 
+import aiohttp
+
+from .constants import (
+    HEADHUNTER_API_CITIES,
+    HEADHUNTER_API_LINK,
+    HEADHUNTER_BASELINK,
+    HEADHUNTER_LINK,
+    JOBSUA_BASELINK,
+    JOBSUA_CITIES,
+    JOBSUA_LINK,
+    JOOBLEORG_BASELINK,
+    JOOBLEORG_CITIES,
+    JOOBLEORG_LINK,
+    NOVAROBOTAUA_BASELINK,
+    NOVAROBOTAUA_CITIES,
+    NOVAROBOTAUA_LINK,
+    RABOTAUA_API_CITIES,
+    RABOTAUA_API_LINK,
+    RABOTAUA_BASELINK,
+    REQUEST_HEADER,
+    TRUDUA_BASELINK,
+    TRUDUA_CITIES,
+    TRUDUA_LINK,
+    TRUDUA_LINK_CITY,
+    WORKUA_BASELINK,
+    WORKUA_CITIES,
+    WORKUA_LINK,
+)
+from .scrape_base import ScraperBase
 
 # class JobisScraper(ScraperBase):
 #     def __init__(self):
@@ -79,66 +107,81 @@ class JobsScraper(ScraperBase):
         self.cities = JOBSUA_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        DEFAULT_MIN_SALARY = '1'
-        DEFAULT_MAX_SALARY = '1000000'
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        salary_max = query_params.get('salary_max')
-        with_salary = query_params.get('with_salary')
-        salary = ''
+        DEFAULT_MIN_SALARY = "1"
+        DEFAULT_MAX_SALARY = "1000000"
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        salary_max = query_params.get("salary_max")
+        with_salary = query_params.get("with_salary")
+        salary = ""
         if salary_min or salary_max or with_salary:
             salary_min = salary_min if salary_min else DEFAULT_MIN_SALARY
             salary_max = salary_max if salary_max else DEFAULT_MAX_SALARY
-            salary = f'?salary={salary_min},{salary_max}'
-        return f'{JOBSUA_LINK}/{city_name}/rabota-{title}{salary}/page-{page_num}'
+            salary = f"?salary={salary_min},{salary_max}"
+        return (
+            f"{JOBSUA_LINK}/{city_name}/rabota-{title}{salary}/page-{page_num}"
+        )
 
     @staticmethod
     def _convert_title(title):
-        return '-'.join(title.lower().split()) if title else ''
+        return "-".join(title.lower().split()) if title else ""
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('div', class_='b-vacancy__pages-title')
-        if last: last = last.span
-        if last: last = last.find_all('b')
+        last = page.find("div", class_="b-vacancy__pages-title")
+        if last:
+            last = last.span
+        if last:
+            last = last.find_all("b")
         return int(last[1].get_text()) if last else 1
 
     @staticmethod
     def _get_jobs_list(page):
-        offers = page.find_all('li', class_='b-vacancy__item js-item_list')
-        return [offer for offer in offers if offer.has_attr('id')]
+        offers = page.find_all("li", class_="b-vacancy__item js-item_list")
+        return [offer for offer in offers if offer.has_attr("id")]
 
     @staticmethod
     def _get_job_title(offer):
-        return offer.find(
-            'div', class_='b-vacancy__top-inner').find(
-            'a', class_='b-vacancy__top__title').get_text()
+        return (
+            offer.find("div", class_="b-vacancy__top-inner")
+            .find("a", class_="b-vacancy__top__title")
+            .get_text()
+        )
 
     @staticmethod
     def _get_job_body(offer):
-        body = ''
-        for requirement in offer.find_all('div', class_='b-vacancy__tech__item'):
-            if requirement.find('span', class_='caption'):
-                body += requirement.find(
-                    'span', class_='caption').get_text() + ' ' + requirement.find(
-                    'span', class_='black-text').get_text() + '. '
-        body += '\n'
-        for paragraph in offer.find('div', class_='grey-light').find_all('p'):
+        body = ""
+        for requirement in offer.find_all(
+            "div", class_="b-vacancy__tech__item"
+        ):
+            if requirement.find("span", class_="caption"):
+                body += (
+                    requirement.find("span", class_="caption").get_text()
+                    + " "
+                    + requirement.find("span", class_="black-text").get_text()
+                    + ". "
+                )
+        body += "\n"
+        for paragraph in offer.find("div", class_="grey-light").find_all("p"):
             body += paragraph.get_text()
         return body.strip()
 
     @staticmethod
     def _get_job_salary(offer):
-        return offer.find('span', class_='b-vacancy__top__pay')
+        return offer.find("span", class_="b-vacancy__top__pay")
 
     @staticmethod
     def _get_job_employer(offer):
-        employer_tag = offer.find('span', class_='link__hidden')
+        employer_tag = offer.find("span", class_="link__hidden")
         return employer_tag.get_text().strip() if employer_tag else None
 
     @staticmethod
     def _get_job_link(offer):
-        return offer.find('div', class_='b-vacancy__top-inner').a['href']
+        return offer.find("div", class_="b-vacancy__top-inner").a["href"]
 
     @staticmethod
     def _get_job_source():
@@ -150,53 +193,57 @@ class JoobleScraper(ScraperBase):
         self.cities = JOOBLEORG_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        DEFAULT_MIN_SALARY = '1'
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        with_salary = query_params.get('with_salary')
-        salary = ''
-        page_num = f'p={page_num}'
+        DEFAULT_MIN_SALARY = "1"
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        with_salary = query_params.get("with_salary")
+        salary = ""
+        page_num = f"p={page_num}"
         if salary_min or with_salary:
             salary_min = salary_min if salary_min else DEFAULT_MIN_SALARY
-            salary = f'salary={salary_min}&'
-        return f'{JOOBLEORG_LINK}/работа-{title}/{city_name}?{salary}{page_num}'
+            salary = f"salary={salary_min}&"
+        return f"{JOOBLEORG_LINK}/работа-{title}/{city_name}?{salary}{page_num}"
 
     @staticmethod
     def _convert_title(title):
-        return '-'.join(title.lower().split()) if title else ''
+        return "-".join(title.lower().split()) if title else ""
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('div', class_='paging')
-        if last: last = last.find_all('a')
+        last = page.find("div", class_="paging")
+        if last:
+            last = last.find_all("a")
         return int(last[-1].get_text()) if last else 1
 
     @staticmethod
     def _get_jobs_list(page):
-        jobs = page.find('div', id='jobs_list__page')
-        return jobs.find_all('div', class_='vacancy_wrapper') if jobs else []
+        jobs = page.find("div", id="jobs_list__page")
+        return jobs.find_all("div", class_="vacancy_wrapper") if jobs else []
 
     @staticmethod
     def _get_job_title(offer):
-        return offer.find(
-            'h2',id='h2Position', class_='position').get_text()
+        return offer.find("h2", id="h2Position", class_="position").get_text()
 
     @staticmethod
     def _get_job_body(offer):
-        return offer.find('span', class_='description').get_text()
+        return offer.find("span", class_="description").get_text()
 
     @staticmethod
     def _get_job_salary(offer):
-        return offer.find('span', class_='salary')
+        return offer.find("span", class_="salary")
 
     @staticmethod
     def _get_job_employer(offer):
-        employer_tag = offer.find('span', class_='gray_text company-name')
+        employer_tag = offer.find("span", class_="gray_text company-name")
         return employer_tag.get_text().strip() if employer_tag else None
 
     @staticmethod
     def _get_job_link(offer):
-        return offer.find('div', class_='top-wr').a['href'].split('ckey=')[0]
+        return offer.find("div", class_="top-wr").a["href"].split("ckey=")[0]
 
     @staticmethod
     def _get_job_source():
@@ -210,7 +257,9 @@ class JoobleScraper(ScraperBase):
     #     while True:
     #         page = self._request_page(url, page_num)
     #         self.last_page_num = self._get_last_page_num(page)
-    #         if page_num > self.last_page_num or (page_limit and page_num > page_limit):
+    #         if page_num > self.last_page_num or (
+    #             page_limit and page_num > page_limit
+    #         ):
     #             break
     #         self._add_jobs_to_result(self._get_jobs_list(page), location)
     #         page_num += 1
@@ -221,57 +270,67 @@ class NovarobotaScraper(ScraperBase):
         self.cities = NOVAROBOTAUA_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        DEFAULT_MIN_SALARY = '1'
-        DEFAULT_MAX_SALARY = '1000000'
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        salary_max = query_params.get('salary_max')
-        with_salary = query_params.get('with_salary')
-        salary = ''
-        page_num = f'page={page_num}'
+        DEFAULT_MIN_SALARY = "1"
+        DEFAULT_MAX_SALARY = "1000000"
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        salary_max = query_params.get("salary_max")
+        with_salary = query_params.get("with_salary")
+        salary = ""
+        page_num = f"page={page_num}"
         if salary_min or salary_max or with_salary:
             salary_min = salary_min if salary_min else DEFAULT_MIN_SALARY
             salary_max = salary_max if salary_max else DEFAULT_MAX_SALARY
-            salary = f'salary={salary_min}_{salary_max}&'
-        return f'{NOVAROBOTAUA_LINK}/{title}/{city_name}?{salary}{page_num}'
+            salary = f"salary={salary_min}_{salary_max}&"
+        return f"{NOVAROBOTAUA_LINK}/{title}/{city_name}?{salary}{page_num}"
 
     @staticmethod
     def _convert_title(title):
-        return '+'.join(title.lower().split()) if title else ''
+        return "+".join(title.lower().split()) if title else ""
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('ul', class_='pagination')
-        if last: last = last.find('ul', class_='pagination')
-        if last: last = last.find_all('li')
-        if last: last = last[-2].get_text()
+        last = page.find("ul", class_="pagination")
+        if last:
+            last = last.find("ul", class_="pagination")
+        if last:
+            last = last.find_all("li")
+        if last:
+            last = last[-2].get_text()
         return int(last) if last else 1
 
     @staticmethod
     def _get_jobs_list(page):
-        return page.find_all('div', class_='vacancy')
+        return page.find_all("div", class_="vacancy")
 
     @staticmethod
     def _get_job_title(offer):
-        return offer.find('a', class_='title').get_text()
+        return offer.find("a", class_="title").get_text()
 
     @staticmethod
     def _get_job_body(offer):
-        body_tag = offer.find('div', class_='price').next_sibling.next_sibling
+        body_tag = offer.find("div", class_="price").next_sibling.next_sibling
         return body_tag.get_text().strip()
 
     @staticmethod
     def _get_job_salary(offer):
-        return offer.find('div', class_='price')
+        return offer.find("div", class_="price")
 
     @staticmethod
     def _get_job_employer(offer):
-        tag = offer.find('div', class_='info')
-        return tag.get_text().strip().split('\n')[0] if tag else None
+        tag = offer.find("div", class_="info")
+        return tag.get_text().strip().split("\n")[0] if tag else None
 
     @staticmethod
     def _get_job_link(offer):
-        return NOVAROBOTAUA_BASELINK + offer.find('div', class_='col-xs-12').a['href']
+        return (
+            NOVAROBOTAUA_BASELINK
+            + offer.find("div", class_="col-xs-12").a["href"]
+        )
 
     @staticmethod
     def _get_job_source():
@@ -283,20 +342,27 @@ class RabotaAPIScraper(ScraperBase):
         self.cities = RABOTAUA_API_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        with_salary = query_params.get('with_salary')
-        page_num = f'page={page_num}'
-        salary = f'salary={salary_min}&' if salary_min else ''
-        with_salary = 'noSalary=false&' if with_salary else ''
-        return f'{RABOTAUA_API_LINK}?keyWords={title}&{city_name}{salary}{with_salary}{page_num}'
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        with_salary = query_params.get("with_salary")
+        page_num = f"page={page_num}"
+        salary = f"salary={salary_min}&" if salary_min else ""
+        with_salary = "noSalary=false&" if with_salary else ""
+        return (
+            f"{RABOTAUA_API_LINK}?keyWords={title}&{city_name}"
+            f"{salary}{with_salary}{page_num}"
+        )
 
     @staticmethod
     def _convert_title(title):
-        return '+'.join(title.lower().split()) if title else ''
+        return "+".join(title.lower().split()) if title else ""
 
     def _parse_salary(self, salary):
-        return None, salary, 'UAH'
+        return None, salary, "UAH"
 
     @staticmethod
     def _get_last_page_num(response):
@@ -307,13 +373,16 @@ class RabotaAPIScraper(ScraperBase):
         return total_results // results_per_page
 
     @staticmethod
-    def _get_jobs_list(response): return response["documents"]
+    def _get_jobs_list(response):
+        return response["documents"]
 
     @staticmethod
-    def _get_job_title(offer): return offer["name"]
+    def _get_job_title(offer):
+        return offer["name"]
 
     @staticmethod
-    def _get_job_body(offer): return offer["shortDescription"]
+    def _get_job_body(offer):
+        return offer["shortDescription"]
 
     @staticmethod
     def _get_job_salary(offer):
@@ -327,7 +396,7 @@ class RabotaAPIScraper(ScraperBase):
     def _get_job_link(offer):
         company_id = offer["notebookId"]
         offer_id = offer["id"]
-        return f'https://rabota.ua/ua/company{company_id}/vacancy{offer_id}'
+        return f"https://rabota.ua/ua/company{company_id}/vacancy{offer_id}"
 
     @staticmethod
     def _get_job_source():
@@ -339,7 +408,7 @@ class RabotaAPIScraper(ScraperBase):
         # or server error
         for count in range(5):
             try:
-                headers = {'Accept': 'application/json'}
+                headers = {"Accept": "application/json"}
                 async with session.get(url, headers=headers) as response:
                     response_data = await response.json()
                     self.last_page_num = self._get_last_page_num(response_data)
@@ -351,10 +420,12 @@ class RabotaAPIScraper(ScraperBase):
                         self._add_jobs_to_result(jobs_list, location)
                         break
             except Exception as exeption:
-                print(f'Scraping exception: {exeption}')
+                print(f"Scraping exception: {exeption}")
         return response_data
 
-    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+    async def _scrape_job_pages(
+        self, location, city_name, page_num, query_params
+    ):
         last_page_num = self.last_page_num = page_num
         async with aiohttp.ClientSession() as session:
             while page_num <= last_page_num:
@@ -368,69 +439,83 @@ class TrudScraper(ScraperBase):
         self.cities = TRUDUA_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        DEFAULT_MIN_SALARY = '1'
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        with_salary = query_params.get('with_salary')
-        salary = ''
-        page_num = f'/page/{page_num}' if page_num != 1 else ''
+        DEFAULT_MIN_SALARY = "1"
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        with_salary = query_params.get("with_salary")
+        salary = ""
+        page_num = f"/page/{page_num}" if page_num != 1 else ""
         if salary_min or with_salary:
             salary_min = salary_min if salary_min else DEFAULT_MIN_SALARY
-            salary = f'/salary/{salary_min}'
+            salary = f"/salary/{salary_min}"
         if city_name:
-            return f'{TRUDUA_LINK_CITY}/{city_name}/q/{title}{salary}{page_num}.html'
-        return f'{TRUDUA_LINK}/{title}{salary}{page_num}.html'
+            return (
+                f"{TRUDUA_LINK_CITY}/{city_name}/q/"
+                f"{title}{salary}{page_num}.html"
+            )
+        return f"{TRUDUA_LINK}/{title}{salary}{page_num}.html"
 
     @staticmethod
     def _convert_title(title):
-        return '+'.join(title.lower().split()) if title else ''
+        return "+".join(title.lower().split()) if title else ""
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('div', class_='yiiPager')
+        last = page.find("div", class_="yiiPager")
         if last:
-            last = last.find('a', class_='next-p')['href'].split('/')[-1][:-5]
+            last = last.find("a", class_="next-p")["href"].split("/")[-1][:-5]
         else:
-            last = '1'
+            last = "1"
         return int(last)
 
     @staticmethod
     def _get_jobs_list(page):
-        return page.find_all('div', class_='result-unit')
+        return page.find_all("div", class_="result-unit")
 
     @staticmethod
     def _get_job_title(offer):
-        return offer.find('div', class_='titl-r').find('a').get_text()
+        return offer.find("div", class_="titl-r").find("a").get_text()
 
     @staticmethod
     def _get_job_body(offer):
-        return offer.find('div', class_='descr-r').find('a').get_text()
+        return offer.find("div", class_="descr-r").find("a").get_text()
 
     @staticmethod
     def _get_job_salary(offer):
-        return offer.find('div', class_='salary')
+        return offer.find("div", class_="salary")
 
     @staticmethod
     def _get_job_employer(offer):
-        employer_tag = offer.find('div', class_='institution').find('a')
+        employer_tag = offer.find("div", class_="institution").find("a")
         return employer_tag.get_text().strip() if employer_tag else None
 
     @staticmethod
     def _get_job_link(offer):
-        return TRUDUA_BASELINK + offer.find('div', class_='titl-r').a['href']
+        return TRUDUA_BASELINK + offer.find("div", class_="titl-r").a["href"]
 
     @staticmethod
     def _get_job_source():
         return TRUDUA_BASELINK
 
-    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+    async def _scrape_job_pages(
+        self, location, city_name, page_num, query_params
+    ):
         last_page_num = page_num
         async with aiohttp.ClientSession() as session:
             while page_num <= last_page_num:
                 url = self._get_url(city_name, page_num, query_params)
-                page = await self._scrape_job_page(url, page_num, location, session)
+                page = await self._scrape_job_page(
+                    url, page_num, location, session
+                )
                 self.last_page_num = page_num
-                if page and page.find('span', class_='next-p disabled') is not None:
+                if (
+                    page
+                    and page.find("span", class_="next-p disabled") is not None
+                ):
                     break
                 page_num += 1
 
@@ -440,74 +525,94 @@ class WorkScraper(ScraperBase):
         self.cities = WORKUA_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        SALARY_OPTIONS = (0, 3000, 5000, 7000, 10000, 15000, 20000, 30000, 50000)
+        SALARY_OPTIONS = (
+            0,
+            3000,
+            5000,
+            7000,
+            10000,
+            15000,
+            20000,
+            30000,
+            50000,
+        )
 
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        salary_max = query_params.get('salary_max')
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        salary_max = query_params.get("salary_max")
         # Pick the closest match for minimum salary
         if salary_min:
             for index in range(1, len(SALARY_OPTIONS)):
                 if SALARY_OPTIONS[index] > int(salary_min):
-                    salary_min = f'salaryfrom={index}&'
+                    salary_min = f"salaryfrom={index}&"
                     break
         else:
-            salary_min = ''
+            salary_min = ""
         # Pick the closest match for maximum salary
         if salary_max and int(salary_max) > SALARY_OPTIONS[-1]:
-            salary_max = ''
+            salary_max = ""
         elif salary_max:
             for index in range(1, len(SALARY_OPTIONS)):
                 if SALARY_OPTIONS[index] > int(salary_max):
-                    salary_max = f'salaryto={index + 1}&'
+                    salary_max = f"salaryto={index + 1}&"
                     break
         else:
-            salary_max = ''
+            salary_max = ""
         # If "only with salary" was chosen instead, then pick the first
         # non-zero salary amount from standard range
-        if not salary_min and query_params.get('with_salary'):
-            salary_min = f'salaryfrom={SALARY_OPTIONS[0]}&'
+        if not salary_min and query_params.get("with_salary"):
+            salary_min = f"salaryfrom={SALARY_OPTIONS[0]}&"
 
-        page_num = f'?page={page_num}' if page_num else ''
-        city_name = f'{city_name}-' if city_name else ''
-        return f'{WORKUA_LINK}{city_name}{title}/?{salary_min}{salary_max}/{page_num}'
+        page_num = f"?page={page_num}" if page_num else ""
+        city_name = f"{city_name}-" if city_name else ""
+        return (
+            f"{WORKUA_LINK}{city_name}{title}/?"
+            f"{salary_min}{salary_max}/{page_num}"
+        )
 
     @staticmethod
     def _convert_title(title):
-        return '+'.join(title.lower().split()) if title else ''
+        return "+".join(title.lower().split()) if title else ""
 
     @staticmethod
     def _get_last_page_num(page):
-        last = page.find('ul', class_='pagination pagination-small visible-xs-block')
-        if last: last = last.find('span', class_='text-default')
+        last = page.find(
+            "ul", class_="pagination pagination-small visible-xs-block"
+        )
+        if last:
+            last = last.find("span", class_="text-default")
         return int(last.get_text().split()[-1]) if last else 1
 
     @staticmethod
     def _get_jobs_list(page):
-        return page.find_all('div', class_='job-link')
+        return page.find_all("div", class_="job-link")
 
     @staticmethod
     def _get_job_title(offer):
-        return offer.h2.a['title'].split(', ')[0]
+        return offer.h2.a["title"].split(", ")[0]
 
     @staticmethod
     def _get_job_body(offer):
-        return offer.find(class_='overflow').get_text().strip('\n')
+        return offer.find(class_="overflow").get_text().strip("\n")
 
     @staticmethod
     def _get_job_salary(offer):
         tag = offer.h2.next_sibling.next_sibling
-        if tag.get('class'):
+        if tag.get("class"):
             return None
         return tag.b
 
     @staticmethod
     def _get_job_employer(offer):
-        return offer.find('div', class_='add-top-xs').b.get_text()
+        return offer.find("div", class_="add-top-xs").b.get_text()
 
     @staticmethod
     def _get_job_link(offer):
-        return WORKUA_BASELINK + offer.h2.a['href']
+        return WORKUA_BASELINK + offer.h2.a["href"]
 
     @staticmethod
     def _get_job_source():
@@ -519,17 +624,24 @@ class HeadDunterAPIScraper(ScraperBase):
         self.cities = HEADHUNTER_API_CITIES
 
     def _get_url(self, city_name, page_num, query_params):
-        title = self._convert_title(query_params.get('title')) if query_params else ''
-        salary_min = query_params.get('salary_min')
-        with_salary = query_params.get('with_salary')
-        page_num = f'page={page_num}'
-        salary = f'salary={salary_min}&' if salary_min else ''
-        with_salary = 'only_with_salary=true&' if with_salary else ''
-        return f'{HEADHUNTER_API_LINK}?text={title}&{city_name}{salary}{with_salary}{page_num}'
+        title = (
+            self._convert_title(query_params.get("title"))
+            if query_params
+            else ""
+        )
+        salary_min = query_params.get("salary_min")
+        with_salary = query_params.get("with_salary")
+        page_num = f"page={page_num}"
+        salary = f"salary={salary_min}&" if salary_min else ""
+        with_salary = "only_with_salary=true&" if with_salary else ""
+        return (
+            f"{HEADHUNTER_API_LINK}?text={title}&"
+            f"{city_name}{salary}{with_salary}{page_num}"
+        )
 
     @staticmethod
     def _convert_title(title):
-        return '+'.join(title.lower().split()) if title else ''
+        return "+".join(title.lower().split()) if title else ""
 
     def _parse_salary(self, salary):
         if not salary:
@@ -539,35 +651,39 @@ class HeadDunterAPIScraper(ScraperBase):
         return salary.get("from"), salary.get("to"), salary.get("currency")
 
     @staticmethod
-    def _get_last_page_num(response): return response.get("pages") or 1
+    def _get_last_page_num(response):
+        return response.get("pages") or 1
 
     @staticmethod
-    def _get_jobs_list(response): return response.get("items")
+    def _get_jobs_list(response):
+        return response.get("items")
 
     @staticmethod
-    def _get_job_title(offer): return offer.get("name")
+    def _get_job_title(offer):
+        return offer.get("name")
 
     @staticmethod
     def _get_job_body(offer):
         body = offer.get("snippet")
-        body = [
-            body.get("requirement") or '',
-            body.get("responsibility") or ''
-        ]
+        body = [body.get("requirement") or "", body.get("responsibility") or ""]
         body = "\n".join(body)
-        return f'{body}'
+        return f"{body}"
 
     @staticmethod
-    def _get_job_salary(offer): return offer.get("salary")
+    def _get_job_salary(offer):
+        return offer.get("salary")
 
     @staticmethod
-    def _get_job_employer(offer): return offer["employer"].get("name")
+    def _get_job_employer(offer):
+        return offer["employer"].get("name")
 
     @staticmethod
-    def _get_job_link(offer): return f'{HEADHUNTER_LINK}{offer["id"]}'
+    def _get_job_link(offer):
+        return f'{HEADHUNTER_LINK}{offer["id"]}'
 
     @staticmethod
-    def _get_job_source(): return HEADHUNTER_BASELINK
+    def _get_job_source():
+        return HEADHUNTER_BASELINK
 
     async def _scrape_job_page(self, url, page_num, location, session):
         # Max of 5 consecutive requests can be made
@@ -575,7 +691,7 @@ class HeadDunterAPIScraper(ScraperBase):
         # or server error
         for count in range(5):
             try:
-                headers = {'User-Agent': REQUEST_HEADER}
+                headers = {"User-Agent": REQUEST_HEADER}
                 async with session.get(url, headers=headers) as response:
                     response_data = await response.json()
                     self.last_page_num = self._get_last_page_num(response_data)
@@ -587,17 +703,18 @@ class HeadDunterAPIScraper(ScraperBase):
                         self._add_jobs_to_result(jobs_list, location)
                         break
             except Exception as exeption:
-                print(f'Scraping exception: {exeption}')
+                print(f"Scraping exception: {exeption}")
         return response_data
 
-    async def _scrape_job_pages(self, location, city_name, page_num, query_params):
+    async def _scrape_job_pages(
+        self, location, city_name, page_num, query_params
+    ):
         last_page_num = self.last_page_num = page_num
         async with aiohttp.ClientSession() as session:
             while page_num <= last_page_num:
                 url = self._get_url(city_name, page_num, query_params)
                 await self._scrape_job_page(url, page_num, location, session)
                 page_num += 1
-
 
 
 class JobsSitesScraper:
@@ -608,21 +725,18 @@ class JobsSitesScraper:
             # Otherwise Jobis will not work
             #
             # JobisScraper().scrape_job_website,
-
             RabotaAPIScraper(),
             WorkScraper(),
             HeadDunterAPIScraper(),
             JobsScraper(),
             JoobleScraper(),
             NovarobotaScraper(),
-            TrudScraper()
+            TrudScraper(),
         ]
         for website in websites:
-            async_task = asyncio.create_task(website.scrape_job_website(
-                location,
-                page_num,
-                query_params
-            ))
+            async_task = asyncio.create_task(
+                website.scrape_job_website(location, page_num, query_params)
+            )
             async_tasks.append(async_task)
         return await asyncio.gather(*async_tasks)
 
@@ -631,17 +745,13 @@ class JobsSitesScraper:
         object_list = []
         last_page_list = []
         for item in results:
-            object_list.extend(item['object_list'])
-            last_page_list.append(item['last_page'])
-        return {
-            'object_list': object_list,
-            'last_page': max(last_page_list)
-        }
+            object_list.extend(item["object_list"])
+            last_page_list.append(item["last_page"])
+        return {"object_list": object_list, "last_page": max(last_page_list)}
 
     # @timer
     def scrape_websites(self, location, page_num, query_params):
         results = asyncio.run(
-            self._scrape_websites(location, page_num, query_params),
-            debug=True
+            self._scrape_websites(location, page_num, query_params), debug=True
         )
         return self._adjust_results_number(results)
