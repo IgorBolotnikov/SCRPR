@@ -3,7 +3,7 @@ from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from ..authentication.models import User
+from authentication.models import User
 
 
 class TokenMixin:

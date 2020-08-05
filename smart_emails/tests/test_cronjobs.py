@@ -3,8 +3,8 @@ from unittest.mock import patch
 import pytest
 from mixer.backend.django import mixer
 
-from .. import cron_daily, cron_monthly, cron_weekly
-from ..models import SavedSuggestion
+from smart_emails import cron_daily, cron_monthly, cron_weekly
+from smart_emails.models import SavedSuggestion
 
 pytestmark = pytest.mark.django_db
 

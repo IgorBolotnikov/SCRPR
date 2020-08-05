@@ -1,4 +1,4 @@
-from ..web_scraping import scrape_games, scrape_jobs
+from web_scraper.web_scraping import scrape_games, scrape_jobs
 
 
 class TestJobScraping:

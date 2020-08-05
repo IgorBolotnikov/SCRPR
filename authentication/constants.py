@@ -34,5 +34,6 @@ ACCOUNT_IMAGE_FIELD_ATTRS = {
 }
 
 USER_IMAGE_SIZE = (120, 120)
-with open(Path(__file__).parent / "authentication" / "image.txt") as fd:
+IMAGE_FOLDER = Path(__file__).parent / "static" / "authentication" / "image.txt"
+with open(IMAGE_FOLDER) as fd:
     DEFAULT_USER_IMAGE = fd.read().strip()

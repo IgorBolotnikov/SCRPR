@@ -4,7 +4,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.template import loader
 
-from ..authentication.models import User
+from authentication.models import User
 
 logger = get_task_logger(__name__)
 

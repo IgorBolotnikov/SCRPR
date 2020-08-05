@@ -3,7 +3,7 @@ from django_rest_passwordreset.signals import reset_password_token_created
 from django.conf import settings
 from django.dispatch import receiver
 
-from ..authentication.tasks import send_reset_password_email
+from authentication.tasks import send_reset_password_email
 
 RESET_PASSWORD_URL = settings.FRONTEND_URL + "/auth/reset-password/"
 

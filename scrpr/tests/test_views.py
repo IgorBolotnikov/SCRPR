@@ -39,7 +39,7 @@ RATE_ERRORS = {
 }
 
 
-class GetResponseMixin(TestCase):
+class GetResponseMixin:
     url: str
     template_name: str
 
@@ -54,7 +54,7 @@ class GetResponseMixin(TestCase):
         self.assertTemplateUsed(FOOTER_TEMPLATE)
 
 
-class FormValidationMixin(TestCase):
+class FormValidationMixin:
     invalid_form_samples: tuple
     invalid_form_errors: tuple
     url: str
@@ -70,7 +70,7 @@ class FormValidationMixin(TestCase):
                 )
 
 
-class ObjectDeletionWithRedirectMixin(TestCase):
+class ObjectDeletionWithRedirectMixin:
     url: str
     redirect_url: str
     model: models.Model
@@ -82,7 +82,7 @@ class ObjectDeletionWithRedirectMixin(TestCase):
         self.assertEqual(deleted_object, None)
 
 
-class ModelInstancesContextMixin(TestCase):
+class ModelInstancesContextMixin:
     url: str
     model: models.Model
 
@@ -94,7 +94,7 @@ class ModelInstancesContextMixin(TestCase):
         )
 
 
-class SingleObjectContextMixin(TestCase):
+class SingleObjectContextMixin:
     url: str
     model: models.Model
 
@@ -105,7 +105,7 @@ class SingleObjectContextMixin(TestCase):
         self.assertEqual(response.context["object"], test_object)
 
 
-class RedirectIfNoUserMixin(TestCase):
+class RedirectIfNoUserMixin:
     url: str
     next: str
 
@@ -115,7 +115,7 @@ class RedirectIfNoUserMixin(TestCase):
         self.assertRedirects(response, LOGIN_URL + self.next)
 
 
-class RedirectIfWrongUserMixin(TestCase):
+class RedirectIfWrongUserMixin:
     url: str
 
     def test_redirect_if_wrong_user(self):
@@ -124,7 +124,7 @@ class RedirectIfWrongUserMixin(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class WebScrapingResultsMixin(TestCase):
+class WebScrapingResultsMixin:
     url: str
     queries: list
 

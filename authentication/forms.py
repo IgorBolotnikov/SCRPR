@@ -14,7 +14,8 @@ from django.forms import (
     TextInput,
 )
 
-from ..authentication.tasks import send_reset_password_email
+from authentication.tasks import send_reset_password_email
+
 from .constants import (
     ACCOUNT_FIELD_ATTRS,
     ACCOUNT_IMAGE_FIELD_ATTRS,
