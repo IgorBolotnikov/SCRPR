@@ -1,57 +1,52 @@
-import asyncio
-from urllib.parse import urlencode, parse_qs
-from django.http import Http404, HttpResponseNotFound
-from django.db.models import Q
-from django.shortcuts import render, redirect
-from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext as _
-from django.core.cache import cache
-from django.contrib.auth.views import LogoutView
+from urllib.parse import parse_qs, urlencode
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LogoutView
+from django.core.cache import cache
+from django.http import Http404
+from django.shortcuts import redirect, render
+from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView, MultipleObjectMixin
 from django.views.generic.edit import (
-    View,
-    FormView,
     CreateView,
-    UpdateView,
     DeleteView,
-    DeletionMixin
+    FormView,
+    UpdateView,
 )
-from authentication.models import User
-from .forms import *
-from .models import *
-from .constants import *
-from .paginator import VirtualPaginator
+from django.views.generic.list import ListView
+
 from project.cache import generate_cache_key
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
 from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
+
+from .constants import NON_FORM_VALUES
+from .forms import GamesForm, JobsForm, RateForm
+from .models import FavoriteGameQuery, FavoriteJobQuery, NewsPost
+from .paginator import VirtualPaginator
 
 
 class FormListView(FormView):
     def get(self, request, *args, **kwargs):
         self.form = self.get_form(self.get_form_class())
         self.form.initial = self.get_form_values(request.GET.dict())
-        self.current_page = self.get_current_page(request.META['QUERY_STRING'])
+        self.current_page = self.get_current_page(request.META["QUERY_STRING"])
         self.params = self.get_query_string(self.form.initial)
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_current_page(self, query_string):
-        page_field = parse_qs(query_string).get('page')
-        page_num = page_field[0] if page_field else '1'
+        page_field = parse_qs(query_string).get("page")
+        page_num = page_field[0] if page_field else "1"
         return int(page_num) if page_num.isnumeric() else 1
 
     def get_context_data(self, **kwargs):
         context = {
-            'form': self.form,
-            'params': self.params,
-            'object_list': self.get_queryset(self.form.initial)
+            "form": self.form,
+            "params": self.params,
+            "object_list": self.get_queryset(self.form.initial),
         }
         if self.last_page > 1:
-            context['page_obj'] = VirtualPaginator(
-                self.current_page,
-                self.last_page
+            context["page_obj"] = VirtualPaginator(
+                self.current_page, self.last_page
             )
         context.update(kwargs)
         return super().get_context_data(**context)
@@ -70,19 +65,19 @@ class FormListView(FormView):
         response = redirect(url)
         if params:
             query_string = self.get_query_string(params)
-            response['Location'] += '?' + query_string
+            response["Location"] += "?" + query_string
         return response
 
     def post(self, request, *args, **kwargs):
         params = self.get_form_values(request.POST.dict())
-        if request.POST.get('save_to_favorites'):
-            kwargs = {'account': request.user.id}
+        if request.POST.get("save_to_favorites"):
+            kwargs = {"account": request.user.id}
             kwargs.update(params)
             form_kwargs = {
-                'initial': self.get_initial(),
-                'prefix': self.get_prefix(),
-                'data': kwargs,
-                'files': None
+                "initial": self.get_initial(),
+                "prefix": self.get_prefix(),
+                "data": kwargs,
+                "files": None,
             }
             form = self.form_class(**form_kwargs)
             if form.is_valid():
@@ -91,31 +86,27 @@ class FormListView(FormView):
 
 
 class MainPageView(TemplateView):
-    template_name = 'scrpr/index.html'
+    template_name = "scrpr/index.html"
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Home')
-        }
+        context = {"title": _("Home")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class NewsListView(ListView):
-    template_name = 'scrpr/news.html'
+    template_name = "scrpr/news.html"
     model = NewsPost
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('News')
-        }
+        context = {"title": _("News")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class FavoritesView(LoginRequiredMixin, TemplateView):
-    login_url = '/auth/login/'
-    template_name = 'scrpr/content_with_sidebar/favorites.html'
+    login_url = "/auth/login/"
+    template_name = "scrpr/content_with_sidebar/favorites.html"
     model_games = FavoriteGameQuery
     model_jobs = FavoriteJobQuery
 
@@ -125,16 +116,18 @@ class FavoritesView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = _('Favorites')
-        context['object_list_games'] = self.model_games.objects.filter(
-            account=self.user_id)
-        context['object_list_jobs'] = self.model_jobs.objects.filter(
-            account=self.user_id)
+        context["title"] = _("Favorites")
+        context["object_list_games"] = self.model_games.objects.filter(
+            account=self.user_id
+        )
+        context["object_list_jobs"] = self.model_jobs.objects.filter(
+            account=self.user_id
+        )
         return context
 
 
 class FavoritesMixin(LoginRequiredMixin):
-    login_url = '/auth/login/'
+    login_url = "/auth/login/"
 
     def get(self, request, *args, **kwargs):
         if self.get_object().account.id != request.user.id:
@@ -144,20 +137,20 @@ class FavoritesMixin(LoginRequiredMixin):
 
 
 class FavoritesGameDetailView(FavoritesMixin, UpdateView):
-    template_name = 'scrpr/content_with_sidebar/favorites_game.html'
+    template_name = "scrpr/content_with_sidebar/favorites_game.html"
     model = FavoriteGameQuery
     form_class = GamesForm
-    template_name_suffix = ''
-    success_url = '/favorites'
+    template_name_suffix = ""
+    success_url = "/favorites"
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        params = {'account': request.user.id}
+        params = {"account": request.user.id}
         params.update(request.POST.dict())
         form_kwargs = {
-            'prefix': self.get_prefix(),
-            'data': params,
-            'instance': self.object
+            "prefix": self.get_prefix(),
+            "data": params,
+            "instance": self.object,
         }
         form = self.form_class(**form_kwargs)
         if form.is_valid():
@@ -165,180 +158,172 @@ class FavoritesGameDetailView(FavoritesMixin, UpdateView):
         return redirect(self.success_url)
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Favorites (Edit)')
-        }
+        context = {"title": _("Favorites (Edit)")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class FavoritesJobDetailView(FavoritesMixin, UpdateView):
-    template_name = 'scrpr/content_with_sidebar/favorites_job.html'
+    template_name = "scrpr/content_with_sidebar/favorites_job.html"
     model = FavoriteJobQuery
     form_class = JobsForm
-    template_name_suffix = ''
-    success_url = '/favorites'
+    template_name_suffix = ""
+    success_url = "/favorites"
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        params = {'account': request.user.id}
+        params = {"account": request.user.id}
         params.update(request.POST.dict())
         form_kwargs = {
-            'prefix': self.get_prefix(),
-            'data': params,
-            'instance': self.object
+            "prefix": self.get_prefix(),
+            "data": params,
+            "instance": self.object,
         }
         form = self.form_class(**form_kwargs)
         if form.is_valid():
             self.form_valid(form)
-            # self.object = form.save()
         return redirect(self.success_url)
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Favorites (Edit)')
-        }
+        context = {"title": _("Favorites (Edit)")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class FavoritesGameDeleteView(FavoritesMixin, DeleteView):
-    template_name = 'scrpr/content_with_sidebar/delete_favorites_game.html'
+    template_name = "scrpr/content_with_sidebar/delete_favorites_game.html"
     model = FavoriteGameQuery
-    success_url = '/favorites'
+    success_url = "/favorites"
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Favorites (Delete)')
-        }
+        context = {"title": _("Favorites (Delete)")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class FavoritesJobDeleteView(FavoritesMixin, DeleteView):
-    template_name = 'scrpr/content_with_sidebar/delete_favorites_job.html'
+    template_name = "scrpr/content_with_sidebar/delete_favorites_job.html"
     model = FavoriteJobQuery
-    success_url = '/favorites'
+    success_url = "/favorites"
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Favorites (Delete)')
-        }
+        context = {"title": _("Favorites (Delete)")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class AboutView(TemplateView):
-    template_name = 'scrpr/about.html'
+    template_name = "scrpr/about.html"
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('About')
-        }
+        context = {"title": _("About")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
 
 class RateView(CreateView):
-    template_name = 'scrpr/rate.html'
+    template_name = "scrpr/rate.html"
     form_class = RateForm
-    success_url = '/'
+    success_url = "/"
 
     def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Rate!')
-        }
+        context = {"title": _("Rate!")}
         context.update(**kwargs)
         return super().get_context_data(**context)
 
     def form_valid(self, form):
         form.send_message(
-            name=form.cleaned_data['name'],
-            message_body=form.cleaned_data['comment']
+            name=form.cleaned_data["name"],
+            message_body=form.cleaned_data["comment"],
         )
         return super().form_valid(form)
 
 
 class GamesView(FormListView):
-    template_name = 'scrpr/content_with_sidebar/games.html'
+    template_name = "scrpr/content_with_sidebar/games.html"
     form_class = GamesForm
-    url = 'scrpr:games'
+    url = "scrpr:games"
 
     def get_cache_key(self, query_params):
-        query_params['page'] = self.current_page if self.current_page else 1
+        query_params["page"] = self.current_page if self.current_page else 1
         return generate_cache_key(query_params)
 
     def get_queryset(self, query_params=None):
-        query_params['type'] = 'games'
+        query_params["type"] = "games"
         cache_key = self.get_cache_key(query_params)
         cached_query = cache.get(cache_key)
         if cached_query:
             query_results = cached_query
         else:
             query_results = PSStoreScraper().scrape_game_website(
-                query_params=query_params,
-                page_num=self.current_page,
+                query_params=query_params, page_num=self.current_page,
             )
-            if query_results.get('object_list') and len(query_results['object_list']) > 0:
+            if (
+                query_results.get("object_list")
+                and len(query_results["object_list"]) > 0
+            ):
                 cache.set(cache_key, query_results)
-        self.last_page = query_results.get('last_page', 1)
-        return query_results.get('object_list')
+        self.last_page = query_results.get("last_page", 1)
+        return query_results.get("object_list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] =  _('Games')
+        context["title"] = _("Games")
         return context
 
 
 class JobsView(FormListView):
-    template_name = 'scrpr/content_with_sidebar/jobs.html'
+    template_name = "scrpr/content_with_sidebar/jobs.html"
     form_class = JobsForm
-    url = 'scrpr:jobs'
+    url = "scrpr:jobs"
 
     def get_cache_key(self, query_params):
-        query_params['page'] = self.current_page if self.current_page else 1
+        query_params["page"] = self.current_page if self.current_page else 1
         return generate_cache_key(query_params)
 
     def get_queryset(self, query_params=None):
-        query_params['type'] = 'jobs'
+        query_params["type"] = "jobs"
         cache_key = self.get_cache_key(query_params)
         cached_query = cache.get(cache_key)
         if cached_query:
             query_results = cached_query
         else:
             query_results = JobsSitesScraper().scrape_websites(
-                location=query_params.get('city') if query_params else None,
+                location=query_params.get("city") if query_params else None,
                 query_params=query_params,
                 page_num=self.current_page,
             )
-            if query_results.get('object_list') and len(query_results['object_list']) > 0:
+            if (
+                query_results.get("object_list")
+                and len(query_results["object_list"]) > 0
+            ):
                 cache.set(cache_key, query_results)
-        self.last_page = query_results.get('last_page', 1)
-        return query_results.get('object_list')
+        self.last_page = query_results.get("last_page", 1)
+        return query_results.get("object_list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = _('Jobs')
+        context["title"] = _("Jobs")
         return context
 
 
 class CustomLogoutView(LogoutView):
-    next_page = '/'
-    template_name = 'scrpr/index.html'
+    next_page = "/"
+    template_name = "scrpr/index.html"
 
 
 def freelance(request):
     context = None
-    return render(request, 'scrpr/index.html', context)
+    return render(request, "scrpr/index.html", context)
 
 
 def page_not_found_view(request, exception, template_name="scrpr/404.html"):
-    response = render(request, template_name, context={'user': request.user})
+    response = render(request, template_name, context={"user": request.user})
     response.status_code = 404
     return response
 
 
 def internal_server_error_view(request, template_name="scrpr/500.html"):
-    response = render(request, template_name, context={'user': request.user})
+    response = render(request, template_name, context={"user": request.user})
     response.status_code = 500
     return response

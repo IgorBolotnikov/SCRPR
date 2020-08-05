@@ -1,5 +1,6 @@
 from datetime import datetime
-from smart_emails.suggestions import *
+
+from .suggestions import Suggestion
 
 
 def send_suggestions():

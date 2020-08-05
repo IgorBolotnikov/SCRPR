@@ -1,4 +1,1 @@
-from django.urls import path
-from .views import *
-
-app_name = 'smart_emails'
+app_name = "smart_emails"

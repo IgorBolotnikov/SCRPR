@@ -1,15 +1,18 @@
-from django.db import models
-from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
-from authentication.constants import *
+from django.db import models
+
+from authentication.constants import (
+    DEFAULT_USER_IMAGE,
+    USER_EMAIL_CONSTRAINT_MESSAGE,
+)
 
 
 class User(AbstractUser):
     email = models.EmailField(
-        unique=True,
-        error_messages={'unique': USER_EMAIL_CONSTRAINT_MESSAGE}
+        unique=True, error_messages={"unique": USER_EMAIL_CONSTRAINT_MESSAGE}
     )
-    image = models.TextField(null=True, blank=True, default=DEFAULT_USER_IMAGE) # Image is saved as base64 string
+    # Image is saved as base64 string
+    image = models.TextField(null=True, blank=True, default=DEFAULT_USER_IMAGE)
 
     def __str__(self):
-        return f'{self.email}, {self.username}'
+        return f"{self.email}, {self.username}"

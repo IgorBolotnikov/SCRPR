@@ -16,3 +16,6 @@ htmlcov/
 .pytest_cache
 .coverage
 pytest.ini
+
+# PyCharm
+.idea/

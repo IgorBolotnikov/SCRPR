@@ -1,1 +1,0 @@
-0 */2 * * * . /Users/bolotnikovigor/Dev/Personal\ Website/venv/bin/activate && /Library/Frameworks/Python.framework/Versions/3.7/bin/python3 /Users/bolotnikovigor/Dev/Personal\ Website/manage.py updatescrapeddata && deactivate >> /Users/bolotnikovigor/Dev/Personal\ Website/web_scraper/web_scraping/web_scraping.log

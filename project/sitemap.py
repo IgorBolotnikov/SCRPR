@@ -1,6 +1,5 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from scrpr.models import NewsPost
 
 
 class StaticViewSitemap(Sitemap):
@@ -9,14 +8,14 @@ class StaticViewSitemap(Sitemap):
 
     def items(self):
         return [
-            'scrpr:index',
-            'scrpr:news',
-            'scrpr:about',
-            'scrpr:rate',
-            'scrpr:games',
-            'scrpr:jobs',
-            'authentication:login',
-            'authentication:register'
+            "scrpr:index",
+            "scrpr:news",
+            "scrpr:about",
+            "scrpr:rate",
+            "scrpr:games",
+            "scrpr:jobs",
+            "authentication:login",
+            "authentication:register",
         ]
 
     def location(self, item):

@@ -1,10 +1,10 @@
-
 class VirtualPaginator:
-    '''
-    This class is userd for making mock pagination of results
-    It uses page numbers, aquired from parsing websites and uses them to navigate
-    these websites
-    '''
+    """
+    This class is used for making mock pagination of results
+    It uses page numbers, acquired from parsing websites and
+    uses them to navigate these websites.
+    """
+
     def __init__(self, current_page=1, num_pages=1):
         self.number = current_page
         self.num_pages = num_pages

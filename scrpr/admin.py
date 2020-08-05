@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import *
+
+from .models import Comment, FavoriteGameQuery, FavoriteJobQuery, NewsPost
 
 # Register your models here.
 admin.site.register(Comment)

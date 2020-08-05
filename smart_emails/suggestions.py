@@ -1,15 +1,14 @@
 import sendgrid
-from django.db.models import Q
-from django.template.loader import get_template
-from django.template import Context
+
 from django.conf import settings
 from django.forms.models import model_to_dict
-from authentication.models import User
-from scrpr.models import FavoriteJobQuery, FavoriteGameQuery
-from .models import SavedSuggestion
+from django.template.loader import get_template
+
+from scrpr.models import FavoriteGameQuery, FavoriteJobQuery
 from web_scraper.web_scraping.scrape_games import PSStoreScraper
 from web_scraper.web_scraping.scrape_jobs import JobsSitesScraper
 
+from .models import SavedSuggestion
 
 # workflow of cron job:
 # For every User:
@@ -43,7 +42,8 @@ class Suggestion:
     @staticmethod
     def _get_saved_suggestions(user, type):
         suggestions = SavedSuggestion.objects.filter(
-            account=user, type=type).order_by('-saved_datetime')
+            account=user, type=type
+        ).order_by("-saved_datetime")
         if len(suggestions) > 50:
             for suggestion in suggestions[51:]:
                 suggestion.delete()
@@ -54,99 +54,105 @@ class Suggestion:
         old_list = [item.link for item in old_list]
         result = []
         for entry in new_list:
-            if entry['link'] not in old_list:
+            if entry["link"] not in old_list:
                 result.append(entry)
         return result
 
     @staticmethod
     def _get_email_context(suggestions, username, frequency):
         return {
-            'object_list': suggestions,
-            'username': username,
-            'frequency': frequency,
+            "object_list": suggestions,
+            "username": username,
+            "frequency": frequency,
         }
 
     @staticmethod
     def _save_new_suggestions(new_suggestions, type, user):
         new_entries = [
-            SavedSuggestion(
-                type=type,
-                link=suggestion['link'],
-                account=user
-            ) for suggestion in new_suggestions
+            SavedSuggestion(type=type, link=suggestion["link"], account=user)
+            for suggestion in new_suggestions
         ]
         SavedSuggestion.objects.bulk_create(new_entries)
 
     @staticmethod
-    def _send_message(subject_filename, body_txt_filename,
-                     body_html_filename, receiver_email, email_context):
-        subject_template = get_template('smart_emails/' + subject_filename)
-        text_email_template = get_template('smart_emails/' + body_txt_filename)
-        html_email_template = get_template('smart_emails/' + body_html_filename)
+    def _send_message(
+        subject_filename,
+        body_txt_filename,
+        body_html_filename,
+        receiver_email,
+        email_context,
+    ):
+        subject_template = get_template("smart_emails/" + subject_filename)
+        text_email_template = get_template("smart_emails/" + body_txt_filename)
+        html_email_template = get_template("smart_emails/" + body_html_filename)
         rendered_subject = subject_template.render().strip()
         txt_with_context = text_email_template.render(email_context)
         html_with_context = html_email_template.render(email_context)
         message = sendgrid.helpers.mail.Mail(
-            from_email='bolotnikovprojects@gmail.com',
+            from_email="bolotnikovprojects@gmail.com",
             to_emails=receiver_email,
             subject=rendered_subject,
+            plain_text_content=txt_with_context,
             html_content=html_with_context,
         )
         sg_client = sendgrid.SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
-        response = sg_client.send(message)
+        sg_client.send(message)
 
     def _get_job_favorites(self):
-        return FavoriteJobQuery.objects.select_related('account'
-            ).filter(notification_freq=self.frequency_in_days)
+        return FavoriteJobQuery.objects.select_related("account").filter(
+            notification_freq=self.frequency_in_days
+        )
 
     def _get_game_favorites(self):
-        return FavoriteGameQuery.objects.select_related('account'
-            ).filter(notification_freq=self.frequency_in_days)
+        return FavoriteGameQuery.objects.select_related("account").filter(
+            notification_freq=self.frequency_in_days
+        )
 
     def _get_filtered_suggestions(self, new_suggestions, user, type):
         prev_suggestions = self._get_saved_suggestions(user, type)
-        return self._remove_duplicates(
-            new_suggestions,
-            prev_suggestions
-        )[:self.MAX_SUGGESTIONS]
+        return self._remove_duplicates(new_suggestions, prev_suggestions)[
+            : self.MAX_SUGGESTIONS
+        ]
 
     def _get_game_suggestions_from_query(self, query_params):
         query_results = PSStoreScraper().scrape_game_website(
-            query_params=query_params,
-            page_num=1,
+            query_params=query_params, page_num=1,
         )
-        return query_results.get('object_list')
+        return query_results.get("object_list")
 
     def _get_job_suggestions_from_query(self, query_params):
         query_results = JobsSitesScraper().scrape_websites(
-            location=query_params.get('city') if query_params else None,
+            location=query_params.get("city") if query_params else None,
             query_params=query_params,
             page_num=1,
         )
-        return query_results.get('object_list')
+        return query_results.get("object_list")
 
     def _send_game_suggestions(self, game_favorites):
         for game_favorite in game_favorites:
             user = game_favorite.account
             game_favorite = model_to_dict(game_favorite)
-            game_suggestions = self._get_game_suggestions_from_query(game_favorite)
+            game_suggestions = self._get_game_suggestions_from_query(
+                game_favorite
+            )
             if game_suggestions:
                 filtered_suggestions = self._get_filtered_suggestions(
-                    game_suggestions, user, 'GAME')
+                    game_suggestions, user, "GAME"
+                )
                 if filtered_suggestions:
                     email_context = self._get_email_context(
-                        filtered_suggestions,
-                        user.username,
-                        self.frequency
+                        filtered_suggestions, user.username, self.frequency
                     )
                     self._send_message(
-                        subject_filename='games_email_subject_template.txt',
-                        body_txt_filename='games_email_body_template.txt',
-                        body_html_filename='games_email_body_template.html',
+                        subject_filename="games_email_subject_template.txt",
+                        body_txt_filename="games_email_body_template.txt",
+                        body_html_filename="games_email_body_template.html",
                         receiver_email=user.email,
-                        email_context=email_context
+                        email_context=email_context,
                     )
-                    self._save_new_suggestions(filtered_suggestions, 'GAME', user)
+                    self._save_new_suggestions(
+                        filtered_suggestions, "GAME", user
+                    )
 
     def _send_job_suggestions(self, job_favorites):
         for job_favorite in job_favorites:
@@ -155,21 +161,22 @@ class Suggestion:
             job_suggestions = self._get_job_suggestions_from_query(job_favorite)
             if job_suggestions:
                 filtered_suggestions = self._get_filtered_suggestions(
-                    job_suggestions, user, 'JOB')
+                    job_suggestions, user, "JOB"
+                )
                 if filtered_suggestions:
                     email_context = self._get_email_context(
-                        filtered_suggestions,
-                        user.username,
-                        self.frequency
+                        filtered_suggestions, user.username, self.frequency
                     )
                     self._send_message(
-                        subject_filename='jobs_email_subject_template.txt',
-                        body_txt_filename='jobs_email_body_template.txt',
-                        body_html_filename='jobs_email_body_template.html',
+                        subject_filename="jobs_email_subject_template.txt",
+                        body_txt_filename="jobs_email_body_template.txt",
+                        body_html_filename="jobs_email_body_template.html",
                         receiver_email=user.email,
-                        email_context=email_context
+                        email_context=email_context,
                     )
-                    self._save_new_suggestions(filtered_suggestions, 'JOB', user)
+                    self._save_new_suggestions(
+                        filtered_suggestions, "JOB", user
+                    )
 
     def send_suggestions(self):
         game_favorites = self._get_game_favorites()
@@ -184,4 +191,5 @@ class Suggestion:
     @property
     def frequency(self):
         from scrpr.constants import CHOICES_DICT
+
         return CHOICES_DICT[self.frequency_in_days]

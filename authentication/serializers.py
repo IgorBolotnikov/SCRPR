@@ -1,10 +1,9 @@
-from django.contrib.auth.password_validation import validate_password
-
-from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
+
 from authentication.models import User
-from authentication.constants import *
 
 
 class TokenMixin:
@@ -19,19 +18,19 @@ class TokenMixin:
 class UserSerializer(serializers.ModelSerializer, TokenMixin):
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'image']
+        fields = ["id", "email", "username", "image"]
 
 
 class UserWithTokenSerializer(serializers.ModelSerializer, TokenMixin):
-    token = serializers.SerializerMethodField() # manually create token
+    token = serializers.SerializerMethodField()  # manually create token
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['token', 'email', 'username', 'password']
+        fields = ["token", "email", "username", "password"]
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         new_user = self.Meta.model(**validated_data)
         if password is not None:
             new_user.set_password(password)
