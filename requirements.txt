@@ -54,7 +54,7 @@ psycopg2-binary==2.8.3
 ptyprocess==0.6.0
 py==1.8.1
 Pygments==2.5.2
-PyJWT==1.7.1
+PyJWT==2.4.0
 pyparsing==2.4.6
 pytest==5.3.5
 pytest-cov==2.8.1
